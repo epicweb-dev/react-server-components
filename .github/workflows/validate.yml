@@ -19,10 +19,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: ⬇️ Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: ⎔ Setup node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 18
 
@@ -43,18 +43,13 @@ jobs:
 
     steps:
       - name: ⬇️ Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      # move Dockerfile to root
-      - name: 🚚 Move Files
-        run: |
-          mv ./kcdshop/deployed/fly.toml ./fly.toml
-          mv ./kcdshop/deployed/Dockerfile ./Dockerfile
-          mv ./kcdshop/deployed/.dockerignore ./.dockerignore
+      - name: 🎈 Setup Fly
+        uses: superfly/flyctl-actions/setup-flyctl@1.5
 
       - name: 🚀 Deploy Production
-        uses: superfly/flyctl-actions@1.3
-        with:
-          args: 'deploy --remote-only'
+        run: flyctl deploy --remote-only
+        working-directory: ./kcdshop/deploy
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
