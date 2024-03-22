@@ -16,9 +16,7 @@
     "test:e2e:run": "npm run test:e2e:run --silent --prefix playground",
     "setup": "node ./setup.js",
     "setup:custom": "node ./kcdshop/setup-custom.js",
-    "lint": "eslint .",
     "format": "prettier --write .",
-    "typecheck": "tsc -b",
     "validate:all": "npm-run-all --parallel --print-label --print-name --continue-on-error test:all lint typecheck"
   },
   "keywords": [],
