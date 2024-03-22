@@ -48,9 +48,9 @@ jobs:
       # move Dockerfile to root
       - name: 🚚 Move Files
         run: |
-          mv ./kcdshop/fly.toml ./fly.toml
-          mv ./kcdshop/Dockerfile ./Dockerfile
-          mv ./kcdshop/.dockerignore ./.dockerignore
+          mv ./kcdshop/deployed/fly.toml ./fly.toml
+          mv ./kcdshop/deployed/Dockerfile ./Dockerfile
+          mv ./kcdshop/deployed/.dockerignore ./.dockerignore
 
       - name: 🚀 Deploy Production
         uses: superfly/flyctl-actions@1.3
