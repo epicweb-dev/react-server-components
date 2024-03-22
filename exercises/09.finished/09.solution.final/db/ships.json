@@ -1,0 +1,309 @@
+[
+  {
+    "id": "bc4cbadf89bd3",
+    "name": "Infinity Drifter",
+    "image": "/ships/bc4cbadf89bd3.webp",
+    "topSpeed": 10,
+    "hyperdrive": true,
+    "weapons": [
+      {
+        "name": "Laser",
+        "type": "beam",
+        "damage": 35
+      },
+      {
+        "name": "Photon Torpedo",
+        "type": "projectile",
+        "damage": 50
+      },
+      {
+        "name": "Plasma Cannon",
+        "type": "beam",
+        "damage": 75
+      }
+    ]
+  },
+  {
+    "id": "3ba8aa65ffe6c",
+    "name": "Star Hopper",
+    "image": "/ships/3ba8aa65ffe6c.webp",
+    "topSpeed": 8,
+    "hyperdrive": true,
+    "weapons": [
+      {
+        "name": "Laser",
+        "type": "beam",
+        "damage": 25
+      },
+      {
+        "name": "Photon Torpedo",
+        "type": "projectile",
+        "damage": 40
+      }
+    ]
+  },
+  {
+    "id": "ab267a5984523",
+    "name": "Galaxy Cruiser",
+    "image": "/ships/ab267a5984523.webp",
+    "topSpeed": 6,
+    "hyperdrive": true,
+    "weapons": [
+      {
+        "name": "Laser",
+        "type": "beam",
+        "damage": 15
+      }
+    ]
+  },
+  {
+    "id": "d3b8aa65ffe6c",
+    "name": "Planet Hopper",
+    "image": "/ships/d3b8aa65ffe6c.webp",
+    "topSpeed": 4,
+    "hyperdrive": false,
+    "weapons": [
+      {
+        "name": "Laser",
+        "type": "beam",
+        "damage": 10
+      }
+    ]
+  },
+  {
+    "id": "1ff1991efe029",
+    "name": "Space Taxi",
+    "image": "/ships/1ff1991efe029.webp",
+    "topSpeed": 2,
+    "hyperdrive": false,
+    "weapons": []
+  },
+  {
+    "id": "f3d9a88e1c234",
+    "name": "Star Destroyer",
+    "image": "/ships/f3d9a88e1c234.webp",
+    "topSpeed": 12,
+    "hyperdrive": true,
+    "weapons": [
+      {
+        "name": "Ion Cannon",
+        "type": "beam",
+        "damage": 60
+      },
+      {
+        "name": "Proton Torpedo",
+        "type": "projectile",
+        "damage": 80
+      },
+      {
+        "name": "Plasma Cannon",
+        "type": "beam",
+        "damage": 100
+      }
+    ]
+  },
+  {
+    "id": "cb03cc4e5717e",
+    "name": "Interceptor",
+    "image": "/ships/cb03cc4e5717e.webp",
+    "topSpeed": 9,
+    "hyperdrive": true,
+    "weapons": [
+      {
+        "name": "Railgun",
+        "type": "projectile",
+        "damage": 45
+      },
+      {
+        "name": "EMP Blaster",
+        "type": "beam",
+        "damage": 70
+      }
+    ]
+  },
+  {
+    "id": "6c86fca8b9086",
+    "name": "Stealth Cruiser",
+    "image": "/ships/6c86fca8b9086.webp",
+    "topSpeed": 7,
+    "hyperdrive": true,
+    "weapons": [
+      {
+        "name": "Cloaking Device",
+        "type": "special",
+        "damage": 0
+      },
+      {
+        "name": "Plasma Cannon",
+        "type": "beam",
+        "damage": 85
+      }
+    ]
+  },
+  {
+    "id": "fdc13cb488bf1",
+    "name": "Battleship",
+    "image": "/ships/fdc13cb488bf1.webp",
+    "topSpeed": 10,
+    "hyperdrive": false,
+    "weapons": [
+      {
+        "name": "Cannon",
+        "type": "projectile",
+        "damage": 50
+      },
+      {
+        "name": "Missile Launcher",
+        "type": "projectile",
+        "damage": 70
+      }
+    ]
+  },
+  {
+    "id": "d486d48b82b81",
+    "name": "Dreadnought",
+    "image": "/ships/d486d48b82b81.webp",
+    "topSpeed": 8,
+    "hyperdrive": true,
+    "weapons": [
+      {
+        "name": "Plasma Cannon",
+        "type": "beam",
+        "damage": 90
+      },
+      {
+        "name": "Quantum Torpedo",
+        "type": "projectile",
+        "damage": 120
+      }
+    ]
+  },
+  {
+    "id": "cfd10fcd2de6c",
+    "name": "Cruiser",
+    "image": "/ships/cfd10fcd2de6c.webp",
+    "topSpeed": 6,
+    "hyperdrive": false,
+    "weapons": [
+      {
+        "name": "Laser Cannon",
+        "type": "beam",
+        "damage": 55
+      },
+      {
+        "name": "Missile Launcher",
+        "type": "projectile",
+        "damage": 75
+      }
+    ]
+  },
+  {
+    "id": "e92cefe4f6727",
+    "name": "Frigate",
+    "image": "/ships/e92cefe4f6727.webp",
+    "topSpeed": 5,
+    "hyperdrive": false,
+    "weapons": [
+      {
+        "name": "Plasma Cannon",
+        "type": "beam",
+        "damage": 70
+      },
+      {
+        "name": "Torpedo Launcher",
+        "type": "projectile",
+        "damage": 60
+      }
+    ]
+  },
+  {
+    "id": "ec7a3f950f99f",
+    "name": "Scout Ship",
+    "image": "/ships/ec7a3f950f99f.webp",
+    "topSpeed": 11,
+    "hyperdrive": true,
+    "weapons": []
+  },
+  {
+    "id": "5c13d8b28a14a",
+    "name": "Bomber",
+    "image": "/ships/5c13d8b28a14a.webp",
+    "topSpeed": 8,
+    "hyperdrive": false,
+    "weapons": [
+      {
+        "name": "Bomb Dropper",
+        "type": "projectile",
+        "damage": 90
+      }
+    ]
+  },
+  {
+    "id": "670003aed3795",
+    "name": "Transport Ship",
+    "image": "/ships/670003aed3795.webp",
+    "topSpeed": 4,
+    "hyperdrive": true,
+    "weapons": []
+  },
+  {
+    "id": "b442531ea32b2",
+    "name": "Gunship",
+    "image": "/ships/b442531ea32b2.webp",
+    "topSpeed": 7,
+    "hyperdrive": true,
+    "weapons": [
+      {
+        "name": "Laser Cannon",
+        "type": "beam",
+        "damage": 65
+      }
+    ]
+  },
+  {
+    "id": "6f375578ead88",
+    "name": "Diplomatic Vessel",
+    "image": "/ships/6f375578ead88.webp",
+    "topSpeed": 3,
+    "hyperdrive": true,
+    "weapons": [
+      {
+        "name": "Laser",
+        "type": "beam",
+        "damage": 5
+      }
+    ]
+  },
+  {
+    "id": "627c497212456",
+    "name": "Mining Ship",
+    "image": "/ships/627c497212456.webp",
+    "topSpeed": 4,
+    "hyperdrive": false,
+    "weapons": []
+  },
+  {
+    "id": "441f7092a8d44",
+    "name": "Research Vessel",
+    "image": "/ships/441f7092a8d44.webp",
+    "topSpeed": 3,
+    "hyperdrive": true,
+    "weapons": []
+  },
+  {
+    "id": "0268fc4817ad1",
+    "name": "Medical Ship",
+    "image": "/ships/0268fc4817ad1.webp",
+    "topSpeed": 2,
+    "hyperdrive": true,
+    "weapons": []
+  },
+  {
+    "id": "1ae7b4b92036b",
+    "name": "Cargo Ship",
+    "image": "/ships/1ae7b4b92036b.webp",
+    "topSpeed": 2,
+    "hyperdrive": true,
+    "weapons": []
+  }
+]

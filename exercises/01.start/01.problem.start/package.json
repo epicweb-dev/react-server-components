@@ -1,0 +1,37 @@
+{
+  "name": "exercises__sep__01.start__sep__01.problem.start",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "description": "Super simple implementation of RSCs with minimal deps",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node dev.js"
+  },
+  "imports": {
+    "react-server-dom-esm": "./built_node_modules/react-server-dom-esm",
+    "react-server-dom-esm/*": "./built_node_modules/react-server-dom-esm/*"
+  },
+  "keywords": [],
+  "author": "Kent C. Dodds <me@kentcdodds.com> (https://kentcdodds.com/)",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "busboy": "^1.6.0",
+    "chalk": "^5.3.0",
+    "compression": "^1.7.4",
+    "concurrently": "^8.2.2",
+    "cross-env": "^7.0.3",
+    "express": "^4.19.1",
+    "get-port": "^7.1.0",
+    "react": "0.0.0-experimental-670811593-20240322",
+    "react-dom": "0.0.0-experimental-670811593-20240322",
+    "react-error-boundary": "^4.0.13"
+  },
+  "devDependencies": {
+    "prettier": "^3.2.5"
+  },
+  "workspaces": [
+    "built_node_modules/*"
+  ]
+}
