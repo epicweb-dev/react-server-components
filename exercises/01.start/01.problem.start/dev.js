@@ -1,6 +1,7 @@
 import { spawn } from 'node:child_process'
 import chalk from 'chalk'
 import getPort, { portNumbers } from 'get-port'
+import closeWithGrace from 'close-with-grace'
 
 function spawnScript(command, args, env, prefix) {
 	const script = spawn(command, args, {
@@ -23,7 +24,7 @@ function spawnScript(command, args, env, prefix) {
 	return script
 }
 
-const GLOBAL_PORT = await getPort({ port: process.env.PORT || 3000 })
+const GLOBAL_PORT = await getPort({ port: Number(process.env.PORT || 3000) })
 const REGION_PORT = await getPort({ port: portNumbers(9000, 9999) })
 const API_ORIGIN = `http://localhost:${REGION_PORT}`
 
@@ -47,8 +48,7 @@ const regionalServer = spawnScript(
 	chalk.green.bgBlack('region'),
 )
 
-process.on('SIGINT', async () => {
+closeWithGrace(async () => {
 	console.log('Shutting down servers...')
-	await Promise.all([globalServer.kill(), regionalServer.kill()]) // Ensure both servers are killed before exiting
-	process.exit()
+	await Promise.all([globalServer.kill(), regionalServer.kill()])
 })

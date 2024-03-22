@@ -9,6 +9,7 @@ import bodyParser from 'body-parser'
 import busboy from 'busboy'
 import { Readable } from 'stream'
 import { promises as fsPromises } from 'fs'
+import closeWithGrace from 'close-with-grace'
 
 const app = express()
 import compress from 'compression'
@@ -141,4 +142,9 @@ app.on('error', function (error) {
 		default:
 			throw error
 	}
+})
+
+closeWithGrace(async () => {
+	console.log('Shutting down server...')
+	app.close()
 })

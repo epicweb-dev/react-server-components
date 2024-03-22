@@ -1,5 +1,5 @@
 {
-  "name": "exercises__sep__01.start__sep__01.problem.start",
+  "name": "exercises__sep__09.finished__sep__09.solution.final",
   "version": "1.0.0",
   "type": "module",
   "private": true,
@@ -8,10 +8,6 @@
   "scripts": {
     "dev": "node dev.js"
   },
-  "imports": {
-    "react-server-dom-esm": "./built_node_modules/react-server-dom-esm",
-    "react-server-dom-esm/*": "./built_node_modules/react-server-dom-esm/*"
-  },
   "keywords": [],
   "author": "Kent C. Dodds <me@kentcdodds.com> (https://kentcdodds.com/)",
   "license": "MIT",
@@ -19,6 +15,7 @@
     "body-parser": "^1.20.2",
     "busboy": "^1.6.0",
     "chalk": "^5.3.0",
+    "close-with-grace": "^1.3.0",
     "compression": "^1.7.4",
     "concurrently": "^8.2.2",
     "cross-env": "^7.0.3",
@@ -26,12 +23,10 @@
     "get-port": "^7.1.0",
     "react": "0.0.0-experimental-670811593-20240322",
     "react-dom": "0.0.0-experimental-670811593-20240322",
-    "react-error-boundary": "^4.0.13"
+    "react-error-boundary": "^4.0.13",
+    "react-server-dom-esm": "npm:@kentcdodds/tmp-react-server-dom-esm@0.0.0-experimental-670811593-20240322"
   },
   "devDependencies": {
     "prettier": "^3.2.5"
-  },
-  "workspaces": [
-    "built_node_modules/*"
-  ]
+  }
 }

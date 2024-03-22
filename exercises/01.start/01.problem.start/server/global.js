@@ -1,17 +1,25 @@
 // This is a server to host CDN distributed resources like module source files and SSR
 
-import path from 'path'
-import { promises as fs } from 'fs'
+import { createRequire } from 'node:module'
+import path from 'node:path'
+import { promises as fs } from 'node:fs'
+import http from 'node:http'
 import compress from 'compression'
 import chalk from 'chalk'
 import express from 'express'
-import http from 'http'
 import React from 'react'
+import closeWithGrace from 'close-with-grace'
 
 import { renderToPipeableStream } from 'react-dom/server'
 import { createFromNodeStream } from 'react-server-dom-esm/client'
 
 const moduleBasePath = new URL('../src', import.meta.url).href
+
+const PORT = process.env.PORT || 3000
+const REGION_PORT = process.env.REGION_PORT || 3001
+const API_ORIGIN = new URL(
+	process.env.API_ORIGIN || `http://localhost:${REGION_PORT}`,
+)
 
 const app = express()
 
@@ -29,12 +37,16 @@ function request(options, body) {
 	})
 }
 
+app.head('/', async (req, res) => {
+	res.status(200).end()
+})
+
 app.all('/', async function (req, res, next) {
 	// Proxy the request to the regional server.
 	const proxiedHeaders = {
 		'X-Forwarded-Host': req.hostname,
 		'X-Forwarded-For': req.ips,
-		'X-Forwarded-Port': 3000,
+		'X-Forwarded-Port': PORT,
 		'X-Forwarded-Proto': req.protocol,
 	}
 	// Proxy other headers as desired.
@@ -47,8 +59,8 @@ app.all('/', async function (req, res, next) {
 
 	const promiseForData = request(
 		{
-			host: '127.0.0.1',
-			port: process.env.REGION_PORT || 3001,
+			host: API_ORIGIN.hostname,
+			port: API_ORIGIN.port,
 			method: req.method,
 			path: req.url,
 			headers: proxiedHeaders,
@@ -84,8 +96,7 @@ app.all('/', async function (req, res, next) {
 						'react-dom/': 'https://esm.sh/react-dom@experimental&pin=v125&dev/',
 						'react-error-boundary':
 							'https://esm.sh/react-error-boundary@4.0.12?pin=124&dev',
-						'react-server-dom-esm/client':
-							'/built_node_modules/react-server-dom-esm/esm/react-server-dom-esm-client.browser.development.js',
+						'react-server-dom-esm/client': '/react-server-dom-esm/client',
 					},
 				},
 				bootstrapModules: ['/src/index.js'],
@@ -101,7 +112,10 @@ app.all('/', async function (req, res, next) {
 			const rscResponse = await promiseForData
 
 			// For other request, we pass-through the RSC payload.
-			res.set('Content-type', 'text/x-component')
+			if (req.get('rsc-action')) {
+				res.set('Content-type', 'text/x-component')
+			}
+
 			rscResponse.on('data', data => {
 				res.write(data)
 				res.flush()
@@ -119,11 +133,19 @@ app.all('/', async function (req, res, next) {
 
 app.use(express.static('public'))
 app.use('/src', express.static('src'))
-app.use('/built_node_modules', express.static('built_node_modules'))
+app.use('/react-server-dom-esm/client', (req, res, next) => {
+	const require = createRequire(import.meta.url)
+	const pkgPath = require.resolve('react-server-dom-esm')
+	const modulePath = path.join(
+		path.dirname(pkgPath),
+		'esm',
+		'react-server-dom-esm-client.browser.development.js',
+	)
+	res.sendFile(modulePath)
+})
 
-const port = process.env.PORT || 3000
-app.listen(port, () => {
-	console.log(`✅ SSR: http://localhost:${port}`)
+app.listen(PORT, () => {
+	console.log(`✅ SSR: http://localhost:${PORT}`)
 })
 
 app.on('error', function (error) {
@@ -143,4 +165,9 @@ app.on('error', function (error) {
 		default:
 			throw error
 	}
+})
+
+closeWithGrace(async () => {
+	console.log('Shutting down server...')
+	app.close()
 })
