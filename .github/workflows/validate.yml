@@ -24,7 +24,7 @@ jobs:
       - name: ⎔ Setup node
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
 
       - name: ▶️ Run setup script
         run: npm run setup
@@ -44,6 +44,6 @@ jobs:
 
       - name: 🚀 Deploy Production
         run: flyctl deploy --remote-only
-        working-directory: ./kcdshop/deploy
+        working-directory: kcdshop/deploy
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
