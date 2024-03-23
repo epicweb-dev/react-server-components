@@ -1,10 +1,11 @@
 import { Fragment, createElement as h, Suspense } from 'react'
+import { asyncLocalStorage } from '../server/rsc-async-storage.js'
 import { ShipDetails, ShipFallback } from './ship-details.js'
 import { SearchResults, SearchResultsFallback } from './ship-search-results.js'
 
 const shipFallbackSrc = '/img/fallback-ship.png'
 
-export async function Document({ shipId, search }) {
+export async function Document() {
 	return h(
 		'html',
 		{ lang: 'en' },
@@ -20,15 +21,12 @@ export async function Document({ shipId, search }) {
 			h('link', { rel: 'stylesheet', href: '/style.css' }),
 			h('link', { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }),
 		),
-		h(
-			'body',
-			null,
-			h('div', { className: 'app-wrapper' }, h(App, { shipId, search })),
-		),
+		h('body', null, h('div', { className: 'app-wrapper' }, h(App))),
 	)
 }
 
-export function App({ shipId, search }) {
+export function App() {
+	const { shipId, search } = asyncLocalStorage.getStore()
 	return h(
 		'div',
 		{ className: 'app' },

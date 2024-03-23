@@ -17,7 +17,9 @@ app.use(compress())
 const moduleBasePath = new URL('../src', import.meta.url).href
 
 async function renderApp(res, returnValue) {
-	const root = h(Document)
+	const shipId = '6c86fca8b9086'
+	const search = ''
+	const root = h(Document, { shipId, search })
 	// For client-invoked server actions we refresh the tree and return a return value.
 	const payload = returnValue ? { returnValue, root } : root
 	const { pipe } = renderToPipeableStream(payload, moduleBasePath)
