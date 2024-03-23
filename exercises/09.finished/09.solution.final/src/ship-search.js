@@ -1,15 +1,13 @@
 'use client'
 
 import {
-	createElement as h,
 	Fragment,
 	Suspense,
+	createElement as h,
 	use,
 	useTransition,
 } from 'react'
 import { ErrorBoundary } from './error-boundary.js'
-import { getImageUrlForShip } from './img-utils.js'
-import { ShipImg } from './img.js'
 import { RefreshRootContext } from './refresh.js'
 import { useSpinDelay } from './spin-delay.js'
 

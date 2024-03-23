@@ -1,10 +1,10 @@
 import { createElement as h, Suspense } from 'react'
+import { asyncLocalStorage } from '../server/rsc-async-storage.js'
 import { ErrorBoundary } from './error-boundary.js'
-import { ShipDetails, ShipFallback, ShipError } from './ship-details.js'
-import { ShipSearch } from './ship-search.js'
-import { SearchResults, SearchResultsFallback } from './ship-search-results.js'
-import { asyncLocalStorage } from '../server/region-async-storage.js'
 import { ShipDetailsPendingTransition } from './ship-details-pending.js'
+import { ShipDetails, ShipFallback, ShipError } from './ship-details.js'
+import { SearchResults, SearchResultsFallback } from './ship-search-results.js'
+import { ShipSearch } from './ship-search.js'
 
 const shipFallbackSrc = '/img/fallback-ship.png'
 
@@ -22,6 +22,7 @@ export async function Document() {
 			}),
 			h('title', null, 'Super Simple RSC'),
 			h('link', { rel: 'stylesheet', href: '/style.css' }),
+			h('link', { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }),
 		),
 		h('body', null, h('div', { className: 'app-wrapper' }, h(App))),
 	)

@@ -1,7 +1,6 @@
 import {
 	createElement as h,
 	use,
-	Suspense,
 	useState,
 	startTransition,
 	useTransition,

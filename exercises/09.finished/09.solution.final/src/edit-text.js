@@ -22,7 +22,7 @@ export function EditableText({ id, shipId, action, initialValue = '' }) {
 				'form',
 				{
 					action: formAction,
-					onSubmit: event => {
+					onSubmit: () => {
 						setValue(inputRef.current?.value ?? '')
 					},
 				},
@@ -100,7 +100,7 @@ export function EditableText({ id, shipId, action, initialValue = '' }) {
 }
 
 function PendingButton() {
-	const { pending, data, method, action } = useFormStatus()
+	const { pending } = useFormStatus()
 
 	return h('button', { type: 'submit' }, pending ? '...' : 'Submit')
 }

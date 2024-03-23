@@ -1,8 +1,8 @@
 // This should run by node without any dependencies
 // because you may need to run it without deps.
 
-import path from 'node:path'
 import { spawn } from 'child_process'
+import path from 'node:path'
 import {
 	getApps,
 	isExampleApp,

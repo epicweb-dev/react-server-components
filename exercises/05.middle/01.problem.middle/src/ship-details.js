@@ -1,13 +1,8 @@
 import { createElement as h } from 'react'
 import { getShip } from '../db/ship-api.js'
-import { asyncLocalStorage } from '../server/rsc-async-storage.js'
-import { updateShipName } from './actions.js'
-import { EditableText } from './edit-text.js'
 import { getImageUrlForShip } from './img-utils.js'
-import { ShipImg } from './img.js'
 
-export async function ShipDetails() {
-	const { shipId } = asyncLocalStorage.getStore()
+export async function ShipDetails({ shipId }) {
 	const ship = await getShip({ shipId })
 	const shipImgSrc = getImageUrlForShip(ship.id, { size: 200 })
 	return h(
@@ -16,22 +11,9 @@ export async function ShipDetails() {
 		h(
 			'div',
 			{ className: 'ship-info__img-wrapper' },
-			h(ShipImg, { src: shipImgSrc, alt: ship.name }),
+			h('img', { src: shipImgSrc, alt: ship.name }),
 		),
-		h(
-			'section',
-			null,
-			h(
-				'h2',
-				null,
-				h(EditableText, {
-					key: shipId,
-					shipId,
-					action: updateShipName,
-					initialValue: ship.name,
-				}),
-			),
-		),
+		h('section', null, h('h2', null, ship.name)),
 		h('div', null, 'Top Speed: ', ship.topSpeed, ' ', h('small', null, 'lyh')),
 		h(
 			'section',
@@ -62,15 +44,14 @@ export async function ShipDetails() {
 	)
 }
 
-export function ShipFallback() {
-	const { shipId } = asyncLocalStorage.getStore()
+export function ShipFallback({ shipId }) {
 	return h(
 		'div',
 		{ className: 'ship-info' },
 		h(
 			'div',
 			{ className: 'ship-info__img-wrapper' },
-			h(ShipImg, {
+			h('img', {
 				src: getImageUrlForShip(shipId, {
 					size: 200,
 				}),
@@ -98,20 +79,5 @@ export function ShipFallback() {
 				),
 			),
 		),
-	)
-}
-
-export function ShipError() {
-	const { shipId } = asyncLocalStorage.getStore()
-	return h(
-		'div',
-		{ className: 'ship-info' },
-		h(
-			'div',
-			{ className: 'ship-info__img-wrapper' },
-			h('img', { src: '/img/broken-ship.webp', alt: 'broken ship' }),
-		),
-		h('section', null, h('h2', null, 'There was an error')),
-		h('section', null, 'There was an error loading "', shipId, '"'),
 	)
 }
