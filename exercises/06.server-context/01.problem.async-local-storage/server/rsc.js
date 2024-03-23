@@ -1,6 +1,3 @@
-// The RSC server
-// This is a server to host data-local resources like databases and RSC
-
 import closeWithGrace from 'close-with-grace'
 import compress from 'compression'
 import express from 'express'

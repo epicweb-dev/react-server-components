@@ -1,5 +1,3 @@
-// This is a server to host CDN distributed resources like module source files and SSR
-
 import http from 'node:http'
 import { createRequire } from 'node:module'
 import path from 'node:path'
