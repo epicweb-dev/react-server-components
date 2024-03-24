@@ -7,7 +7,7 @@ import {
 	use,
 	useTransition,
 } from 'react'
-import { ErrorBoundary } from './error-boundary.js'
+import { ErrorBoundary } from 'react-error-boundary'
 import { RefreshRootContext } from './refresh.js'
 import { useSpinDelay } from './spin-delay.js'
 

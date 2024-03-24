@@ -30,7 +30,7 @@ module.exports = {
 		'no-unsafe-optional-chaining': 'error',
 		'no-unused-expressions': 'error',
 		'no-unused-vars': [
-			'error',
+			'warn',
 			{
 				args: 'after-used',
 				argsIgnorePattern: '^_',
@@ -46,6 +46,7 @@ module.exports = {
 		],
 		strict: 'error',
 		'valid-typeof': 'error',
+		'import/named': 'error',
 		'import/no-unresolved': [
 			'error',
 			// workaround for

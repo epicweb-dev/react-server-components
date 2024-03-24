@@ -36,23 +36,19 @@ async function callServer(id, args) {
 
 // to avoid having to do this fetch to hydrate the app, you can use this:
 // https://github.com/devongovett/rsc-html-stream
-const serializedJsx = refresh()
+const initialSerializedJsxPromise = refresh()
 
 async function refresh() {
 	const params = new URLSearchParams(state)
 	const root = await createFromFetch(
-		fetch(`/?${params}`, {
-			headers: {
-				Accept: 'text/x-component',
-			},
-		}),
+		fetch(`/?${params}`, { headers: { Accept: 'text/x-component' } }),
 		{ callServer, moduleBaseURL },
 	)
 	return root
 }
 
-function Shell({ serializedJsx }) {
-	const [root, setRoot] = useState(use(serializedJsx))
+function Shell() {
+	const [root, setRoot] = useState(use(initialSerializedJsxPromise))
 	const [isShipDetailsPending, startShipDetailsTransition] = useTransition()
 	updateRoot = setRoot
 	return h(
@@ -80,6 +76,7 @@ function Shell({ serializedJsx }) {
 	)
 }
 
+await initialSerializedJsxPromise
 startTransition(() => {
-	ReactDOM.hydrateRoot(document, h(Shell, { serializedJsx }))
+	ReactDOM.hydrateRoot(document, h(Shell))
 })

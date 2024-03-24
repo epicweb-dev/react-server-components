@@ -77,18 +77,7 @@ app.all('/', async function (req, res) {
 			}
 			// Render it into HTML by resolving the client components
 			res.set('Content-type', 'text/html')
-			const { pipe } = renderToPipeableStream(React.createElement(Root), {
-				importMap: {
-					imports: {
-						react: 'https://esm.sh/react@experimental?pin=v125&dev',
-						'react-dom': 'https://esm.sh/react-dom@experimental?pin=v125&dev',
-						'react-dom/': 'https://esm.sh/react-dom@experimental&pin=v125&dev/',
-						'react-error-boundary':
-							'https://esm.sh/react-error-boundary@4.0.12?pin=124&dev',
-						'react-server-dom-esm/client': '/react-server-dom-esm/client',
-					},
-				},
-			})
+			const { pipe } = renderToPipeableStream(React.createElement(Root))
 			pipe(res)
 		} catch (e) {
 			console.error(`Failed to SSR: ${e.stack}`)

@@ -45,9 +45,6 @@ app.all('/', async function (req, res) {
 	if (req.get('Content-Type')) {
 		proxiedHeaders['Content-Type'] = req.get('Content-Type')
 	}
-	if (req.get('rsc-action')) {
-		proxiedHeaders['rsc-action'] = req.get('rsc-action')
-	}
 
 	const promiseForData = request(
 		{

@@ -1,7 +1,6 @@
 import { createElement as h, Suspense } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { asyncLocalStorage } from '../server/rsc-async-storage.js'
-import { ShipDetailsPendingTransition } from './ship-details-pending.js'
 import { ShipDetails, ShipFallback, ShipError } from './ship-details.js'
 import { SearchResults, SearchResultsFallback } from './ship-search-results.js'
 import { ShipSearch } from './ship-search.js'
@@ -60,8 +59,8 @@ export function App() {
 					}),
 				),
 				h(
-					ShipDetailsPendingTransition,
-					null,
+					'div',
+					{ className: 'details' },
 					h(
 						ErrorBoundary,
 						{ fallback: h(ShipError) },
