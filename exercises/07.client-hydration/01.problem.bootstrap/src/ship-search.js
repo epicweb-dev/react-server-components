@@ -1,7 +1,7 @@
 'use client'
 
 import { Fragment, Suspense, createElement as h } from 'react'
-import { ErrorBoundary } from 'react-error-boundary'
+import { ErrorBoundary } from './error-boundary.js'
 
 export function ShipSearch({ search, results, fallback }) {
 	return h(

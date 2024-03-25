@@ -1,10 +1,11 @@
 import bodyParser from 'body-parser'
+import busboy from 'busboy'
 import closeWithGrace from 'close-with-grace'
 import compress from 'compression'
 import express from 'express'
 import { createElement as h } from 'react'
 import {
-	decodeReply,
+	decodeReplyFromBusboy,
 	renderToPipeableStream,
 } from 'react-server-dom-esm/server'
 import { Document } from '../src/app.js'
@@ -46,7 +47,10 @@ app.post('/', bodyParser.text(), async function (req, res) {
 		throw new Error('Invalid action')
 	}
 
-	const args = await decodeReply(req.body, moduleBasePath)
+	const bb = busboy({ headers: req.headers })
+	const reply = decodeReplyFromBusboy(bb, moduleBasePath)
+	req.pipe(bb)
+	const args = await reply
 	const result = action.apply(null, args)
 	try {
 		// Wait for any mutations
