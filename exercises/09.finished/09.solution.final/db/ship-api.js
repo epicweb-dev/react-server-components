@@ -5,12 +5,12 @@ const shipData = JSON.parse(
 )
 
 export async function searchShips({
-	query,
+	search,
 	delay = Math.random() * 200 + 300,
 }) {
 	const endTime = Date.now() + delay
 	const ships = shipData
-		.filter(ship => ship.name.toLowerCase().includes(query.toLowerCase()))
+		.filter(ship => ship.name.toLowerCase().includes(search.toLowerCase()))
 		.slice(0, 13)
 	await new Promise(resolve => setTimeout(resolve, endTime - Date.now()))
 	return {

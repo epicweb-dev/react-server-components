@@ -5,7 +5,7 @@ import { getImageUrlForShip } from './img-utils.js'
 const shipFallbackSrc = '/img/fallback-ship.png'
 
 export async function SearchResults({ shipId: currentShipId, search }) {
-	const shipResults = await searchShips({ query: search })
+	const shipResults = await searchShips({ search })
 	return shipResults.ships.map(ship =>
 		h(
 			'li',

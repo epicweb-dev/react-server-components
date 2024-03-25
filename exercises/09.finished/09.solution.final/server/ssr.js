@@ -4,7 +4,7 @@ import path from 'node:path'
 import closeWithGrace from 'close-with-grace'
 import compress from 'compression'
 import express from 'express'
-import React from 'react'
+import { createElement as h, use } from 'react'
 import { renderToPipeableStream } from 'react-dom/server'
 import { createFromNodeStream } from 'react-server-dom-esm/client'
 
@@ -69,18 +69,19 @@ app.all('/', async function (req, res) {
 			// so we start by consuming the RSC payload. This needs the local file path
 			// to load the source files from as well as the URL path for preloads.
 
-			let root
+			let rootPromise
 			function Root() {
-				root ??= createFromNodeStream(
+				rootPromise ??= createFromNodeStream(
 					rscResponse,
 					moduleBasePath,
 					moduleBaseURL,
 				)
-				return React.use(root)
+				const root = use(rootPromise)
+				return root
 			}
 			// Render it into HTML by resolving the client components
 			res.set('Content-type', 'text/html')
-			const { pipe } = renderToPipeableStream(React.createElement(Root), {
+			const { pipe } = renderToPipeableStream(h(Root), {
 				importMap: {
 					imports: {
 						react: 'https://esm.sh/react@experimental?pin=v125&dev',

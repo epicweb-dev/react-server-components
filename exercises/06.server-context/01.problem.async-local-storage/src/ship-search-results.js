@@ -7,7 +7,7 @@ const shipFallbackSrc = '/img/fallback-ship.png'
 
 export async function SearchResults() {
 	const { shipId: currentShipId, search } = asyncLocalStorage.getStore()
-	const shipResults = await searchShips({ query: search })
+	const shipResults = await searchShips({ search })
 	return shipResults.ships.map(ship =>
 		h(
 			'li',

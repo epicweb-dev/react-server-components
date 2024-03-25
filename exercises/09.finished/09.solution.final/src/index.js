@@ -8,7 +8,6 @@ import {
 import ReactDOM from 'react-dom/client'
 import { createFromFetch, encodeReply } from 'react-server-dom-esm/client'
 import { RefreshRootContext } from './refresh.js'
-import { ShipDetailsPendingContext } from './ship-details-pending.js'
 
 let state = {}
 const moduleBaseURL = '/src'
@@ -49,30 +48,30 @@ async function refresh() {
 
 function Shell() {
 	const [root, setRoot] = useState(use(initialSerializedJsxPromise))
-	const [isShipDetailsPending, startShipDetailsTransition] = useTransition()
+	const [pendingState, setPendingState] = useState({
+		previousState: null,
+		nextState: null,
+	})
+	const [isPending, startTransition] = useTransition()
+
 	updateRoot = setRoot
 	return h(
-		ShipDetailsPendingContext.Provider,
-		{ value: isShipDetailsPending },
-		h(
-			RefreshRootContext.Provider,
-			{
-				value: async updates => {
+		RefreshRootContext.Provider,
+		{
+			value: {
+				nextState: pendingState.nextState,
+				previousState: pendingState.previousState,
+				isPending,
+				refresh: async updates => {
+					const previousState = state
 					state = { ...state, ...updates }
-					// 😆 not sure how to manage this better. The question is: how do I be
-					// more fine-grained about what's getting updated?
-					const wrapper =
-						'shipId' in updates ? startShipDetailsTransition : cb => cb()
+					setPendingState({ previousState, nextState: state })
 					const updatedData = await refresh()
-					wrapper(() => {
-						startTransition(() => {
-							updateRoot(updatedData)
-						})
-					})
+					startTransition(() => updateRoot(updatedData))
 				},
 			},
-			root,
-		),
+		},
+		root,
 	)
 }
 

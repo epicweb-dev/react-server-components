@@ -43,7 +43,7 @@
 Here are some resources you can read before taking the workshop to get you up to
 speed on some of the tools and concepts we'll be covering:
 
-- TODO: add resources
+- ["React from Another Dimension" by Dan Abramov at Remix Conf 2023](https://www.youtube.com/watch?v=zMf_xeGPn6s)
 
 ## System Requirements
 
