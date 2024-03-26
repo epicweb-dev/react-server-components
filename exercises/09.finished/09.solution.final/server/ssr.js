@@ -79,9 +79,8 @@ app.all('/', async function (req, res) {
 				const root = use(rootPromise)
 				return root
 			}
-			// Render it into HTML by resolving the client components
-			res.set('Content-type', 'text/html')
 			const { pipe } = renderToPipeableStream(h(Root), {
+				bootstrapModules: ['/js/src/index.js'],
 				importMap: {
 					imports: {
 						react: 'https://esm.sh/react@experimental?pin=v125&dev',
@@ -89,10 +88,9 @@ app.all('/', async function (req, res) {
 						'react-dom/': 'https://esm.sh/react-dom@experimental&pin=v125&dev/',
 						'react-error-boundary':
 							'https://esm.sh/react-error-boundary@4.0.13?pin=124&dev',
-						'react-server-dom-esm/client': '/react-server-dom-esm/client',
+						'react-server-dom-esm/client': '/js/react-server-dom-esm/client',
 					},
 				},
-				bootstrapModules: ['/src/index.js'],
 			})
 			pipe(res)
 		} catch (e) {
@@ -125,8 +123,8 @@ app.all('/', async function (req, res) {
 })
 
 app.use(express.static('public'))
-app.use('/src', express.static('src'))
-app.use('/react-server-dom-esm/client', (req, res) => {
+app.use('/js/src', express.static('src'))
+app.use('/js/react-server-dom-esm/client', (req, res) => {
 	const require = createRequire(import.meta.url)
 	const pkgPath = require.resolve('react-server-dom-esm')
 	const modulePath = path.join(

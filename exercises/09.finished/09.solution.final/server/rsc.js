@@ -24,7 +24,6 @@ async function renderApp(res, returnValue) {
 	const search = res.req.query.search || ''
 	asyncLocalStorage.run({ shipId, search }, () => {
 		const root = h(Document)
-		// For client-invoked server actions we refresh the tree and return a return value.
 		const payload = returnValue ? { returnValue, root } : root
 		const { pipe } = renderToPipeableStream(payload, moduleBasePath)
 		pipe(res)

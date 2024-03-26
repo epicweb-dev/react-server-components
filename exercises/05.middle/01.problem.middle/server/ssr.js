@@ -76,7 +76,6 @@ app.all('/', async function (req, res) {
 				const root = use(rootPromise)
 				return root
 			}
-			// Render it into HTML by resolving the client components
 			res.set('Content-type', 'text/html')
 			const { pipe } = renderToPipeableStream(h(Root))
 			pipe(res)
@@ -93,17 +92,6 @@ app.all('/', async function (req, res) {
 })
 
 app.use(express.static('public'))
-app.use('/src', express.static('src'))
-app.use('/react-server-dom-esm/client', (req, res) => {
-	const require = createRequire(import.meta.url)
-	const pkgPath = require.resolve('react-server-dom-esm')
-	const modulePath = path.join(
-		path.dirname(pkgPath),
-		'esm',
-		'react-server-dom-esm-client.browser.development.js',
-	)
-	res.sendFile(modulePath)
-})
 
 const server = app.listen(PORT, () => {
 	console.log(`✅ SSR: http://localhost:${PORT}`)

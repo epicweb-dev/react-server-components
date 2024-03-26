@@ -23,7 +23,6 @@ app.all('/', async function (req, res) {
 			const search = ''
 			const ship = await getShip({ shipId })
 			const shipResults = await searchShips({ search })
-			// Render it into HTML by resolving the client components
 			res.set('Content-type', 'text/html')
 			const { pipe } = renderToPipeableStream(
 				h(Document, { shipId, search, ship, shipResults }),
