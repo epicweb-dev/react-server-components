@@ -2,7 +2,7 @@ import { createElement as h, startTransition, use } from 'react'
 import ReactDOM from 'react-dom/client'
 import { createFromFetch } from 'react-server-dom-esm/client'
 
-const moduleBaseURL = '/src'
+const moduleBaseURL = '/js/src'
 
 // to avoid having to do this fetch to hydrate the app, you can use this:
 // https://github.com/devongovett/rsc-html-stream

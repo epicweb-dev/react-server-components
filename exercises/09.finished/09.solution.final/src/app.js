@@ -1,5 +1,5 @@
 import { createElement as h, Suspense } from 'react'
-import { asyncLocalStorage } from '../server/rsc-async-storage.js'
+import { shipDataStorage } from '../server/async-storage.js'
 import { ErrorBoundary } from './error-boundary.js'
 import { ShipDetailsPendingTransition } from './ship-details-pending.js'
 import { ShipDetails, ShipFallback, ShipError } from './ship-details.js'
@@ -22,14 +22,18 @@ export async function Document() {
 			}),
 			h('title', null, 'Super Simple RSC'),
 			h('link', { rel: 'stylesheet', href: '/style.css' }),
-			h('link', { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }),
+			h('link', {
+				rel: 'shortcut icon',
+				type: 'image/svg+xml',
+				href: '/favicon.svg',
+			}),
 		),
 		h('body', null, h('div', { className: 'app-wrapper' }, h(App))),
 	)
 }
 
 export function App() {
-	const { shipId, search } = asyncLocalStorage.getStore()
+	const { shipId, search } = shipDataStorage.getStore()
 	return h(
 		'div',
 		{ className: 'app' },

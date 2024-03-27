@@ -10,7 +10,7 @@ import { createFromFetch } from 'react-server-dom-esm/client'
 import { RefreshRootContext } from './refresh.js'
 
 let state = {}
-const moduleBaseURL = '/src'
+const moduleBaseURL = '/js/src'
 let updateRoot
 
 // to avoid having to do this fetch to hydrate the app, you can use this:

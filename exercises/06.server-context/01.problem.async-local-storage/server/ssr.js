@@ -57,41 +57,33 @@ app.all('/', async function (req, res) {
 		req,
 	)
 
-	if (req.accepts('text/html')) {
-		try {
-			const rscResponse = await promiseForData
-			const moduleBaseURL = '/src'
+	try {
+		const rscResponse = await promiseForData
+		const moduleBaseURL = '/js/src'
 
-			// For HTML, we're a "client" emulator that runs the client code,
-			// so we start by consuming the RSC payload. This needs the local file path
-			// to load the source files from as well as the URL path for preloads.
+		// For HTML, we're a "client" emulator that runs the client code,
+		// so we start by consuming the RSC payload. This needs the local file path
+		// to load the source files from as well as the URL path for preloads.
 
-			let rootPromise
-			function Root() {
-				rootPromise ??= createFromNodeStream(
-					rscResponse,
-					moduleBasePath,
-					moduleBaseURL,
-				)
-				const root = use(rootPromise)
-				return root
-			}
-			res.set('Content-type', 'text/html')
-			const { pipe } = renderToPipeableStream(h(Root))
-			pipe(res)
-		} catch (e) {
-			console.error(`Failed to SSR: ${e.stack}`)
-			res.statusCode = 500
-			res.end()
+		let rootPromise
+		function Root() {
+			rootPromise ??= createFromNodeStream(
+				rscResponse,
+				moduleBasePath,
+				moduleBaseURL,
+			)
+			const root = use(rootPromise)
+			return root
 		}
-	} else {
-		console.error(`non-html responses not yet supported`)
+		res.set('Content-type', 'text/html')
+		const { pipe } = renderToPipeableStream(h(Root))
+		pipe(res)
+	} catch (e) {
+		console.error(`Failed to SSR: ${e.stack}`)
 		res.statusCode = 500
-		res.end('Error: Non-HTML responses not yet supported')
+		res.end(`Failed to SSR: ${e.stack}`)
 	}
 })
-
-app.use(express.static('public'))
 
 const server = app.listen(PORT, () => {
 	console.log(`✅ SSR: http://localhost:${PORT}`)

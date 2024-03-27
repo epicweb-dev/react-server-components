@@ -60,7 +60,7 @@ app.all('/', async function (req, res) {
 	if (req.accepts('text/html')) {
 		try {
 			const rscResponse = await promiseForData
-			const moduleBaseURL = '/src'
+			const moduleBaseURL = '/js/src'
 
 			// For HTML, we're a "client" emulator that runs the client code,
 			// so we start by consuming the RSC payload. This needs the local file path
@@ -94,7 +94,7 @@ app.all('/', async function (req, res) {
 		} catch (e) {
 			console.error(`Failed to SSR: ${e.stack}`)
 			res.statusCode = 500
-			res.end()
+			res.end(`Failed to SSR: ${e.stack}`)
 		}
 	} else {
 		try {
@@ -115,7 +115,7 @@ app.all('/', async function (req, res) {
 		} catch (e) {
 			console.error(`Failed to proxy request: ${e.stack}`)
 			res.statusCode = 500
-			res.end()
+			res.end(`Failed to proxy request: ${e.stack}`)
 		}
 	}
 })

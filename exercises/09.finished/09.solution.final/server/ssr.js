@@ -7,6 +7,7 @@ import express from 'express'
 import { createElement as h, use } from 'react'
 import { renderToPipeableStream } from 'react-dom/server'
 import { createFromNodeStream } from 'react-server-dom-esm/client'
+import { RouterContext } from '../src/router.js'
 
 const moduleBasePath = new URL('../src', import.meta.url).href
 
@@ -34,7 +35,20 @@ app.head('/', async (req, res) => {
 	res.status(200).end()
 })
 
-app.all('/', async function (req, res) {
+app.use(express.static('public'))
+app.use('/js/src', express.static('src'))
+app.use('/js/react-server-dom-esm/client', (req, res) => {
+	const require = createRequire(import.meta.url)
+	const pkgPath = require.resolve('react-server-dom-esm')
+	const modulePath = path.join(
+		path.dirname(pkgPath),
+		'esm',
+		'react-server-dom-esm-client.browser.development.js',
+	)
+	res.sendFile(modulePath)
+})
+
+app.all('/:shipId?', async function (req, res) {
 	// Proxy the request to the rsc server.
 	const proxiedHeaders = {
 		'X-Forwarded-Host': req.hostname,
@@ -63,7 +77,7 @@ app.all('/', async function (req, res) {
 	if (req.accepts('text/html')) {
 		try {
 			const rscResponse = await promiseForData
-			const moduleBaseURL = '/src'
+			const moduleBaseURL = '/js/src'
 
 			// For HTML, we're a "client" emulator that runs the client code,
 			// so we start by consuming the RSC payload. This needs the local file path
@@ -79,30 +93,53 @@ app.all('/', async function (req, res) {
 				const root = use(rootPromise)
 				return root
 			}
-			const { pipe } = renderToPipeableStream(h(Root), {
-				bootstrapModules: ['/js/src/index.js'],
-				importMap: {
-					imports: {
-						react: 'https://esm.sh/react@experimental?pin=v125&dev',
-						'react-dom': 'https://esm.sh/react-dom@experimental?pin=v125&dev',
-						'react-dom/': 'https://esm.sh/react-dom@experimental&pin=v125&dev/',
-						'react-error-boundary':
-							'https://esm.sh/react-error-boundary@4.0.13?pin=124&dev',
-						'react-server-dom-esm/client': '/js/react-server-dom-esm/client',
+			const location = req.url
+			const navigate = () => {
+				throw new Error('navigate cannot be called on the server')
+			}
+			const refresh = () => {
+				throw new Error('refresh cannot be called on the server')
+			}
+			const isPending = false
+			const routerValue = {
+				location,
+				nextLocation: location,
+				navigate,
+				refresh,
+				isPending,
+			}
+			const { pipe } = renderToPipeableStream(
+				h(RouterContext.Provider, { value: routerValue }, h(Root)),
+				{
+					bootstrapModules: ['/js/src/index.js'],
+					importMap: {
+						imports: {
+							react: 'https://esm.sh/react@experimental?pin=v125&dev',
+							'react-dom': 'https://esm.sh/react-dom@experimental?pin=v125&dev',
+							'react-dom/':
+								'https://esm.sh/react-dom@experimental&pin=v125&dev/',
+							'react-error-boundary':
+								'https://esm.sh/react-error-boundary@4.0.13?pin=124&dev',
+							'react-server-dom-esm/client': '/js/react-server-dom-esm/client',
+						},
 					},
 				},
-			})
+			)
 			pipe(res)
 		} catch (e) {
 			console.error(`Failed to SSR: ${e.stack}`)
 			res.statusCode = 500
-			res.end()
+			res.end(`Failed to SSR: ${e.stack}`)
 		}
 	} else {
 		try {
 			const rscResponse = await promiseForData
 
-			// For other request, we pass-through the RSC payload.
+			// Forward all headers from the RSC response to the client response
+			Object.entries(rscResponse.headers).forEach(([header, value]) => {
+				res.set(header, value)
+			})
+
 			if (req.get('rsc-action')) {
 				res.set('Content-type', 'text/x-component')
 			}
@@ -117,22 +154,9 @@ app.all('/', async function (req, res) {
 		} catch (e) {
 			console.error(`Failed to proxy request: ${e.stack}`)
 			res.statusCode = 500
-			res.end()
+			res.end(`Failed to proxy request: ${e.stack}`)
 		}
 	}
-})
-
-app.use(express.static('public'))
-app.use('/js/src', express.static('src'))
-app.use('/js/react-server-dom-esm/client', (req, res) => {
-	const require = createRequire(import.meta.url)
-	const pkgPath = require.resolve('react-server-dom-esm')
-	const modulePath = path.join(
-		path.dirname(pkgPath),
-		'esm',
-		'react-server-dom-esm-client.browser.development.js',
-	)
-	res.sendFile(modulePath)
 })
 
 const server = app.listen(PORT, () => {

@@ -1,10 +1,10 @@
 import { createElement as h } from 'react'
 import { getShip } from '../db/ship-api.js'
-import { asyncLocalStorage } from '../server/rsc-async-storage.js'
+import { shipDataStorage } from '../server/async-storage.js'
 import { getImageUrlForShip } from './img-utils.js'
 
 export async function ShipDetails() {
-	const { shipId } = asyncLocalStorage.getStore()
+	const { shipId } = shipDataStorage.getStore()
 	const ship = await getShip({ shipId })
 	const shipImgSrc = getImageUrlForShip(ship.id, { size: 200 })
 	return h(
@@ -47,7 +47,7 @@ export async function ShipDetails() {
 }
 
 export function ShipFallback() {
-	const { shipId } = asyncLocalStorage.getStore()
+	const { shipId } = shipDataStorage.getStore()
 	return h(
 		'div',
 		{ className: 'ship-info' },

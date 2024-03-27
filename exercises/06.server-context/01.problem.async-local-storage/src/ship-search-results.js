@@ -1,12 +1,12 @@
 import { createElement as h } from 'react'
 import { searchShips } from '../db/ship-api.js'
-import { asyncLocalStorage } from '../server/rsc-async-storage.js'
+import { shipDataStorage } from '../server/async-storage.js'
 import { getImageUrlForShip } from './img-utils.js'
 
 const shipFallbackSrc = '/img/fallback-ship.png'
 
 export async function SearchResults() {
-	const { shipId: currentShipId, search } = asyncLocalStorage.getStore()
+	const { shipId: currentShipId, search } = shipDataStorage.getStore()
 	const shipResults = await searchShips({ search })
 	return shipResults.ships.map(ship =>
 		h(

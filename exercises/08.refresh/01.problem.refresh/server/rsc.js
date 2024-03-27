@@ -4,7 +4,7 @@ import express from 'express'
 import { createElement as h } from 'react'
 import { renderToPipeableStream } from 'react-server-dom-esm/server'
 import { Document } from '../src/app.js'
-import { asyncLocalStorage } from './rsc-async-storage.js'
+import { shipDataStorage } from './async-storage.js'
 
 const PORT = process.env.PORT || 3001
 
@@ -17,7 +17,7 @@ const moduleBasePath = new URL('../src', import.meta.url).href
 async function renderApp(res) {
 	const shipId = res.req.query.shipId || '6c86fca8b9086'
 	const search = res.req.query.search || ''
-	asyncLocalStorage.run({ shipId, search }, () => {
+	shipDataStorage.run({ shipId, search }, () => {
 		const root = h(Document)
 		const { pipe } = renderToPipeableStream(root, moduleBasePath)
 		pipe(res)

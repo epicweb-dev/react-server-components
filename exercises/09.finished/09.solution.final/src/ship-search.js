@@ -2,23 +2,38 @@
 
 import { Fragment, Suspense, createElement as h } from 'react'
 import { ErrorBoundary } from './error-boundary.js'
-import { useRefreshContext } from './refresh.js'
+import { parseLocationState, mergeLocationState, useRouter } from './router.js'
 import { useSpinDelay } from './spin-delay.js'
 
 export function ShipSearch({ search, results, fallback }) {
-	const { refresh, isPending, nextState, previousState } = useRefreshContext()
-	const isShipSearchPending = useSpinDelay(
-		isPending && nextState.search !== previousState.search,
-	)
+	const { navigate, location, nextLocation } = useRouter()
+	const previousSearch = parseLocationState(nextLocation).search
+	const nextSearch = parseLocationState(location).search
+	const isShipSearchPending = useSpinDelay(previousSearch !== nextSearch, {
+		delay: 300,
+		minDuration: 350,
+	})
+
 	return h(
 		Fragment,
 		null,
-		h('input', {
-			placeholder: 'Filter ships...',
-			type: 'search',
-			defaultValue: search,
-			onChange: e => refresh({ search: e.currentTarget.value }),
-		}),
+		h(
+			'form',
+			{ onSubmit: e => e.preventDefault() },
+			h('input', {
+				placeholder: 'Filter ships...',
+				type: 'search',
+				defaultValue: search,
+				name: 'search',
+				autoFocus: true,
+				onChange: event => {
+					const newLocation = mergeLocationState(location, {
+						search: event.currentTarget.value,
+					})
+					navigate(newLocation, { replace: true })
+				},
+			}),
+		),
 		h(
 			ErrorBoundary,
 			{
@@ -38,10 +53,16 @@ export function ShipSearch({ search, results, fallback }) {
 }
 
 export function SelectShipButton({ shipId, highlight, children }) {
-	const { refresh } = useRefreshContext()
-	return h('button', {
+	const { location, navigate } = useRouter()
+	return h('a', {
 		children,
+		href: `/${shipId}`,
 		style: { fontWeight: highlight ? 'bold' : 'normal' },
-		onClick: () => refresh({ shipId }),
+		onClick: event => {
+			if (event.metaKey || event.ctrlKey) return
+			event.preventDefault()
+			const newLocation = mergeLocationState(location, { shipId })
+			navigate(newLocation)
+		},
 	})
 }

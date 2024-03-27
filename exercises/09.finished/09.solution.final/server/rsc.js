@@ -9,7 +9,7 @@ import {
 	renderToPipeableStream,
 } from 'react-server-dom-esm/server'
 import { Document } from '../src/app.js'
-import { asyncLocalStorage } from './rsc-async-storage.js'
+import { shipDataStorage } from './async-storage.js'
 
 const PORT = process.env.PORT || 3001
 
@@ -20,9 +20,10 @@ app.use(compress())
 const moduleBasePath = new URL('../src', import.meta.url).href
 
 async function renderApp(res, returnValue) {
-	const shipId = res.req.query.shipId || '6c86fca8b9086'
+	const shipId = res.req.params.shipId || null
 	const search = res.req.query.search || ''
-	asyncLocalStorage.run({ shipId, search }, () => {
+	res.set('x-location', res.req.url)
+	shipDataStorage.run({ shipId, search }, () => {
 		const root = h(Document)
 		const payload = returnValue ? { returnValue, root } : root
 		const { pipe } = renderToPipeableStream(payload, moduleBasePath)
@@ -30,11 +31,11 @@ async function renderApp(res, returnValue) {
 	})
 }
 
-app.get('/', async function (req, res) {
+app.get('/:shipId?', async function (req, res) {
 	await renderApp(res, null)
 })
 
-app.post('/', bodyParser.text(), async function (req, res) {
+app.post('/:shipId?', bodyParser.text(), async function (req, res) {
 	const serverReference = req.get('rsc-action')
 	// This is the client-side case
 	const [filepath, name] = serverReference.split('#')

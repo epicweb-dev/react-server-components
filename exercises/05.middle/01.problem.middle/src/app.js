@@ -18,7 +18,11 @@ export async function Document({ shipId, search }) {
 			}),
 			h('title', null, 'Super Simple RSC'),
 			h('link', { rel: 'stylesheet', href: '/style.css' }),
-			h('link', { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }),
+			h('link', {
+				rel: 'shortcut icon',
+				type: 'image/svg+xml',
+				href: '/favicon.svg',
+			}),
 		),
 		h(
 			'body',
