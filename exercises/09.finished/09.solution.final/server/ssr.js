@@ -114,12 +114,14 @@ app.all('/:shipId?', async function (req, res) {
 					bootstrapModules: ['/js/src/index.js'],
 					importMap: {
 						imports: {
-							react: 'https://esm.sh/react@experimental?pin=v125&dev',
-							'react-dom': 'https://esm.sh/react-dom@experimental?pin=v125&dev',
+							react:
+								'https://esm.sh/react@0.0.0-experimental-2b036d3f1-20240327?pin=v126&dev',
+							'react-dom':
+								'https://esm.sh/react-dom@0.0.0-experimental-2b036d3f1-20240327?pin=v126&dev',
 							'react-dom/':
-								'https://esm.sh/react-dom@experimental&pin=v125&dev/',
+								'https://esm.sh/react-dom@0.0.0-experimental-2b036d3f1-20240327&pin=v126&dev/',
 							'react-error-boundary':
-								'https://esm.sh/react-error-boundary@4.0.13?pin=124&dev',
+								'https://esm.sh/react-error-boundary@4.0.13?pin=126&dev',
 							'react-server-dom-esm/client': '/js/react-server-dom-esm/client',
 						},
 					},

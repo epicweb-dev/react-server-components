@@ -14,18 +14,14 @@ app.use(compress())
 
 const moduleBasePath = new URL('../src', import.meta.url).href
 
-async function renderApp(res) {
-	const shipId = res.req.query.shipId || '6c86fca8b9086'
-	const search = res.req.query.search || ''
+app.get('/:shipId?', function (req, res) {
+	const shipId = req.params.shipId || null
+	const search = req.query.search || ''
 	shipDataStorage.run({ shipId, search }, () => {
 		const root = h(Document)
 		const { pipe } = renderToPipeableStream(root, moduleBasePath)
 		pipe(res)
 	})
-}
-
-app.get('/', async function (req, res) {
-	await renderApp(res, null)
 })
 
 const server = app.listen(PORT, () => {

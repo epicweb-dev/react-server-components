@@ -28,7 +28,7 @@ export function Document() {
 }
 
 export function App() {
-	const { search, shipId } = shipDataStorage.getStore()
+	const { shipId, search } = shipDataStorage.getStore()
 	return h(
 		'div',
 		{ className: 'app' },

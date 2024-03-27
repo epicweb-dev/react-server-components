@@ -35,8 +35,8 @@ export function SearchResultsFallback() {
 			'li',
 			{ key: i },
 			h(
-				'button',
-				null,
+				'a',
+				{ href: '#' },
 				h('img', { src: shipFallbackSrc, alt: 'loading' }),
 				'... loading',
 			),

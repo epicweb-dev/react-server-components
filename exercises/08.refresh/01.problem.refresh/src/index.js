@@ -1,61 +1,101 @@
+'use client'
+
 import {
 	createElement as h,
-	use,
-	useState,
 	startTransition,
+	use,
+	useEffect,
+	useRef,
+	useState,
 	useTransition,
 } from 'react'
 import ReactDOM from 'react-dom/client'
-import { createFromFetch } from 'react-server-dom-esm/client'
-import { RefreshRootContext } from './refresh.js'
+import * as RSC from 'react-server-dom-esm/client'
+import { RouterContext } from './router.js'
 
-let state = {}
-const moduleBaseURL = '/js/src'
-let updateRoot
+const getGlobalLocation = () =>
+	window.location.pathname + window.location.search
 
-// to avoid having to do this fetch to hydrate the app, you can use this:
-// https://github.com/devongovett/rsc-html-stream
-const initialSerializedJsxPromise = refresh()
-
-async function refresh() {
-	const params = new URLSearchParams(state)
-	const root = await createFromFetch(
-		fetch(`/?${params}`, { headers: { Accept: 'text/x-component' } }),
-		{ moduleBaseURL },
-	)
-	return root
+function fetchContent(location) {
+	return fetch(location, { headers: { Accept: 'text/x-component' } })
 }
 
-function Shell() {
-	const [root, setRoot] = useState(use(initialSerializedJsxPromise))
-	const [pendingState, setPendingState] = useState({
-		previousState: null,
-		nextState: null,
-	})
+const moduleBaseURL = '/js/src'
+
+const initialLocation = getGlobalLocation()
+const initialContentPromise = RSC.createFromFetch(
+	fetchContent(initialLocation),
+	{ moduleBaseURL },
+)
+
+export function Root() {
+	const latestNav = useRef(null)
+	const [location, setLocation] = useState(getGlobalLocation)
+	const [nextLocation, setNextLocation] = useState(location)
+	const [contentPromise, setContentPromise] = useState(initialContentPromise)
 	const [isPending, startTransition] = useTransition()
 
-	updateRoot = setRoot
+	useEffect(() => {
+		// once the transition has completed, we can update the current location
+		if (!isPending) setLocation(nextLocation)
+	}, [isPending])
+
+	useEffect(() => {
+		function handlePopState() {
+			navigate(getGlobalLocation(), { updateHistory: false })
+		}
+		window.addEventListener('popstate', handlePopState)
+		return () => window.removeEventListener('popstate', handlePopState)
+	}, [])
+
+	function createFromFetch(fetchPromise) {
+		return RSC.createFromFetch(fetchPromise, { moduleBaseURL })
+	}
+
+	async function navigate(
+		nextLocation,
+		{ updateHistory = true, replace = false } = {},
+	) {
+		if (updateHistory) {
+			setNextLocation(nextLocation)
+		}
+		const thisNav = Symbol()
+		latestNav.current = thisNav
+
+		const nextContentPromise = createFromFetch(
+			fetchContent(nextLocation).then(response => {
+				if (thisNav !== latestNav.current) return
+				const newLocation = response.headers.get('x-location')
+				if (updateHistory) {
+					if (replace) {
+						window.history.replaceState(null, '', newLocation)
+					} else {
+						window.history.pushState(null, '', newLocation)
+					}
+				}
+				return response
+			}),
+		)
+
+		startTransition(() => {
+			setContentPromise(nextContentPromise)
+		})
+	}
+
 	return h(
-		RefreshRootContext.Provider,
+		RouterContext.Provider,
 		{
 			value: {
-				nextState: pendingState.nextState,
-				previousState: pendingState.previousState,
+				location,
+				nextLocation: isPending ? nextLocation : location,
+				navigate,
 				isPending,
-				refresh: async updates => {
-					const previousState = state
-					state = { ...state, ...updates }
-					setPendingState({ previousState, nextState: state })
-					const updatedData = await refresh()
-					startTransition(() => updateRoot(updatedData))
-				},
 			},
 		},
-		root,
+		use(contentPromise),
 	)
 }
 
-await initialSerializedJsxPromise
 startTransition(() => {
-	ReactDOM.hydrateRoot(document, h(Shell))
+	ReactDOM.hydrateRoot(document, h(Root))
 })

@@ -69,17 +69,16 @@ export function Root() {
 	}
 
 	function createFromFetch(fetchPromise) {
-		return RSC.createFromFetch(fetchPromise, {
-			moduleBaseURL,
-			callServer,
-		})
+		return RSC.createFromFetch(fetchPromise, { moduleBaseURL, callServer })
 	}
 
 	async function navigate(
 		nextLocation,
 		{ updateHistory = true, replace = false } = {},
 	) {
-		setNextLocation(nextLocation)
+		if (updateHistory) {
+			setNextLocation(nextLocation)
+		}
 		const thisNav = Symbol()
 		latestNav.current = thisNav
 
