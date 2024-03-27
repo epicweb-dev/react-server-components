@@ -71,9 +71,7 @@ export function ShipFallback() {
 			'div',
 			{ className: 'ship-info__img-wrapper' },
 			h(ShipImg, {
-				src: getImageUrlForShip(shipId, {
-					size: 200,
-				}),
+				src: getImageUrlForShip(shipId, { size: 200 }),
 				// TODO: handle this better
 				alt: shipId,
 			}),

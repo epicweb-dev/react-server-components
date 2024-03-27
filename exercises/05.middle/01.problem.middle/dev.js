@@ -35,7 +35,13 @@ const ssrServer = spawnScript(
 
 const rscServer = spawnScript(
 	'node',
-	['--watch', '--conditions=react-server', 'server/rsc.js'],
+	[
+		'--watch',
+		'--import',
+		'./server/register-rsc-loader.js',
+		'--conditions=react-server',
+		'server/rsc.js',
+	],
 	{ PORT: RSC_PORT },
 	chalk.green.bgBlack('RSC'),
 )

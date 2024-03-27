@@ -4,6 +4,7 @@ import express from 'express'
 import { createElement as h } from 'react'
 import { renderToPipeableStream } from 'react-server-dom-esm/server'
 import { Document } from '../src/app.js'
+import { shipDataStorage } from './async-storage.js'
 
 const PORT = process.env.PORT || 3001
 
@@ -13,17 +14,15 @@ app.use(compress())
 
 const moduleBasePath = new URL('../src', import.meta.url).href
 
-async function renderApp(res) {
-	const shipId = '6c86fca8b9086'
-	const search = ''
-	const root = h(Document, { shipId, search })
-	// For client-invoked server actions we refresh the tree and return a return value.
-	const { pipe } = renderToPipeableStream(root, moduleBasePath)
-	pipe(res)
-}
-
-app.get('/', async function (req, res) {
-	await renderApp(res)
+app.get('/:shipId?', function (req, res) {
+	const shipId = req.params.shipId || null
+	const search = req.query.search || ''
+	shipDataStorage.run({ shipId, search }, () => {
+		const root = h(Document)
+		const payload = { root }
+		const { pipe } = renderToPipeableStream(payload, moduleBasePath)
+		pipe(res)
+	})
 })
 
 const server = app.listen(PORT, () => {
