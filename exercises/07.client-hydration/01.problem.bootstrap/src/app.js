@@ -1,6 +1,7 @@
 import { createElement as h, Suspense } from 'react'
 import { shipDataStorage } from '../server/async-storage.js'
 import { ErrorBoundary } from './error-boundary.js'
+import { ShipDetailsPendingTransition } from './ship-details-pending.js'
 import { ShipDetails, ShipFallback, ShipError } from './ship-details.js'
 import { SearchResults, SearchResultsFallback } from './ship-search-results.js'
 import { ShipSearch } from './ship-search.js'
@@ -63,8 +64,8 @@ export function App() {
 					}),
 				),
 				h(
-					'div',
-					{ className: 'details' },
+					ShipDetailsPendingTransition,
+					null,
 					h(
 						ErrorBoundary,
 						{ fallback: h(ShipError) },

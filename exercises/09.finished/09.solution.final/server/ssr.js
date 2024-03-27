@@ -83,29 +83,25 @@ app.all('/:shipId?', async function (req, res) {
 			// so we start by consuming the RSC payload. This needs the local file path
 			// to load the source files from as well as the URL path for preloads.
 
-			let rootPromise
+			let contentPromise
 			function Root() {
-				rootPromise ??= createFromNodeStream(
+				contentPromise ??= createFromNodeStream(
 					rscResponse,
 					moduleBasePath,
 					moduleBaseURL,
 				)
-				const root = use(rootPromise)
-				return root
+				const content = use(contentPromise)
+				return content.root
 			}
 			const location = req.url
 			const navigate = () => {
 				throw new Error('navigate cannot be called on the server')
-			}
-			const refresh = () => {
-				throw new Error('refresh cannot be called on the server')
 			}
 			const isPending = false
 			const routerValue = {
 				location,
 				nextLocation: location,
 				navigate,
-				refresh,
 				isPending,
 			}
 			const { pipe } = renderToPipeableStream(

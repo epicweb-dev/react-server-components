@@ -58,11 +58,7 @@ export function Root() {
 		})
 		const actionResponsePromise = createFromFetch(fetchPromise)
 		startTransition(() => {
-			setContentPromise(
-				new Promise((resolve, reject) => {
-					actionResponsePromise.then(({ root }) => resolve(root), reject)
-				}),
-			)
+			setContentPromise(actionResponsePromise)
 		})
 		const { returnValue } = await actionResponsePromise
 		return returnValue
@@ -112,7 +108,7 @@ export function Root() {
 				isPending,
 			},
 		},
-		use(contentPromise),
+		use(contentPromise).root,
 	)
 }
 

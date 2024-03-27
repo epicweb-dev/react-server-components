@@ -25,7 +25,7 @@ async function renderApp(res, returnValue) {
 	res.set('x-location', res.req.url)
 	shipDataStorage.run({ shipId, search }, () => {
 		const root = h(Document)
-		const payload = returnValue ? { returnValue, root } : root
+		const payload = { returnValue, root }
 		const { pipe } = renderToPipeableStream(payload, moduleBasePath)
 		pipe(res)
 	})
