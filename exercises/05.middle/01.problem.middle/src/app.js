@@ -1,9 +1,8 @@
 import { Fragment, createElement as h, Suspense } from 'react'
 import { shipDataStorage } from '../server/async-storage.js'
+import { shipFallbackSrc } from './img-utils.js'
 import { ShipDetails, ShipFallback } from './ship-details.js'
 import { SearchResults } from './ship-search-results.js'
-
-const shipFallbackSrc = '/img/fallback-ship.png'
 
 export async function Document() {
 	return h(

@@ -1,11 +1,9 @@
 import { createElement as h } from 'react'
 import { searchShips } from '../db/ship-api.js'
 import { shipDataStorage } from '../server/async-storage.js'
-import { getImageUrlForShip } from './img-utils.js'
+import { getImageUrlForShip, shipFallbackSrc } from './img-utils.js'
 import { ShipImg } from './img.js'
 import { SelectShipButton } from './ship-search.js'
-
-const shipFallbackSrc = '/img/fallback-ship.png'
 
 export async function SearchResults() {
 	const { shipId: currentShipId, search } = shipDataStorage.getStore()
