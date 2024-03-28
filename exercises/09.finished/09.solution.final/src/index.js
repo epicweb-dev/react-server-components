@@ -36,7 +36,11 @@ function generateKey() {
 }
 
 const contentCache = new Map()
-const initialContentKey = window.history.state?.key ?? generateKey()
+let initialContentKey = window.history.state?.key
+if (!initialContentKey) {
+	initialContentKey = generateKey()
+	window.history.replaceState({ key: initialContentKey }, '')
+}
 contentCache.set(initialContentKey, initialContentPromise)
 
 export function Root() {
