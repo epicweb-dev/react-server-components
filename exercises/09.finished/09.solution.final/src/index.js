@@ -30,12 +30,22 @@ const initialContentPromise = RSC.createFromFetch(
 	{ moduleBaseURL, callServer: (id, args) => callServer?.(id, args) },
 )
 
+function generateKey() {
+	return Date.now().toString(36) + Math.random().toString(36).slice(2)
+}
+
+const contentCache = new Map()
+const initialContentKey = window.history.state?.key ?? generateKey()
+contentCache.set(initialContentKey, initialContentPromise)
+
 export function Root() {
 	const latestNav = useRef(null)
 	const [location, setLocation] = useState(getGlobalLocation)
-	const [nextLocation, setNextLocation] = useState(location)
-	const [contentPromise, setContentPromise] = useState(initialContentPromise)
+	const [nextLocation, setNextLocation] = useState(getGlobalLocation)
+	const [contentKey, setContentKey] = useState(initialContentKey)
 	const [isPending, startTransition] = useTransition()
+
+	const contentPromise = contentCache.get(contentKey)
 
 	useEffect(() => {
 		// once the transition has completed, we can update the current location
@@ -44,7 +54,13 @@ export function Root() {
 
 	useEffect(() => {
 		function handlePopState() {
-			navigate(getGlobalLocation(), { updateHistory: false })
+			const key = window.history.state?.key
+			const contentPromise = key ? contentCache.get(key) : null
+			if (contentPromise) {
+				startTransition(() => setContentKey(key))
+			} else {
+				navigate(getGlobalLocation(), { updateHistory: false })
+			}
 		}
 		window.addEventListener('popstate', handlePopState)
 		return () => window.removeEventListener('popstate', handlePopState)
@@ -57,8 +73,10 @@ export function Root() {
 			body: await RSC.encodeReply(args),
 		})
 		const actionResponsePromise = createFromFetch(fetchPromise)
+		const newContentKey = generateKey()
+		contentCache.set(newContentKey, actionResponsePromise)
 		startTransition(() => {
-			setContentPromise(actionResponsePromise)
+			setContentKey(newContentKey)
 		})
 		const { returnValue } = await actionResponsePromise
 		return returnValue
@@ -78,23 +96,25 @@ export function Root() {
 		const thisNav = Symbol()
 		latestNav.current = thisNav
 
+		const newContentKey = generateKey()
 		const nextContentPromise = createFromFetch(
 			fetchContent(nextLocation).then(response => {
 				if (thisNav !== latestNav.current) return
 				const newLocation = response.headers.get('x-location')
 				if (updateHistory) {
 					if (replace) {
-						window.history.replaceState(null, '', newLocation)
+						window.history.replaceState({ key: newContentKey }, '', newLocation)
 					} else {
-						window.history.pushState(null, '', newLocation)
+						window.history.pushState({ key: newContentKey }, '', newLocation)
 					}
 				}
 				return response
 			}),
 		)
 
+		contentCache.set(newContentKey, nextContentPromise)
 		startTransition(() => {
-			setContentPromise(nextContentPromise)
+			setContentKey(newContentKey)
 		})
 	}
 
