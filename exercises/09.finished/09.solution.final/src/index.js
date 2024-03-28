@@ -4,6 +4,7 @@ import {
 	createElement as h,
 	startTransition,
 	use,
+	useDeferredValue,
 	useEffect,
 	useRef,
 	useState,
@@ -40,17 +41,12 @@ contentCache.set(initialContentKey, initialContentPromise)
 
 export function Root() {
 	const latestNav = useRef(null)
-	const [location, setLocation] = useState(getGlobalLocation)
 	const [nextLocation, setNextLocation] = useState(getGlobalLocation)
 	const [contentKey, setContentKey] = useState(initialContentKey)
 	const [isPending, startTransition] = useTransition()
 
+	const location = useDeferredValue(nextLocation)
 	const contentPromise = contentCache.get(contentKey)
-
-	useEffect(() => {
-		// once the transition has completed, we can update the current location
-		if (!isPending) setLocation(nextLocation)
-	}, [isPending])
 
 	useEffect(() => {
 		function handlePopState() {
