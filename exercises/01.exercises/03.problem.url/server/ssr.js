@@ -13,9 +13,7 @@ const app = express()
 
 app.use(compress())
 
-app.head('/', async (req, res) => {
-	res.status(200).end()
-})
+app.head('/', (req, res) => res.status(200).end())
 
 app.use(express.static('public'))
 

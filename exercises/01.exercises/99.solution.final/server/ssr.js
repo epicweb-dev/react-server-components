@@ -31,9 +31,7 @@ function request(options, body) {
 	})
 }
 
-app.head('/', async (req, res) => {
-	res.status(200).end()
-})
+app.head('/', (req, res) => res.status(200).end())
 
 app.use(express.static('public'))
 app.use('/js/src', express.static('src'))

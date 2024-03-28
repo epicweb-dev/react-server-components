@@ -1,5 +1,3 @@
-'use client'
-
 import {
 	createElement as h,
 	startTransition,
@@ -10,7 +8,7 @@ import {
 	useState,
 	useTransition,
 } from 'react'
-import ReactDOM from 'react-dom/client'
+import { hydrateRoot } from 'react-dom/client'
 import * as RSC from 'react-server-dom-esm/client'
 import { RouterContext } from './router.js'
 
@@ -133,5 +131,5 @@ export function Root() {
 }
 
 startTransition(() => {
-	ReactDOM.hydrateRoot(document, h(Root))
+	hydrateRoot(document, h(Root))
 })

@@ -12,9 +12,9 @@ const app = express()
 
 app.use(compress())
 
-app.head('/', (req, res) => {
-	res.status(200).end()
-})
+app.head('/', (req, res) => res.status(200).end())
+
+app.use(express.static('public'))
 
 app.get('/', async function (req, res) {
 	try {
