@@ -17,8 +17,7 @@
     "setup": "node ./setup.js",
     "setup:custom": "node ./kcdshop/setup-custom.js",
     "format": "prettier --write .",
-    "lint": "eslint .",
-    "validate:all": "npm-run-all --parallel --print-label --print-name --continue-on-error test:all lint typecheck"
+    "lint": "eslint ."
   },
   "keywords": [],
   "author": "Kent C. Dodds <me@kentcdodds.com> (https://kentcdodds.com/)",
