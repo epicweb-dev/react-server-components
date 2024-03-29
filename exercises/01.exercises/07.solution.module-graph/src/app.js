@@ -7,7 +7,7 @@ import { ShipDetails, ShipFallback, ShipError } from './ship-details.js'
 import { SearchResults, SearchResultsFallback } from './ship-search-results.js'
 import { ShipSearch } from './ship-search.js'
 
-export function Document() {
+export async function Document() {
 	return h(
 		'html',
 		{ lang: 'en' },

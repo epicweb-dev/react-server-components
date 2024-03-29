@@ -3,7 +3,7 @@ import { shipDataStorage } from '../server/async-storage.js'
 import { ShipDetails } from './ship-details.js'
 import { SearchResults } from './ship-search-results.js'
 
-export function Document() {
+export async function Document() {
 	return h(
 		'html',
 		{ lang: 'en' },

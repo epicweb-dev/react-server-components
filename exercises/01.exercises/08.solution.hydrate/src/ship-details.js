@@ -2,6 +2,7 @@ import { createElement as h } from 'react'
 import { getShip } from '../db/ship-api.js'
 import { shipDataStorage } from '../server/async-storage.js'
 import { getImageUrlForShip } from './img-utils.js'
+import { ShipImg } from './img.js'
 
 export async function ShipDetails() {
 	const { shipId } = shipDataStorage.getStore()
@@ -13,7 +14,7 @@ export async function ShipDetails() {
 		h(
 			'div',
 			{ className: 'ship-info__img-wrapper' },
-			h('img', { src: shipImgSrc, alt: ship.name }),
+			h(ShipImg, { src: shipImgSrc, alt: ship.name }),
 		),
 		h('section', null, h('h2', null, ship.name)),
 		h('div', null, 'Top Speed: ', ship.topSpeed, ' ', h('small', null, 'lyh')),
@@ -54,7 +55,7 @@ export function ShipFallback() {
 		h(
 			'div',
 			{ className: 'ship-info__img-wrapper' },
-			h('img', {
+			h(ShipImg, {
 				src: getImageUrlForShip(shipId, { size: 200 }),
 				// TODO: handle this better
 				alt: shipId,

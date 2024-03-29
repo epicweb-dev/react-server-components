@@ -18,6 +18,9 @@ app.head('/', (req, res) => res.status(200).end())
 
 app.use(express.static('public'))
 app.use('/js/src', express.static('src'))
+
+// we have to server this file from our own server so dynamic imports are
+// relative to our own server (this module is what loads client-side modules!)
 app.use('/js/react-server-dom-esm/client', (req, res) => {
 	const require = createRequire(import.meta.url)
 	const pkgPath = require.resolve('react-server-dom-esm')
