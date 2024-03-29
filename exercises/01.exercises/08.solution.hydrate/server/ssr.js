@@ -7,7 +7,6 @@ import express from 'express'
 import { createElement as h, use } from 'react'
 import { renderToPipeableStream } from 'react-dom/server'
 import { createFromNodeStream } from 'react-server-dom-esm/client'
-import { RouterContext } from '../src/router.js'
 
 const moduleBasePath = new URL('../src', import.meta.url).href
 
@@ -50,36 +49,22 @@ app.use('/js/react-server-dom-esm/client', (req, res) => {
 })
 
 app.all('/:shipId?', async function (req, res) {
-	// Proxy the request to the rsc server.
-	const proxiedHeaders = {
-		'X-Forwarded-Host': req.hostname,
-		'X-Forwarded-For': req.ips,
-		'X-Forwarded-Port': PORT,
-		'X-Forwarded-Proto': req.protocol,
-	}
-	if (req.get('Content-Type')) {
-		proxiedHeaders['Content-Type'] = req.get('Content-Type')
-	}
-
 	const promiseForData = request(
 		{
 			host: RSC_ORIGIN.hostname,
 			port: RSC_ORIGIN.port,
 			method: req.method,
 			path: req.url,
-			headers: proxiedHeaders,
+			headers: req.headers,
 		},
 		req,
 	)
 
 	if (req.accepts('text/html')) {
 		try {
+			res.set('Content-type', 'text/html')
 			const rscResponse = await promiseForData
 			const moduleBaseURL = '/js/src'
-
-			// For HTML, we're a "client" emulator that runs the client code,
-			// so we start by consuming the RSC payload. This needs the local file path
-			// to load the source files from as well as the URL path for preloads.
 
 			let contentPromise
 			function Root() {
@@ -91,36 +76,22 @@ app.all('/:shipId?', async function (req, res) {
 				const content = use(contentPromise)
 				return content.root
 			}
-			const location = req.url
-			const navigate = () => {
-				throw new Error('navigate cannot be called on the server')
-			}
-			const isPending = false
-			const routerValue = {
-				location,
-				nextLocation: location,
-				navigate,
-				isPending,
-			}
-			const { pipe } = renderToPipeableStream(
-				h(RouterContext.Provider, { value: routerValue }, h(Root)),
-				{
-					bootstrapModules: ['/js/src/index.js'],
-					importMap: {
-						imports: {
-							react:
-								'https://esm.sh/react@0.0.0-experimental-2b036d3f1-20240327?pin=v126&dev',
-							'react-dom':
-								'https://esm.sh/react-dom@0.0.0-experimental-2b036d3f1-20240327?pin=v126&dev',
-							'react-dom/':
-								'https://esm.sh/react-dom@0.0.0-experimental-2b036d3f1-20240327&pin=v126&dev/',
-							'react-error-boundary':
-								'https://esm.sh/react-error-boundary@4.0.13?pin=126&dev',
-							'react-server-dom-esm/client': '/js/react-server-dom-esm/client',
-						},
+			const { pipe } = renderToPipeableStream(h(Root), {
+				bootstrapModules: ['/js/src/index.js'],
+				importMap: {
+					imports: {
+						react:
+							'https://esm.sh/react@0.0.0-experimental-2b036d3f1-20240327?pin=v126&dev',
+						'react-dom':
+							'https://esm.sh/react-dom@0.0.0-experimental-2b036d3f1-20240327?pin=v126&dev',
+						'react-dom/':
+							'https://esm.sh/react-dom@0.0.0-experimental-2b036d3f1-20240327&pin=v126&dev/',
+						'react-error-boundary':
+							'https://esm.sh/react-error-boundary@4.0.13?pin=126&dev',
+						'react-server-dom-esm/client': '/js/react-server-dom-esm/client',
 					},
 				},
-			)
+			})
 			pipe(res)
 		} catch (e) {
 			console.error(`Failed to SSR: ${e.stack}`)
@@ -136,9 +107,7 @@ app.all('/:shipId?', async function (req, res) {
 				res.set(header, value)
 			})
 
-			if (req.get('rsc-action')) {
-				res.set('Content-type', 'text/x-component')
-			}
+			res.set('Content-type', 'text/x-component')
 
 			rscResponse.on('data', data => {
 				res.write(data)

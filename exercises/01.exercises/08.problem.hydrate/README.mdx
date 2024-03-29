@@ -1,0 +1,11 @@
+# Hydrate
+
+Go to <LinkToApp to="/busted"/> and you'll notice we're not handling errors
+well. React Error Boundaries require client-side code.
+
+<callout-success>
+	Because Error Boundaries are typically what you want to display when an error
+	occurs, Remix will simulate Error Boundary behavior on the server so you will
+	server-render the error rather than render the Suspense fallback followed by
+	the error boundary.
+</callout-success>

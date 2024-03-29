@@ -65,7 +65,8 @@ export function Root() {
 	}, [])
 
 	callServer = async function callServer(id, args) {
-		const fetchPromise = fetch(location, {
+		// using the global location to avoid a stale closure over the location
+		const fetchPromise = fetch(getGlobalLocation(), {
 			method: 'POST',
 			headers: { Accept: 'text/x-component', 'rsc-action': id },
 			body: await RSC.encodeReply(args),
