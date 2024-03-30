@@ -1,8 +1,12 @@
 import { Fragment, createElement as h } from 'react'
+// 🐨 import the shipDataStorage from ../server/async-storage.js here
 import { ShipDetails } from './ship-details.js'
 import { SearchResults } from './ship-search-results.js'
 
-export function Document({ shipId, search, ship, shipResults }) {
+export function Document(
+	// 💣 remove these props
+	{ shipId, search, ship, shipResults },
+) {
 	return h(
 		'html',
 		{ lang: 'en' },
@@ -28,13 +32,20 @@ export function Document({ shipId, search, ship, shipResults }) {
 			h(
 				'div',
 				{ className: 'app-wrapper' },
-				h(App, { shipId, search, ship, shipResults }),
+				h(
+					App,
+					// 💣 remove these props
+					{ shipId, search, ship, shipResults },
+				),
 			),
 		),
 	)
 }
 
-export function App({ shipId, search, ship, shipResults }) {
+export function App(
+	// 💣 remove these props
+	{ shipId, search, ship, shipResults },
+) {
 	return h(
 		'div',
 		{ className: 'app' },
@@ -50,14 +61,26 @@ export function App({ shipId, search, ship, shipResults }) {
 					defaultValue: search,
 					autoFocus: true,
 				}),
-				h('ul', null, h(SearchResults, { shipId, search, shipResults })),
+				h(
+					'ul',
+					null,
+					h(
+						SearchResults,
+						// 💣 remove these props
+						{ shipId, search, shipResults },
+					),
+				),
 			),
 		),
 		h(
 			'div',
 			{ className: 'details' },
 			shipId
-				? h(ShipDetails, { shipId, ship })
+				? h(
+						ShipDetails,
+						// 💣 remove these props
+						{ shipId, ship },
+					)
 				: h('p', null, 'Select a ship from the list to see details'),
 		),
 	)

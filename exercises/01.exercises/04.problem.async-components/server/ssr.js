@@ -21,9 +21,11 @@ app.get('/:shipId?', async function (req, res) {
 	try {
 		const shipId = req.params.shipId || null
 		const search = req.query.search || ''
+		// 💣 delete ship and shipResults
 		const ship = shipId ? await getShip({ shipId }) : null
 		const shipResults = await searchShips({ search })
 		res.set('Content-type', 'text/html')
+		// 💣 remove ship and shipResults from this context
 		shipDataStorage.run({ shipId, search, ship, shipResults }, () => {
 			const root = h(Document)
 			const { pipe } = renderToPipeableStream(root)

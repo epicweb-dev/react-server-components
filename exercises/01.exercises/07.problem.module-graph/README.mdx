@@ -1,5 +1,9 @@
 # Split Module Graph
 
+Problem: Support client-side hydration without sending the entire server-side
+module code to the client. This enables server-only code which can access the
+database, filesystem, etc. without being sent to the client.
+
 <callout-success>
 	NOTE: Now that we have the RSC module graph with `react-server-dom-esm`
 	rendering our app, be sure to take a look at the output by opening the RSC

@@ -1,7 +1,12 @@
 import { createElement as h } from 'react'
+// 🐨 get your shipDataStorage from ../server/async-storage.js
 import { getImageUrlForShip } from './img-utils.js'
 
-export function ShipDetails({ ship }) {
+export function ShipDetails(
+	// 💣 remove this prop
+	{ ship },
+) {
+	// 🐨 get the ship from shipDataStorage.getStore()
 	const shipImgSrc = getImageUrlForShip(ship.id, { size: 200 })
 	return h(
 		'div',

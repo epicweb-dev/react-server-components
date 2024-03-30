@@ -17,9 +17,13 @@ app.head('/', (req, res) => res.status(200).end())
 
 app.use(express.static('public'))
 
+// 🐨 update this url to support an optional shipId param
+// 💰 /:shipId?
 app.get('/', async function (req, res) {
 	try {
+		// 🐨 get the shipId from req.params.shipId (fallback to null)
 		const shipId = '6c86fca8b9086'
+		// 🐨 get the search from req.query.search (fallback to '')
 		const search = ''
 		const ship = await getShip({ shipId })
 		const shipResults = await searchShips({ search })

@@ -1,13 +1,16 @@
 import { createElement as h } from 'react'
+// 🐨 get searchShips from ../db/ship-api.js here
 import { shipDataStorage } from '../server/async-storage.js'
 import { getImageUrlForShip, shipFallbackSrc } from './img-utils.js'
 
 export function SearchResults() {
 	const {
 		shipId: currentShipId,
+		// 💣 delete the shipResults here
 		shipResults,
 		search,
 	} = shipDataStorage.getStore()
+	// 🐨 get shipResults by calling searchShips with { search }
 	return shipResults.ships.map(ship => {
 		const href = [
 			`/${ship.id}`,

@@ -35,6 +35,8 @@ function App() {
 		h(
 			'div',
 			{ className: 'search' },
+			// 🐨 wrap this in a form element so it will submit when you hit "enter"
+			// in the input field.
 			h(
 				Fragment,
 				null,

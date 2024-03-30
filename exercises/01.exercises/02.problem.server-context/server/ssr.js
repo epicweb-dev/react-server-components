@@ -5,6 +5,7 @@ import { createElement as h } from 'react'
 import { renderToPipeableStream } from 'react-dom/server'
 import { getShip, searchShips } from '../db/ship-api.js'
 import { Document } from '../src/app.js'
+// 🐨 import the shipDataStorage from ./async-storage.js here
 
 const PORT = process.env.PORT || 3000
 
@@ -23,7 +24,11 @@ app.get('/', async function (req, res) {
 		const ship = await getShip({ shipId })
 		const shipResults = await searchShips({ search })
 		res.set('Content-type', 'text/html')
+		// 🐨 wrap this bit in shipDataStorage.run and pass the shipId, search,
+		// ship, and shipResults
 		const { pipe } = renderToPipeableStream(
+			// 💣 remove these props (components will access this through the
+			// shipDataStorage instead).
 			h(Document, { shipId, search, ship, shipResults }),
 		)
 		pipe(res)

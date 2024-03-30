@@ -1,9 +1,12 @@
 import { createElement as h } from 'react'
+// 🐨 get the getShip util from ../db/ship-api.js here
 import { shipDataStorage } from '../server/async-storage.js'
 import { getImageUrlForShip } from './img-utils.js'
 
 export function ShipDetails() {
+	// 🐨 instead of the ship, get the shipId from storage
 	const { ship } = shipDataStorage.getStore()
+	// 🐨 get the ship by calling getShip with { shipId } here
 	const shipImgSrc = getImageUrlForShip(ship.id, { size: 200 })
 	return h(
 		'div',

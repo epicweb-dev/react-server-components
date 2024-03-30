@@ -15,6 +15,9 @@ app.use(compress())
 app.head('/', (req, res) => res.status(200).end())
 
 app.use(express.static('public'))
+// 🐨 add a middleware to serve our js src files at /js/src
+// 💰 this isn't an express workshop, so here you go:
+// app.use('/js/src', express.static('src'))
 
 app.get('/:shipId?', async function (req, res) {
 	try {
@@ -23,7 +26,12 @@ app.get('/:shipId?', async function (req, res) {
 		res.set('Content-type', 'text/html')
 		shipDataStorage.run({ shipId, search }, () => {
 			const root = h(Document)
-			const { pipe } = renderToPipeableStream(root)
+			const { pipe } = renderToPipeableStream(
+				root,
+				// 🐨 add an object here for options
+				// 🐨 add the option bootstrapModules that's an array with the string
+				// '/js/src/index.js' to load our src/index.js file into the browser
+			)
 			pipe(res)
 		})
 	} catch (e) {
