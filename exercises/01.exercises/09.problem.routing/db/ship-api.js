@@ -4,9 +4,12 @@ const shipData = JSON.parse(
 	String(await fs.readFile(new URL('./ships.json', import.meta.url))),
 )
 
+const MIN_DELAY = 200
+const MAX_DELAY = 500
+
 export async function searchShips({
 	search,
-	delay = Math.random() * 200 + 300,
+	delay = Math.random() * (MAX_DELAY - MIN_DELAY) + MIN_DELAY,
 }) {
 	const endTime = Date.now() + delay
 	const ships = shipData
@@ -18,7 +21,10 @@ export async function searchShips({
 	}
 }
 
-export async function getShip({ shipId, delay = Math.random() * 200 + 300 }) {
+export async function getShip({
+	shipId,
+	delay = Math.random() * (MAX_DELAY - MIN_DELAY) + MIN_DELAY,
+}) {
 	const endTime = Date.now() + delay
 	if (!shipId) {
 		throw new Error('No shipId provided')
@@ -34,13 +40,19 @@ export async function getShip({ shipId, delay = Math.random() * 200 + 300 }) {
 export async function updateShipName({
 	shipId,
 	shipName,
-	delay = Math.random() * 200 + 300,
+	delay = Math.random() * (MAX_DELAY - MIN_DELAY) + MIN_DELAY,
 }) {
 	const endTime = Date.now() + delay
 	const ship = shipData.find(ship => ship.id === shipId)
 	await new Promise(resolve => setTimeout(resolve, endTime - Date.now()))
 	if (!ship) {
 		throw new Error(`No ship with the id "${shipId}"`)
+	}
+	if (shipName.toLowerCase().includes('error')) {
+		throw new Error('Error updating ship name')
+	}
+	if (shipName === ship.name) {
+		throw new Error('New name is the same as the old name')
 	}
 	ship.name = shipName
 	return ship

@@ -5,6 +5,7 @@
     "react-router-dom",
     "react-router"
   ],
+  "javascript.preferences.importModuleSpecifierEnding": "js",
   "workbench.editorAssociations": {
     "*.db": "sqlite-viewer.view"
   }
