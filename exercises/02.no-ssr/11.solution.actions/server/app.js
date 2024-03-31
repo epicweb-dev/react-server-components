@@ -39,10 +39,24 @@ app.use('/js/react-server-dom-esm/client', (req, res) => {
 	res.sendFile(modulePath)
 })
 
+// This just cleans up the URL if the search ever gets cleared... Not important
+// for RSCs... Just ... I just can't help myself. I like URLs clean.
+app.use((req, res, next) => {
+	if (req.query.search === '') {
+		const searchParams = new URLSearchParams(req.search)
+		searchParams.delete('search')
+		const location = [req.path, searchParams.toString()]
+			.filter(Boolean)
+			.join('?')
+		return res.redirect(302, location)
+	} else {
+		next()
+	}
+})
+
 async function renderApp(res, returnValue) {
 	const shipId = res.req.params.shipId || null
 	const search = res.req.query.search || ''
-	res.set('x-location', res.req.url)
 	shipDataStorage.run({ shipId, search }, () => {
 		const root = h(App)
 		const payload = { returnValue, root }
@@ -51,16 +65,11 @@ async function renderApp(res, returnValue) {
 	})
 }
 
-app.get('/:shipId?', async function (req, res) {
-	if (req.accepts('text/html')) {
-		res.set('Content-type', 'text/html')
-		return res.sendFile('index.html', { root: 'public' })
-	} else {
-		await renderApp(res, null)
-	}
+app.get('/rsc/:shipId?', async function (req, res) {
+	await renderApp(res, null)
 })
 
-app.post('/:shipId?', bodyParser.text(), async function (req, res) {
+app.post('/action/:shipId?', bodyParser.text(), async function (req, res) {
 	const serverReference = req.get('rsc-action')
 	// This is the client-side case
 	const [filepath, name] = serverReference.split('#')
@@ -85,6 +94,11 @@ app.post('/:shipId?', bodyParser.text(), async function (req, res) {
 	}
 	// Refresh the client and return the value
 	await renderApp(res, result)
+})
+
+app.get('/:shipId?', async function (req, res) {
+	res.set('Content-type', 'text/html')
+	return res.sendFile('index.html', { root: 'public' })
 })
 
 const server = app.listen(PORT, () => {

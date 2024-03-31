@@ -17,7 +17,7 @@ const getGlobalLocation = () =>
 	window.location.pathname + window.location.search
 
 function fetchContent(location) {
-	return fetch(location, { headers: { Accept: 'text/x-component' } })
+	return fetch(`/rsc${location}`)
 }
 
 const moduleBaseURL = '/js/src'
@@ -37,15 +37,17 @@ function createFromFetch(fetchPromise) {
 
 async function callServer(id, args) {
 	// using the global location to avoid a stale closure over the location
-	const fetchPromise = fetch(getGlobalLocation(), {
+	const fetchPromise = fetch(`/action${getGlobalLocation()}`, {
 		method: 'POST',
 		headers: { Accept: 'text/x-component', 'rsc-action': id },
 		body: await RSC.encodeReply(args),
 	})
+	const contentKey = window.history.state?.key ?? generateKey()
+	onStreamFinished(fetchPromise, () => {
+		updateContentKey(contentKey, true)
+	})
 	const actionResponsePromise = createFromFetch(fetchPromise)
-	const newContentKey = generateKey()
-	contentCache.set(newContentKey, actionResponsePromise)
-	updateContentKey(newContentKey)
+	contentCache.set(contentKey, actionResponsePromise)
 	const { returnValue } = await actionResponsePromise
 	return returnValue
 }
@@ -60,6 +62,17 @@ if (!initialContentKey) {
 }
 contentCache.set(initialContentKey, initialContentPromise)
 
+function onStreamFinished(fetchPromise, onFinished) {
+	// create a promise chain that resolves when the stream is completely consumed
+	return (
+		fetchPromise
+			// clone the response so createFromFetch can use it (otherwise we lock the reader)
+			// and wait for the text to be consumed so we know the stream is finished
+			.then(response => response.clone().text())
+			.then(onFinished)
+	)
+}
+
 export function Root() {
 	const [, forceRender] = useReducer(() => Symbol(), Symbol())
 	const latestNav = useRef(null)
@@ -69,8 +82,9 @@ export function Root() {
 
 	// update the updateContentKey function to the latest every render
 	useEffect(() => {
-		updateContentKey = newContentKey => {
+		updateContentKey = (newContentKey, triggerRerender = false) => {
 			startTransition(() => setContentKey(newContentKey))
+			if (triggerRerender) forceRender()
 		}
 	})
 
@@ -88,18 +102,13 @@ export function Root() {
 
 			let nextContentPromise
 			const fetchPromise = fetchContent(nextLocation)
-			// create a promise chain that resolves when the stream is completely consumed
-			fetchPromise
-				// clone the response so createFromFetch can use it (otherwise we lock the reader)
-				// and wait for the text to be consumed so we know the stream is finished
-				.then(response => response.clone().text())
-				.then(() => {
-					contentCache.set(historyKey, nextContentPromise)
-					if (thisNav === latestNav.current) {
-						// trigger a rerender now that the updated content is in the cache
-						startTransition(() => forceRender())
-					}
-				})
+			onStreamFinished(fetchPromise, () => {
+				contentCache.set(historyKey, nextContentPromise)
+				if (thisNav === latestNav.current) {
+					// trigger a rerender now that the updated content is in the cache
+					startTransition(() => forceRender())
+				}
+			})
 			nextContentPromise = createFromFetch(fetchPromise)
 
 			if (!contentCache.has(historyKey)) {
@@ -122,11 +131,10 @@ export function Root() {
 		const nextContentPromise = createFromFetch(
 			fetchContent(nextLocation).then(response => {
 				if (thisNav !== latestNav.current) return
-				const newLocation = response.headers.get('x-location')
 				if (replace) {
-					window.history.replaceState({ key: newContentKey }, '', newLocation)
+					window.history.replaceState({ key: newContentKey }, '', nextLocation)
 				} else {
-					window.history.pushState({ key: newContentKey }, '', newLocation)
+					window.history.pushState({ key: newContentKey }, '', nextLocation)
 				}
 				return response
 			}),

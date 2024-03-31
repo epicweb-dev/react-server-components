@@ -21,7 +21,7 @@
     "get-port": "^7.1.0",
     "react": "0.0.0-experimental-2b036d3f1-20240327",
     "react-dom": "0.0.0-experimental-2b036d3f1-20240327",
-    "react-error-boundary": "npm:@kentcdodds/temp-react-error-boundary@4.0.13",
+    "react-error-boundary": "^4.0.13",
     "react-server-dom-esm": "npm:@kentcdodds/tmp-react-server-dom-esm@0.0.0-experimental-2b036d3f1-20240327"
   },
   "devDependencies": {
