@@ -1,4 +1,5 @@
 import {
+	Suspense,
 	createElement as h,
 	startTransition,
 	use,
@@ -11,6 +12,8 @@ import {
 } from 'react'
 import { createRoot } from 'react-dom/client'
 import * as RSC from 'react-server-dom-esm/client'
+import { ErrorBoundary } from './error-boundary.js'
+import { shipFallbackSrc } from './img-utils.js'
 import { RouterContext } from './router.js'
 
 const getGlobalLocation = () =>
@@ -73,7 +76,7 @@ function onStreamFinished(fetchPromise, onFinished) {
 	)
 }
 
-export function Root() {
+function Root() {
 	const [, forceRender] = useReducer(() => Symbol(), Symbol())
 	const latestNav = useRef(null)
 	const [nextLocation, setNextLocation] = useState(getGlobalLocation)
@@ -122,12 +125,12 @@ export function Root() {
 		return () => window.removeEventListener('popstate', handlePopState)
 	}, [])
 
-	async function navigate(nextLocation, { replace = false, contentKey } = {}) {
+	function navigate(nextLocation, { replace = false } = {}) {
 		setNextLocation(nextLocation)
 		const thisNav = Symbol()
 		latestNav.current = thisNav
 
-		const newContentKey = contentKey ?? generateKey()
+		const newContentKey = generateKey()
 		const nextContentPromise = createFromFetch(
 			fetchContent(nextLocation).then(response => {
 				if (thisNav !== latestNav.current) return
@@ -159,5 +162,30 @@ export function Root() {
 }
 
 startTransition(() => {
-	createRoot(document.getElementById('root')).render(h(Root))
+	createRoot(document.getElementById('root')).render(
+		h(
+			'div',
+			{ className: 'app-wrapper' },
+			h(
+				ErrorBoundary,
+				{
+					fallback: h(
+						'div',
+						{ className: 'app-error' },
+						h('p', null, 'Something went wrong!'),
+					),
+				},
+				h(
+					Suspense,
+					{
+						fallback: h('img', {
+							style: { maxWidth: 400 },
+							src: shipFallbackSrc,
+						}),
+					},
+					h(Root),
+				),
+			),
+		),
+	)
 })

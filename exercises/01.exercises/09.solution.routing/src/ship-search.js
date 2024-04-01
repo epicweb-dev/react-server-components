@@ -7,12 +7,11 @@ import { useSpinDelay } from './spin-delay.js'
 
 export function ShipSearch({ search, results, fallback }) {
 	const { navigate, location, nextLocation } = useRouter()
-	const previousSearch = parseLocationState(nextLocation).search
-	const nextSearch = parseLocationState(location).search
-	const isShipSearchPending = useSpinDelay(previousSearch !== nextSearch, {
-		delay: 300,
-		minDuration: 350,
-	})
+	const isShipSearchPending = useSpinDelay(
+		parseLocationState(nextLocation).search !==
+			parseLocationState(location).search,
+		{ delay: 300, minDuration: 350 },
+	)
 
 	return h(
 		Fragment,
@@ -59,7 +58,7 @@ export function SelectShipLink({ shipId, highlight, children }) {
 		href: `/${shipId}`,
 		style: { fontWeight: highlight ? 'bold' : 'normal' },
 		onClick: event => {
-			if (event.metaKey || event.ctrlKey) return
+			if (event.ctrlKey || event.metaKey || event.shiftKey) return
 			event.preventDefault()
 			const newLocation = mergeLocationState(location, { shipId })
 			navigate(newLocation)

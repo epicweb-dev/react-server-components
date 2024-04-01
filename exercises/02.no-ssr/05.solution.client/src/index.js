@@ -10,8 +10,7 @@ const getGlobalLocation = () =>
 	window.location.pathname + window.location.search
 
 const initialLocation = getGlobalLocation()
-const initialContentFetchPromise = fetch(`/rsc${initialLocation}`)
-const initialContentPromise = createFromFetch(initialContentFetchPromise, {
+const initialContentPromise = createFromFetch(fetch(`/rsc${initialLocation}`), {
 	moduleBaseURL,
 })
 

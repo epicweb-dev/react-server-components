@@ -42,7 +42,7 @@ if (!initialContentKey) {
 }
 contentCache.set(initialContentKey, initialContentPromise)
 
-export function Root() {
+function Root() {
 	const [, forceRender] = useReducer(() => Symbol(), Symbol())
 	const latestNav = useRef(null)
 	const [nextLocation, setNextLocation] = useState(getGlobalLocation)
@@ -92,7 +92,7 @@ export function Root() {
 		return () => window.removeEventListener('popstate', handlePopState)
 	}, [])
 
-	async function navigate(nextLocation, { replace = false, contentKey } = {}) {
+	function navigate(nextLocation, { replace = false, contentKey } = {}) {
 		setNextLocation(nextLocation)
 		const thisNav = Symbol()
 		latestNav.current = thisNav

@@ -21,7 +21,7 @@ const initialContentPromise = RSC.createFromFetch(
 	{ moduleBaseURL },
 )
 
-export function Root() {
+function Root() {
 	return use(initialContentPromise).root
 }
 

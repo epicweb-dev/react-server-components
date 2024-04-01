@@ -37,7 +37,7 @@ async function callServer(id, args) {
 
 let initialContentPromise = createFromFetch(fetch('/rsc'))
 
-export function Root() {
+function Root() {
 	const [contentPromise, setContentPromise] = useState(initialContentPromise)
 	const [isPending, startTransition] = useTransition()
 
