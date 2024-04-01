@@ -1,7 +1,7 @@
 import { Suspense, createElement as h, startTransition, use } from 'react'
 import { createRoot } from 'react-dom/client'
-import { ErrorBoundary } from 'react-error-boundary'
 import { createFromFetch } from 'react-server-dom-esm/client'
+import { ErrorBoundary } from './error-boundary.js'
 import { shipFallbackSrc } from './img-utils.js'
 
 const getGlobalLocation = () =>

@@ -10,6 +10,9 @@ export function useRouter() {
 	return context
 }
 
+export const getGlobalLocation = () =>
+	window.location.pathname + window.location.search
+
 export function parseLocationState(location) {
 	const url = new URL(location, 'http://example.com')
 	return {

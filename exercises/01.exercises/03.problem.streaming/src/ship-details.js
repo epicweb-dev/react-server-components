@@ -43,3 +43,39 @@ export async function ShipDetails({ shipId }) {
 		),
 	)
 }
+
+export function ShipFallback({ shipId }) {
+	return h(
+		'div',
+		{ className: 'ship-info' },
+		h(
+			'div',
+			{ className: 'ship-info__img-wrapper' },
+			h('img', {
+				src: getImageUrlForShip(shipId, { size: 200 }),
+				// TODO: handle this better
+				alt: shipId,
+			}),
+		),
+		h('section', null, h('h2', null, 'Loading...')),
+		h('div', null, 'Top Speed: XX', ' ', h('small', null, 'lyh')),
+		h(
+			'section',
+			null,
+			h(
+				'ul',
+				null,
+				Array.from({ length: 3 }).map((_, i) =>
+					h(
+						'li',
+						{ key: i },
+						h('label', null, 'loading'),
+						':',
+						' ',
+						h('span', null, 'XX ', h('small', null, '(loading)')),
+					),
+				),
+			),
+		),
+	)
+}

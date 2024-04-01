@@ -82,3 +82,18 @@ export function ShipFallback() {
 		),
 	)
 }
+
+export function ShipError() {
+	const { shipId } = shipDataStorage.getStore()
+	return h(
+		'div',
+		{ className: 'ship-info' },
+		h(
+			'div',
+			{ className: 'ship-info__img-wrapper' },
+			h('img', { src: '/img/broken-ship.webp', alt: 'broken ship' }),
+		),
+		h('section', null, h('h2', null, 'There was an error')),
+		h('section', null, 'There was an error loading "', shipId, '"'),
+	)
+}

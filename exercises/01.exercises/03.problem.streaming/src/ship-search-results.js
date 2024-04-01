@@ -1,6 +1,6 @@
 import { createElement as h } from 'react'
 import { searchShips } from '../db/ship-api.js'
-import { getImageUrlForShip } from './img-utils.js'
+import { getImageUrlForShip, shipFallbackSrc } from './img-utils.js'
 
 export async function SearchResults({ shipId: currentShipId, search }) {
 	const shipResults = await searchShips({ search })
@@ -28,4 +28,21 @@ export async function SearchResults({ shipId: currentShipId, search }) {
 			),
 		)
 	})
+}
+
+export function SearchResultsFallback() {
+	return Array.from({
+		length: 12,
+	}).map((_, i) =>
+		h(
+			'li',
+			{ key: i },
+			h(
+				'a',
+				{ href: '#' },
+				h('img', { src: shipFallbackSrc, alt: 'loading' }),
+				'... loading',
+			),
+		),
+	)
 }

@@ -1,6 +1,7 @@
 import { Suspense, createElement as h, startTransition, use } from 'react'
 import { createRoot } from 'react-dom/client'
 import { createFromFetch } from 'react-server-dom-esm/client'
+import { ErrorBoundary } from './error-boundary.js'
 import { shipFallbackSrc } from './img-utils.js'
 
 const getGlobalLocation = () =>
@@ -21,14 +22,24 @@ startTransition(() => {
 			'div',
 			{ className: 'app-wrapper' },
 			h(
-				Suspense,
+				ErrorBoundary,
 				{
-					fallback: h('img', {
-						style: { maxWidth: 400 },
-						src: shipFallbackSrc,
-					}),
+					fallback: h(
+						'div',
+						{ className: 'app-error' },
+						h('p', null, 'Something went wrong!'),
+					),
 				},
-				h(Root),
+				h(
+					Suspense,
+					{
+						fallback: h('img', {
+							style: { maxWidth: 400 },
+							src: shipFallbackSrc,
+						}),
+					},
+					h(Root),
+				),
 			),
 		),
 	)

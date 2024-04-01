@@ -48,3 +48,11 @@ export function SearchResultsFallback() {
 		),
 	)
 }
+
+export function ShipResultsErrorFallback() {
+	return h(
+		'div',
+		{ style: { padding: 6, color: '#CD0DD5' } },
+		'There was an error retrieving results',
+	)
+}

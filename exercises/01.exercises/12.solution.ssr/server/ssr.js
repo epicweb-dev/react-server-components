@@ -140,7 +140,8 @@ app.all('/:shipId?', async function (req, res) {
 })
 
 const server = app.listen(PORT, () => {
-	console.log(`✅ SSR: http://localhost:${PORT}`)
+	console.log(`🚀  We have liftoff!`)
+	console.log(`http://localhost:${PORT}`)
 })
 
 closeWithGrace(async ({ signal, err }) => {
