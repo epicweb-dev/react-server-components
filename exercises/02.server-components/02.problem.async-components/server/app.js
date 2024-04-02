@@ -35,8 +35,10 @@ app.get('/rsc/:shipId?', async function (req, res) {
 	try {
 		const shipId = req.params.shipId || null
 		const search = req.query.search || ''
+		// 💣 delete the ship and shipResults
 		const ship = shipId ? await getShip({ shipId }) : null
 		const shipResults = await searchShips({ search })
+		// 💣 remove them from the props object too
 		const props = { shipId, search, ship, shipResults }
 		const { pipe } = renderToPipeableStream(h(App, props))
 		pipe(res)

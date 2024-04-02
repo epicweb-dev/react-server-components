@@ -149,8 +149,8 @@ import { createFromFetch } from 'react-server-dom-esm/client'
 
 // some client code...
 
-const response = await fetch('/rsc')
-const ui = await createFromFetch(response)
+const responsePromise = fetch('/rsc')
+const ui = await createFromFetch(responsePromise)
 createRoot(document.getElementById('root')).render(ui)
 ```
 

@@ -30,7 +30,7 @@ export function App({ shipId, search, ship, shipResults }) {
 			'div',
 			{ className: 'details' },
 			shipId
-				? h(ShipDetails, { shipId, ship })
+				? h(ShipDetails, { ship })
 				: h('p', null, 'Select a ship from the list to see details'),
 		),
 	)

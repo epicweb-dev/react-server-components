@@ -5,3 +5,67 @@ props to our components. Additionally, we're sending a bunch of code to the
 client to render a page that really doesn't need to be on the client. We want
 you to solve both of these problems by using `react-server-dom-esm` which will
 allow us to generated serialized JSX on the server and render it in the browser.
+
+## 🦉 `react-server` export
+
+One important thing to remember is that on the server, React components cannot
+use hooks like `useState`, `useEffect`, etc. You should think of RSCs as a
+one-time template because they'll never be interactive.
+
+This can be confusing and even cause problems if you're not careful. That's why
+React packages have a special version for your RSC server so you don't make this
+mistake. You actually don't have to change your code at all for this to work.
+Instead, you change the environment in which your code is running.
+
+On the server, Node.js has an algorithm to resolve module imports like `react`
+and `react-server-dom-esm`. It's a fair bit complex, so to be brief, I'll just
+say that in the `package.json` of react packages, you'll find something like
+this:
+
+```json
+{
+	"exports": {
+		".": {
+			"react-server": "./react.react-server.js",
+			"default": "./index.js"
+		},
+		"./package.json": "./package.json",
+		"./jsx-runtime": {
+			"react-server": "./jsx-runtime.react-server.js",
+			"default": "./jsx-runtime.js"
+		},
+		"./jsx-dev-runtime": "./jsx-dev-runtime.js"
+	}
+}
+```
+
+This is configuration for the node resolver so the correct version of React is
+resolved based on the environment. In our RSC environment, we want to tell Node
+to resolve to the `react-server` export.
+
+This is done by setting the `--conditions` flag in the `node` command. This flag
+is used to set the environment in which the code is running. In our case, we
+want to set the environment to `react-server`.
+
+🐨 So before you do anything else, update the `dev` script in
+the <InlineFile file="package.json" /> file to add `--conditions=react-server`:
+
+```
+node --watch --conditions=react-server server/app.js
+```
+
+Once you have that done, you can restart your dev server and for any package
+that has a special export for an RSC environment, Node will resolve to that
+version of the package.
+
+## 👨‍💼 Continue
+
+Great, from here, you can proceed to
+update <InlineFile file="public/index.html" /> to properly map the
+`react-server-dom-esm/client` import to the correct URL. Once you have that
+done, you can update <InlineFile file="server/app.js" /> to switch from an
+`/api` route that serves data to an `/rsc` route that serves the RSCs.
+
+Then finally you'll be able to go to the <InlineFile file="src/index.js" /> file
+and update that to fetch the RSCs from the server and render them using the
+`react-server-dom-esm/client` package.

@@ -1,1 +1,85 @@
 # Server Context
+
+👨‍💼 It's kind of annoying to have to send the `search` and `shipId` props down
+through the `App` to all our components below. It would be nice if we could
+use context to share these values...
+
+🦉 One of the limitations of React Server Components is the lack of support for
+React Context.
+
+React Server Components can absolutely render components that use context:
+
+```jsx
+async function MyServerComponent() {
+	return (
+		<div>
+			<MyCombobox>
+				<MyComboboxLabel>Pet Chooser</MyComboboxLabel>
+				<MyComboboxInput />
+			</MyCombobox>
+		</div>
+	)
+}
+// assume MyCombobox is a client component that uses context
+```
+
+But they can't `useContext` themselves.
+
+This is a bummer because another benefit of context is avoiding prop drilling
+for things like the user object, theme, or localization.
+
+Luckily for us, Node.js has an answer. Again, this isn't a Node.js workshop,
+but this is a common problem that you'll experience when using RSCs and this
+is the solution recommended by the React team.
+
+The answer is [`AsyncLocalStorage`](https://nodejs.org/api/async_context.html).
+Here's a simple example from the docs:
+
+```js
+import { AsyncLocalStorage } from 'node:async_hooks'
+
+const userStorage = new AsyncLocalStorage()
+
+// somwhere later in your code
+const user = await getUser()
+try {
+	userStorage.run(user, () => {
+		logUser() // Returns the user object
+		setTimeout(() => {
+			logUser() // Logs the user object
+		}, 200)
+		throw new Error()
+	})
+} catch (e) {
+	logUser() // Logs undefined
+}
+
+function logUser() {
+	const user = userStorage.getStore()
+	console.log({ user })
+}
+```
+
+It's a little magical, but the idea is that you can store a value in the
+`AsyncLocalStorage` and then access it from anywhere in your code, so long as
+the async operation was created within the `run` callback.
+
+👨‍💼 Great, thanks Olivia! So what I want you to do is use this to make the
+`search` and `shipId` values available to all components in the tree without
+having to pass them down as props.
+
+🐨 First you'll want to create a module to create our async storage object. So
+let's start by creating <InlineFile file="server/async-storage.js" /> and stick
+this in there:
+
+```js
+import { AsyncLocalStorage } from 'node:async_hooks'
+
+export const shipDataStorage = new AsyncLocalStorage()
+```
+
+From there, you can import it in <InlineFile file="server/app.js" /> to provide
+the `search` and `shipId` to the rendered components, remove all the prop
+drilling from <InlineFile file="src/app.js" /> and access the values necessary
+from the async storage in <InlineFile file="src/ship-details.js" />
+and <InlineFile file="src/ship-search-results.js" />.

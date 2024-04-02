@@ -35,7 +35,8 @@ app.get('/rsc/:shipId?', async function (req, res) {
 	try {
 		const shipId = req.params.shipId || null
 		const search = req.query.search || ''
-		shipDataStorage.run({ shipId, search }, () => {
+		const data = { shipId, search }
+		shipDataStorage.run(data, () => {
 			const { pipe } = renderToPipeableStream(h(App))
 			pipe(res)
 		})

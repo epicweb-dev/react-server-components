@@ -2,6 +2,7 @@ import { Fragment, createElement as h } from 'react'
 import { ShipDetails } from './ship-details.js'
 import { SearchResults } from './ship-search-results.js'
 
+// 💣 remove the ship and shipResults props
 export function App({ shipId, search, ship, shipResults }) {
 	return h(
 		'div',
@@ -23,6 +24,7 @@ export function App({ shipId, search, ship, shipResults }) {
 						autoFocus: true,
 					}),
 				),
+				// 💣 remove the shipResults prop
 				h('ul', null, h(SearchResults, { shipId, search, shipResults })),
 			),
 		),
@@ -30,7 +32,8 @@ export function App({ shipId, search, ship, shipResults }) {
 			'div',
 			{ className: 'details' },
 			shipId
-				? h(ShipDetails, { shipId, ship })
+				? // 🐨 replace the ship prop with a shipId prop
+					h(ShipDetails, { ship })
 				: h('p', null, 'Select a ship from the list to see details'),
 		),
 	)

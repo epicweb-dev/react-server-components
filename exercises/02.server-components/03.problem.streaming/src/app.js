@@ -1,6 +1,14 @@
 import { Fragment, createElement as h } from 'react'
-import { ShipDetails } from './ship-details.js'
-import { SearchResults } from './ship-search-results.js'
+import {
+	ShipDetails,
+	// 💰 you'll want this:
+	// ShipFallback
+} from './ship-details.js'
+import {
+	SearchResults,
+	// 💰 you'll want this:
+	// SearchResultsFallback
+} from './ship-search-results.js'
 
 export function App({ shipId, search }) {
 	return h(
@@ -23,14 +31,25 @@ export function App({ shipId, search }) {
 						autoFocus: true,
 					}),
 				),
-				h('ul', null, h(SearchResults, { shipId, search })),
+				h(
+					'ul',
+					null,
+					// 🐨 wrap this in a Suspense boundary with the fallback set to
+					// h(SearchResultsFallback)
+					// 💰 remember it's h(Component, props, child1, child2, child3)
+					// 💰 don't feel too bad if you need to reference the diff on this one
+					// it's kinda hard to go back to non-JSX after you've been used to
+					// using JSX for a while 😅
+					h(SearchResults, { shipId, search }),
+				),
 			),
 		),
 		h(
 			'div',
 			{ className: 'details' },
 			shipId
-				? h(ShipDetails, { shipId })
+				? // 🐨 wrap this in a Suspense boundary with the fallback set to h(ShipFallback, { shipId })
+					h(ShipDetails, { shipId })
 				: h('p', null, 'Select a ship from the list to see details'),
 		),
 	)
