@@ -4,17 +4,14 @@ import { Fragment, Suspense, createElement as h } from 'react'
 import { ErrorBoundary } from './error-boundary.js'
 
 export function ShipSearch({ search, results, fallback }) {
-	// 🐨 get navigate, location, and nextLocation from useRouter
-	// 🐨 use the parseLocationState utility to determine whether the search is changing
-	// 💯 use useSpinDelay ('./spin-delay.js') to avoid a flash of pending state
-	const isShipSearchPending = false
-
+	// 🐨 get the navigate function and location from useRouter()
 	return h(
 		Fragment,
 		null,
 		h(
 			'form',
-			{ onSubmit: e => e.preventDefault() },
+			// 🐨 add a submit handler here to prevent the default full page refresh
+			{},
 			h('input', {
 				placeholder: 'Filter ships...',
 				type: 'search',
@@ -30,11 +27,7 @@ export function ShipSearch({ search, results, fallback }) {
 		h(
 			ErrorBoundary,
 			{ fallback: ShipResultsErrorFallback },
-			h(
-				'ul',
-				{ style: { opacity: isShipSearchPending ? 0.6 : 1 } },
-				h(Suspense, { fallback }, results),
-			),
+			h('ul', null, h(Suspense, { fallback }, results)),
 		),
 	)
 }

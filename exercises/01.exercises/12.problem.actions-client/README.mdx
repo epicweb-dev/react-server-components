@@ -1,0 +1,10 @@
+# Actions (Client Side)
+
+<callout-warning>
+	`react-server-dom-esm` does not allow you to specify a `method` or `encType`
+	on a `form` element when you specify an `action` that's a reference to a
+	server action. Instead, it will set those values at request time for you. I
+	personally don't agree with this decision (I would prefer to stick with the
+	platform defaults), but the React team feels like it's worth straying from the
+	platform defaults in this case.
+</callout-warning>

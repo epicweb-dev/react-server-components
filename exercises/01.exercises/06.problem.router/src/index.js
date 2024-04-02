@@ -1,24 +1,24 @@
 import { Suspense, createElement as h, startTransition, use } from 'react'
 import { createRoot } from 'react-dom/client'
-import { createFromFetch } from 'react-server-dom-esm/client'
+import * as RSC from 'react-server-dom-esm/client'
 import { ErrorBoundary } from './error-boundary.js'
 import { shipFallbackSrc } from './img-utils.js'
-import { RouterContext } from './router.js'
+import { RouterContext, getGlobalLocation } from './router.js'
 
-const getGlobalLocation = () =>
-	window.location.pathname + window.location.search
+function fetchContent(location) {
+	return fetch(`/rsc${location}`)
+}
+
+function createFromFetch(fetchPromise) {
+	return RSC.createFromFetch(fetchPromise, { moduleBaseURL: '/js/src' })
+}
 
 const initialLocation = getGlobalLocation()
-const initialContentPromise = createFromFetch(fetch(`/rsc${initialLocation}`), {
-	moduleBaseURL: '/js/src',
-})
+const initialContentPromise = createFromFetch(fetchContent(initialLocation))
 
 function Root() {
-	const nextLocation = getGlobalLocation()
+	const location = initialLocation
 	const contentPromise = initialContentPromise
-	const isPending = false
-
-	const location = nextLocation
 
 	function navigate() {
 		// TODO...
@@ -29,9 +29,7 @@ function Root() {
 		{
 			value: {
 				location,
-				nextLocation: isPending ? nextLocation : location,
 				navigate,
-				isPending,
 			},
 		},
 		use(contentPromise),
