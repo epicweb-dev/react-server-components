@@ -1,1 +1,72 @@
 # 🤹 React Server Components
+
+![A flowchart for a Typical SPA as described below](/img/spa.png)
+
+<details>
+<summary>Here's a bullet-point text version of this flowchart:</summary>
+
+- User goes to site
+
+  - Browser requests document
+    - Server responds with document
+      - Browser renders loading spinner
+  - Browser requests client code
+    - Server responds with client code
+      - Browser updates UI components
+  - Browser requests data
+    - Server generates data response
+      - Browser sends JSON
+        - Browser updates UI with JSON data
+
+- User triggers state change (i.e., route change)
+
+  - Browser renders pending UI
+  - Browser requests new data
+    - Server generates data response
+      - Browser sends JSON
+        - Browser updates UI with JSON data
+
+- User triggers action (i.e., form submission)
+  - Browser renders pending UI
+  - Browser makes POST request
+    - Server performs action with POST body
+      - Browser sends JSON
+        - Browser updates UI with JSON data
+
+</details>
+
+![A flowchart for React Server Components and actions as described below](/img/super-simple-rsc.png)
+
+<details>
+<summary>Here's a bullet-point text version of the flowchart:</summary>
+
+- User goes to site
+
+  - Browser requests document
+    - Server responds with document
+      - Browser renders Suspense fallback
+  - Browser requests JSX payload
+    - Server generates Serialized JSX with `react-server-dom-esm/server.renderToPipeableStream`
+      - Server streams Serialized JSX
+        - Browser renders streamed UI with `react-server-dom-esm/client.createFromFetch`
+          - Browser requests client component code
+            - Server responds with client component code
+              - Browser hydrates client components
+
+- User triggers state change (i.e., route change) NOTE: This only applies once
+  data starts streaming. Until then, state transitions act like a typical SPA.
+
+  - Browser renders pending UI with `startTransition`
+  - Browser requests JSX payload
+    - Server generates Serialized JSX with `react-server-dom-esm/server.renderToPipeableStream`
+      - Server streams Serialized JSX
+        - Browser updates streamed UI with `react-server-dom-esm/client.createFromFetch`
+
+- User triggers action (i.e., form submission)
+  - Browser renders pending UI with `useActionState`
+  - Browser makes POST (via `callServer`)
+    - Server determines action and call with parsed request body
+      - Server streams Serialized JSX and action return value
+        - Browser updates streamed UI with `react-server-dom-esm/client.createFromFetch`
+
+</details>

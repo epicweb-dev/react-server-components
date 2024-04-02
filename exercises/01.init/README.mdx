@@ -1,1 +1,103 @@
-# Init
+# Warm Up
+
+This first exercise is just a warm up to get you familiar with the application
+we're building for today. The key things you need to understand from this
+exercise are:
+
+1. The `public/index.html` is what we want loaded for browser document requests
+   to our application.
+2. The application is served by an express server that serves the static assets
+   and the API endpoint.
+
+This is not an node/express workshop, so we'll be really hand-holdy on things to
+avoid you wasting time acquiring knowledge of things that you didn't come here
+to learn.
+
+That said, because we're not using any build tools, there may be some things
+we're doing you may not be familiar with.
+
+## Import Map
+
+Because we're not using any tools to bundle imports, we're using native
+EcmaScript Modules (ESM). Our code is written to run in two environments in this
+project:
+
+- Node.js
+- Browsers
+
+In Node.js, there is a module resolution algorithm that is used to resolve
+modules. In the browser, there is no such algorithm. To make our code work in
+both environments, we're using an `importmap` to map the module names to the
+actual URLs where the modules can be found.
+
+Here's an example of an `importmap` script:
+
+```html filename=public/index.html
+<script type="importmap">
+	{
+		"imports": {
+			"react": "https://esm.sh/react",
+			"react-dom": "https://esm.sh/react-dom",
+			"react-dom/": "https://esm.sh/react-dom/"
+		}
+	}
+</script>
+<script type="module" src="/js/src/index.js"></script>
+```
+
+```js filename=src/index.js
+// the importmap above will allow the browser to know where to go to get the
+// modules when they are imported.
+import { createElement as h } from 'react'
+import { renderRoot } from 'react-dom/client'
+
+// because this file was loaded from /js/src/index.js, the browser will know to
+// import this file from /js/src/app.js
+import { App } from './app.js'
+
+// other stuff here...
+```
+
+You'll notice we're using `esm.sh` to load the modules. This is a service that
+provides ESM versions of popular libraries. It bundles them on-demand and
+serves them. This works nicely for our build-less setup (thought it does mean
+you need to be connected to the internet to work through this workshop).
+
+- [esm.sh](https://esm.sh)
+- [MDN `importmap` docs](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap)
+
+## Express static
+
+As mentioned, this is not a workshop about express, but we're using it to serve
+our static assets and API endpoints. Here's how serving static assets works with
+express:
+
+```js filename=server/app.js
+import express from 'express'
+
+const app = express()
+
+// this line tells express to serve the files in the public directory when a
+// request is made to the root of the server.
+app.use(express.static('public'))
+```
+
+- [`express.static`](https://expressjs.com/en/starter/static-files.html).
+
+## Express Route Patterns
+
+Express has a special format for defining routes that can be used to match
+patterns in the URL. Here's an example of a route pattern:
+
+```js filename=server/app.js
+app.get('/api/:id?', (req, res) => {
+	res.json({ id: req.params.id })
+})
+```
+
+In this example, the `:id?` is a pattern that will match any URL that starts
+with `/api/` and has an optional `id` parameter. The `req.params.id` will be
+populated with the value of the `id` parameter in the URL.
+
+- [Express Routing](https://expressjs.com/en/guide/routing.html)
+- [`path-to-regexp`](https://www.npmjs.com/package/path-to-regexp)

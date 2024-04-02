@@ -1,1 +1,171 @@
 # Server Components
+
+The vast majority of React applications have both of these issues:
+
+1. Data is subject to either cascading waterfalls or prop drilling.
+2. JavaScript is sent to the client to hydrate components that are not
+   interactive.
+
+Depending on your situation, these two issues can be minimal and not worth
+solving or they can be a major pain point. For most of you, it's probably the
+latter.
+
+React server components solves both of these problems. By pushing the UI we
+generate to the server, we reduce the JavaScript sent to the client down to only
+the interactive bits and we also enable data fetching from the components
+directly.
+
+The idea behind RSCs is conceptually simple. Instead of requesting JSON data and
+handing that off to our components to generate the UI, we request the UI itself.
+
+Let's compare initial render of a SPA that uses JSON with a SPA that uses RSCs:
+
+![A flowchart for the initial render of a Typical SPA as described below](/img/spa-initial-render.png)
+
+<details>
+<summary>Here's a bullet-point text version of this flowchart:</summary>
+
+- User goes to site
+
+  - Browser requests document
+    - Server responds with document
+      - Browser renders loading spinner
+  - Browser requests client code
+    - Server responds with client code
+      - Browser updates UI components
+  - Browser requests data
+    - Server generates data response
+      - Browser sends JSON
+        - Browser updates UI with JSON data
+
+</details>
+
+![A flowchart for React Server Components and actions as described below](/img/super-simple-rsc-initial-render.png)
+
+<details>
+<summary>Here's a bullet-point text version of the flowchart:</summary>
+
+- User goes to site
+
+  - Browser requests document
+    - Server responds with document
+      - Browser renders Suspense fallback
+  - Browser requests JSX payload
+    - Server generates Serialized JSX with `react-server-dom-esm/server.renderToPipeableStream`
+      - Server streams Serialized JSX
+        - Browser renders streamed UI with `react-server-dom-esm/client.createFromFetch`
+          - Browser requests client component code
+            - Server responds with client component code
+              - Browser hydrates client components
+
+</details>
+
+You'll notice these two flows are pretty similar. The biggest difference is in
+where we generate the UI.
+
+In the SPA case, UI = data + components on the client.
+
+In the RSC case, UI = data + components on the server.
+
+Of course, there are some parts of our UI that need to be interactive and
+that requires some of our code to be sent to the client. We'll cover this part
+in a future exercise. This is important because it's the reason React needs its
+own serialization format and can't just use HTML.
+
+## RSC Format
+
+Typically when you server render React, you render a string of HTML. However,
+React Server Components need to have a good mechanism for mixing components for
+client-side interactivity with components that are rendered on the server only.
+Additionally, React Server Actions also necessitate a way to send a reference
+to the client-side component that will be hydrated.
+
+To top it off, this all needs to be done in a way that allows for streaming the
+UI to the client in any order.
+
+So React Server Components use a custom serialization format that looks like
+this:
+
+```json nolang nonumber
+1:D{"name":"App","env":"Server"}
+0:{"returnValue":null,"root":"$L1"}
+2:I["/ship-search.js","ShipSearch"]
+5:I["/ship-details-pending.js","ShipDetailsPendingTransition"]
+6:I["/error-boundary.js","ErrorBoundary"]
+8:"$Sreact.suspense"
+a:I["/img.js","ShipImg"]
+3:D{"name":"SearchResults","env":"Server"}
+4:D{"name":"SearchResultsFallback","env":"Server"}
+4:[["$","li","0",{"children":["$","a",null,{"href":"#","children":[["$","img",null,{"src":"/img/fallback-ship.png","alt":"loading"}],"... loading"]}]}],["$","li","1",{"children":["$","a",null,{"href":"#","children":[["$","img",null,{"src":"/img/fallback-ship.png","alt":"loading"}],"... loading"]}]}],["$","li","2",{"children":["$","a",null,{"href":"#","children":[["$","img",null,{"src":"/img/fallback-ship.png","alt":"loading"}],"... loading"]}]}],["$","li","3",{"children":["$","a",null,{"href":"#","children":[["$","img",null,{"src":"/img/fallback-ship.png","alt":"loading"}],"... loading"]}]}],["$","li","4",{"children":["$","a",null,{"href":"#","children":[["$","img",null,{"src":"/img/fallback-ship.png","alt":"loading"}],"... loading"]}]}],["$","li","5",{"children":["$","a",null,{"href":"#","children":[["$","img",null,{"src":"/img/fallback-ship.png","alt":"loading"}],"... loading"]}]}],["$","li","6",{"children":["$","a",null,{"href":"#","children":[["$","img",null,{"src":"/img/fallback-ship.png","alt":"loading"}],"... loading"]}]}],["$","li","7",{"children":["$","a",null,{"href":"#","children":[["$","img",null,{"src":"/img/fallback-ship.png","alt":"loading"}],"... loading"]}]}],["$","li","8",{"children":["$","a",null,{"href":"#","children":[["$","img",null,{"src":"/img/fallback-ship.png","alt":"loading"}],"... loading"]}]}],["$","li","9",{"children":["$","a",null,{"href":"#","children":[["$","img",null,{"src":"/img/fallback-ship.png","alt":"loading"}],"... loading"]}]}],["$","li","10",{"children":["$","a",null,{"href":"#","children":[["$","img",null,{"src":"/img/fallback-ship.png","alt":"loading"}],"... loading"]}]}],["$","li","11",{"children":["$","a",null,{"href":"#","children":[["$","img",null,{"src":"/img/fallback-ship.png","alt":"loading"}],"... loading"]}]}]]
+7:D{"name":"ShipError","env":"Server"}
+7:["$","div",null,{"className":"ship-info","children":[["$","div",null,{"className":"ship-info__img-wrapper","children":["$","img",null,{"src":"/img/broken-ship.webp","alt":"broken ship"}]}],["$","section",null,{"children":["$","h2",null,{"children":"There was an error"}]}],["$","section",null,{"children":["There was an error loading \"","0268fc4817ad1","\""]}]]}]
+9:D{"name":"ShipFallback","env":"Server"}
+9:["$","div",null,{"className":"ship-info","children":[["$","div",null,{"className":"ship-info__img-wrapper","children":["$","$La",null,{"src":"/img/ships/0268fc4817ad1.webp?size=200","alt":"0268fc4817ad1"}]}],["$","section",null,{"children":["$","h2",null,{"children":"Loading..."}]}],["$","div",null,{"children":["Top Speed: XX"," ",["$","small",null,{"children":"lyh"}]]}],["$","section",null,{"children":["$","ul",null,{"children":[["$","li","0",{"children":[["$","label",null,{"children":"loading"}],":"," ",["$","span",null,{"children":["XX ",["$","small",null,{"children":"(loading)"}]]}]]}],["$","li","1",{"children":[["$","label",null,{"children":"loading"}],":"," ",["$","span",null,{"children":["XX ",["$","small",null,{"children":"(loading)"}]]}]]}],["$","li","2",{"children":[["$","label",null,{"children":"loading"}],":"," ",["$","span",null,{"children":["XX ",["$","small",null,{"children":"(loading)"}]]}]]}]]}]}]]}]
+b:D{"name":"ShipDetails","env":"Server"}
+1:["$","div",null,{"className":"app","children":[["$","div",null,{"className":"search","children":["$","$L2",null,{"search":"m","results":"$L3","fallback":"$4"}]}],["$","$L5",null,{"children":["$","$L6",null,{"fallback":"$7","children":["$","$8",null,{"fallback":"$9","children":"$Lb"}]}]}]]}]
+c:I["/ship-search.js","SelectShipLink"]
+3:[["$","li","Bomber",{"children":["$","$Lc",null,{"shipId":"5c13d8b28a14a","highlight":false,"children":[["$","$La",null,{"src":"/img/ships/5c13d8b28a14a.webp?size=20","alt":"Bomber"}],"Bomber"]}]}],["$","li","Diplomatic Vessel",{"children":["$","$Lc",null,{"shipId":"6f375578ead88","highlight":false,"children":[["$","$La",null,{"src":"/img/ships/6f375578ead88.webp?size=20","alt":"Diplomatic Vessel"}],"Diplomatic Vessel"]}]}],["$","li","Mining Ship",{"children":["$","$Lc",null,{"shipId":"627c497212456","highlight":false,"children":[["$","$La",null,{"src":"/img/ships/627c497212456.webp?size=20","alt":"Mining Ship"}],"Mining Ship"]}]}],["$","li","Medical Ship",{"children":["$","$Lc",null,{"shipId":"0268fc4817ad1","highlight":true,"children":[["$","$La",null,{"src":"/img/ships/0268fc4817ad1.webp?size=20","alt":"Medical Ship"}],"Medical Ship"]}]}]]
+b:["$","div",null,{"className":"ship-info","children":[["$","div",null,{"className":"ship-info__img-wrapper","children":["$","$La",null,{"src":"/img/ships/0268fc4817ad1.webp?size=200","alt":"Medical Ship"}]}],["$","section",null,{"children":["$","h2",null,{"children":"Medical Ship"}]}],["$","div",null,{"children":["Top Speed: ",2," ",["$","small",null,{"children":"lyh"}]]}],["$","section",null,{"children":["$","p",null,{"children":"NOTE: This ship is not equipped with any weapons."}]}]]}]
+```
+
+This is not something you would want to write by hand. Instead, you'll use the
+`react-server-dom-esm/server`'s `renderToPipeableStream` function to generate
+this for you. Then on the client-side, `react-server-dom-esm/client`'s
+`createFromFetch` will take care of converting this format into React elements
+that can be rendered by React in the browser.
+
+<callout-info>
+	The `react-server-dom-esm` package is one of many such packages for generating
+	and consuming React Server Components.
+</callout-info>
+
+<callout-success>
+	To explore this format further, you can check out [this blog
+	post](https://www.alvar.dev/blog/creating-devtools-for-react-server-components)
+	that goes in depth on the format and the [accompanying
+	tool](https://rsc-parser.vercel.app/) that can help you visualize different
+	aspects of the format.
+</callout-success>
+
+## Putting it together
+
+So on the server side, you have some code that generates the serialized JSX in
+the RSC format and on the client side, you have some code that converts the
+serialized JSX into React elements:
+
+```js filename=server.js
+import { renderToPipeableStream } from 'react-server-dom-esm/server'
+
+// some server code...
+
+app.get('/rsc', (req, res) => {
+	const { pipe } = renderToPipeableStream(<App />)
+	pipe(res)
+})
+```
+
+```js filename=client.js
+import { createFromFetch } from 'react-server-dom-esm/client'
+
+// some client code...
+
+const response = await fetch('/rsc')
+const ui = await createFromFetch(response)
+createRoot(document.getElementById('root')).render(ui)
+```
+
+Now you combine this with some nice suspense code on the client for handling the
+loading state and you've got yourself a nice RSC setup.
+
+In this world, it doesn't matter how many components you have or how heavy those
+dependencies are. They'll never get sent over the wire. Just the UI that they
+generated.
+
+<callout-warning>
+	In some situations, it's possible sending the data and components will be less
+	than sending the generated UI. But the size of the payload is only one aspect
+	to consider. Parsing and executing JavaScript on the client requires more
+	resources than handling the stream of RSCs. Additionally, RSCs enable
+	composition of data requirements and UI generation in a way that is not
+	possible with JSON data.
+</callout-warning>
