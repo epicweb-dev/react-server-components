@@ -11,9 +11,8 @@ import { shipDataStorage } from './async-storage.js'
 const PORT = process.env.PORT || 3000
 
 const app = express()
-
 app.use(compress())
-
+// this is here so the workshop app knows when the server has started
 app.head('/', (req, res) => res.status(200).end())
 
 app.use(express.static('public', { index: false }))

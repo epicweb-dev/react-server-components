@@ -14,7 +14,6 @@ const RSC_PORT = process.env.RSC_PORT || 3001
 const RSC_ORIGIN = new URL(`http://localhost:${RSC_PORT}`)
 
 const app = express()
-
 app.use(compress())
 
 function request(options, body) {
@@ -41,7 +40,7 @@ function proxyReq(req, path = req.url) {
 		req,
 	)
 }
-
+// this is here so the workshop app knows when the server has started
 app.head('/', (req, res) => res.status(200).end())
 
 app.use(express.static('public', { index: false }))

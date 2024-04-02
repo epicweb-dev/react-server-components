@@ -21,7 +21,6 @@ const PORT = process.env.PORT || 3000
 // 🐨 create an RSC_ORIGIN variable that's set to new URL(`http://localhost:${RSC_PORT}`)
 
 const app = express()
-
 app.use(compress())
 
 // 🐨 use these handy utilities to make streamed requests from the SSR server to the RSC server:
@@ -51,7 +50,7 @@ app.use(compress())
 // 	)
 // }
 
-// 🐨 keep this stuff in the SSR server but delete it from the RSC server 👇
+// 🐨 keep this stuff in the SSR server but delete it from the RSC server 👇// this is here so the workshop app knows when the server has started
 app.head('/', (req, res) => res.status(200).end())
 
 app.use(express.static('public', { index: false }))

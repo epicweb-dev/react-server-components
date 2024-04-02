@@ -14,7 +14,6 @@ import { shipDataStorage } from './async-storage.js'
 const PORT = process.env.PORT || 3001
 
 const app = express()
-
 app.use(compress())
 
 const moduleBasePath = new URL('../src', import.meta.url).href

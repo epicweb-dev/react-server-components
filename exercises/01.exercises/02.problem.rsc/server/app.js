@@ -6,9 +6,8 @@ import { getShip, searchShips } from '../db/ship-api.js'
 const PORT = process.env.PORT || 3000
 
 const app = express()
-
 app.use(compress())
-
+// this is here so the workshop app knows when the server has started
 app.head('/', (req, res) => res.status(200).end())
 
 app.use(express.static('public', { index: false }))
