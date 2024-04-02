@@ -13,8 +13,6 @@ import {
 import { App } from '../src/app.js'
 import { shipDataStorage } from './async-storage.js'
 
-const moduleBasePath = new URL('../src', import.meta.url).href
-
 // 🐨 default this to 3001 for the RSC server
 const PORT = process.env.PORT || 3000
 // 🐨 in the SSR server, create a RSC_PORT variable like the PORT one that defaults to 3001
@@ -85,6 +83,8 @@ app.use((req, res, next) => {
 })
 // 🐨 keep this stuff in the SSR server but delete it from the RSC server 👆
 
+const moduleBasePath = new URL('../src', import.meta.url).href
+
 // 🐨 keep renderApp stuff for the RSC server, but delete it from the SSR server
 async function renderApp(res, returnValue) {
 	const shipId = res.req.params.shipId || null
@@ -108,7 +108,6 @@ app.get('/rsc/:shipId?', async function (req, res) {
 	await renderApp(res, null)
 
 	// 🐨 create a rscResponse object that is assigned to await proxyReq(req)
-	// 🐨 create a `moduleBasePath` set to new URL('../src', import.meta.url).href
 	// 🐨 create a `moduleBaseURL` set to `/js/src`
 
 	// 🐨 create a contentPromise variable (use let, we'll assign it later)

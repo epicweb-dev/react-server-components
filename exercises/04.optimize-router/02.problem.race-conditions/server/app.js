@@ -8,8 +8,6 @@ import { renderToPipeableStream } from 'react-server-dom-esm/server'
 import { App } from '../src/app.js'
 import { shipDataStorage } from './async-storage.js'
 
-const moduleBasePath = new URL('../src', import.meta.url).href
-
 const PORT = process.env.PORT || 3000
 
 const app = express()
@@ -53,6 +51,7 @@ app.get('/rsc/:shipId?', async function (req, res) {
 		const shipId = req.params.shipId || null
 		const search = req.query.search || ''
 		shipDataStorage.run({ shipId, search }, () => {
+			const moduleBasePath = new URL('../src', import.meta.url).href
 			const { pipe } = renderToPipeableStream(h(App), moduleBasePath)
 			pipe(res)
 		})

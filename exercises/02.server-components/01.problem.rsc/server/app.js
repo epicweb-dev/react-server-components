@@ -32,12 +32,10 @@ app.get('/api/:shipId?', async function (req, res) {
 	try {
 		const shipId = req.params.shipId || null
 		const search = req.query.search || ''
-		return res.json({
-			shipId,
-			search,
-			ship: shipId ? await getShip({ shipId }) : null,
-			shipResults: await searchShips({ search }),
-		})
+		const ship = shipId ? await getShip({ shipId }) : null
+		const shipResults = await searchShips({ search })
+		const data = { shipId, search, ship, shipResults }
+		return res.json(data)
 	} catch (error) {
 		console.error(error)
 		res.status(500).json({ error: error.message })

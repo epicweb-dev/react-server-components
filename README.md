@@ -94,6 +94,14 @@ Learn all about the workshop app on the
 
 [![Kent with the workshop app in the background](https://github-production-user-asset-6210df.s3.amazonaws.com/1500684/280407082-0e012138-e01d-45d5-abf2-86ffe5d03c69.png)](https://www.epicweb.dev/get-started)
 
+## Credits
+
+This workshop is heavily influenced by
+[@sebmarkbage](https://github.com/sebmarkbage)'s work in
+[this commit](https://github.com/facebook/react/commit/f181ba8aa6339d62f6e2572109c61242606f16b3).
+Also, shout-out to [@gaearon](https://github.com/gaearon) and
+[@rickhanlonii](https://github.com/rickhanlonii) for their help on this as well.
+
 <!-- prettier-ignore-start -->
 [npm]: https://www.npmjs.com/
 [node]: https://nodejs.org

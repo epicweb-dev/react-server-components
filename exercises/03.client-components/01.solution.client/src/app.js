@@ -8,7 +8,7 @@ import {
 	ShipResultsErrorFallback,
 } from './ship-search-results.js'
 
-export async function App() {
+export function App() {
 	const { shipId, search } = shipDataStorage.getStore()
 	return h(
 		'div',

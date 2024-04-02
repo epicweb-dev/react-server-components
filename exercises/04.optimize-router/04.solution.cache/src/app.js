@@ -6,7 +6,7 @@ import { ShipDetails, ShipFallback, ShipError } from './ship-details.js'
 import { SearchResults, SearchResultsFallback } from './ship-search-results.js'
 import { ShipSearch } from './ship-search.js'
 
-export async function App() {
+export function App() {
 	const { shipId, search } = shipDataStorage.getStore()
 	return h(
 		'div',

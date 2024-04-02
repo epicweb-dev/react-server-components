@@ -13,8 +13,6 @@ import {
 import { App } from '../src/app.js'
 import { shipDataStorage } from './async-storage.js'
 
-const moduleBasePath = new URL('../src', import.meta.url).href
-
 const PORT = process.env.PORT || 3000
 
 const app = express()
@@ -52,6 +50,8 @@ app.use((req, res, next) => {
 		next()
 	}
 })
+
+const moduleBasePath = new URL('../src', import.meta.url).href
 
 async function renderApp(res, returnValue) {
 	const shipId = res.req.params.shipId || null
