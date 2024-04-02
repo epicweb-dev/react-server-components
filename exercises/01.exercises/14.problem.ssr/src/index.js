@@ -1,4 +1,5 @@
 import {
+	Suspense,
 	createElement as h,
 	startTransition,
 	use,
@@ -8,9 +9,11 @@ import {
 	useState,
 	useTransition,
 } from 'react'
-import { hydrateRoot } from 'react-dom/client'
+import { createRoot } from 'react-dom/client'
 import * as RSC from 'react-server-dom-esm/client'
 import { contentCache, useContentCache, generateKey } from './content-cache.js'
+import { ErrorBoundary } from './error-boundary.js'
+import { shipFallbackSrc } from './img-utils.js'
 import { RouterContext, getGlobalLocation } from './router.js'
 
 function fetchContent(location) {
@@ -148,5 +151,30 @@ function Root() {
 }
 
 startTransition(() => {
-	hydrateRoot(document, h(Root))
+	createRoot(document.getElementById('root')).render(
+		h(
+			'div',
+			{ className: 'app-wrapper' },
+			h(
+				ErrorBoundary,
+				{
+					fallback: h(
+						'div',
+						{ className: 'app-error' },
+						h('p', null, 'Something went wrong!'),
+					),
+				},
+				h(
+					Suspense,
+					{
+						fallback: h('img', {
+							style: { maxWidth: 400 },
+							src: shipFallbackSrc,
+						}),
+					},
+					h(Root),
+				),
+			),
+		),
+	)
 })

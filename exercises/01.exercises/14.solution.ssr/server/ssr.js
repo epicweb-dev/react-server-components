@@ -9,8 +9,6 @@ import { renderToPipeableStream } from 'react-dom/server'
 import { createFromNodeStream } from 'react-server-dom-esm/client'
 import { RouterContext } from '../src/router.js'
 
-const moduleBasePath = new URL('../src', import.meta.url).href
-
 const PORT = process.env.PORT || 3000
 const RSC_PORT = process.env.RSC_PORT || 3001
 const RSC_ORIGIN = new URL(`http://localhost:${RSC_PORT}`)
@@ -29,6 +27,19 @@ function request(options, body) {
 		})
 		body.pipe(req)
 	})
+}
+
+function proxyReq(req, path = req.url) {
+	return request(
+		{
+			host: RSC_ORIGIN.hostname,
+			port: RSC_ORIGIN.port,
+			method: req.method,
+			path,
+			headers: req.headers,
+		},
+		req,
+	)
 }
 
 app.head('/', (req, res) => res.status(200).end())
@@ -64,26 +75,60 @@ app.use((req, res, next) => {
 	}
 })
 
-app.get('/:shipId?', async function (req, res) {
-	res.set('Content-type', 'text/html')
-	return res.sendFile('index.html', { root: 'public' })
+app.get('/rsc/:shipId?', async function (req, res) {
+	try {
+		const rscResponse = await proxyReq(req)
+
+		// Forward all headers from the RSC response to the client response
+		Object.entries(rscResponse.headers).forEach(([header, value]) => {
+			res.set(header, value)
+		})
+
+		res.set('Content-type', 'text/x-component')
+
+		rscResponse.on('data', data => {
+			res.write(data)
+			res.flush()
+		})
+		rscResponse.on('end', () => {
+			res.end()
+		})
+	} catch (e) {
+		console.error(`Failed to proxy request: ${e.stack}`)
+		res.statusCode = 500
+		res.end(`Failed to proxy request: ${e.stack}`)
+	}
 })
 
-app.get('/rsc/:shipId?', async function (req, res) {
-	const promiseForData = request(
-		{
-			host: RSC_ORIGIN.hostname,
-			port: RSC_ORIGIN.port,
-			method: req.method,
-			path: req.url,
-			headers: req.headers,
-		},
-		req,
-	)
-
+app.post('/action/:shipId?', async (req, res) => {
 	try {
-		res.set('Content-type', 'text/html')
-		const rscResponse = await promiseForData
+		const rscResponse = await proxyReq(req)
+
+		// Forward all headers from the RSC response to the client response
+		Object.entries(rscResponse.headers).forEach(([header, value]) => {
+			res.set(header, value)
+		})
+
+		res.set('Content-type', 'text/x-component')
+
+		rscResponse.on('data', data => {
+			res.write(data)
+			res.flush()
+		})
+		rscResponse.on('end', () => {
+			res.end()
+		})
+	} catch (e) {
+		console.error(`Failed to proxy request: ${e.stack}`)
+		res.statusCode = 500
+		res.end(`Failed to proxy request: ${e.stack}`)
+	}
+})
+
+app.get('/:shipId?', async function (req, res) {
+	try {
+		const rscResponse = await proxyReq(req, `/rsc${req.url}`)
+		const moduleBasePath = new URL('../src', import.meta.url).href
 		const moduleBaseURL = '/js/src'
 
 		let contentPromise
@@ -97,15 +142,13 @@ app.get('/rsc/:shipId?', async function (req, res) {
 			return content.root
 		}
 		const location = req.url
-		const navigate = () => {
-			throw new Error('navigate cannot be called on the server')
-		}
-		const isPending = false
 		const routerValue = {
 			location,
 			nextLocation: location,
-			navigate,
-			isPending,
+			navigate() {
+				throw new Error('navigate cannot be called on the server')
+			},
+			isPending: false,
 		}
 		const { pipe } = renderToPipeableStream(
 			h(RouterContext.Provider, { value: routerValue }, h(Root)),
@@ -131,41 +174,6 @@ app.get('/rsc/:shipId?', async function (req, res) {
 		console.error(`Failed to SSR: ${e.stack}`)
 		res.statusCode = 500
 		res.end(`Failed to SSR: ${e.stack}`)
-	}
-})
-
-app.post('/action/:shipId?', async (req, res) => {
-	const promiseForData = request(
-		{
-			host: RSC_ORIGIN.hostname,
-			port: RSC_ORIGIN.port,
-			method: req.method,
-			path: req.url,
-			headers: req.headers,
-		},
-		req,
-	)
-	try {
-		const rscResponse = await promiseForData
-
-		// Forward all headers from the RSC response to the client response
-		Object.entries(rscResponse.headers).forEach(([header, value]) => {
-			res.set(header, value)
-		})
-
-		res.set('Content-type', 'text/x-component')
-
-		rscResponse.on('data', data => {
-			res.write(data)
-			res.flush()
-		})
-		rscResponse.on('end', () => {
-			res.end()
-		})
-	} catch (e) {
-		console.error(`Failed to proxy request: ${e.stack}`)
-		res.statusCode = 500
-		res.end(`Failed to proxy request: ${e.stack}`)
 	}
 })
 
