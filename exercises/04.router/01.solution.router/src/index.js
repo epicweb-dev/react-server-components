@@ -31,16 +31,17 @@ function Root() {
 	function navigate(nextLocation, { replace = false } = {}) {
 		setLocation(nextLocation)
 
-		const nextContentPromise = createFromFetch(
-			fetchContent(nextLocation).then(response => {
+		const nextContentFetchPromise = fetchContent(nextLocation).then(
+			response => {
 				if (replace) {
 					window.history.replaceState({}, '', nextLocation)
 				} else {
 					window.history.pushState({}, '', nextLocation)
 				}
 				return response
-			}),
+			},
 		)
+		const nextContentPromise = createFromFetch(nextContentFetchPromise)
 
 		startTransition(() => setContentPromise(nextContentPromise))
 	}
@@ -49,8 +50,8 @@ function Root() {
 		RouterContext.Provider,
 		{
 			value: {
-				location,
 				navigate,
+				location,
 			},
 		},
 		use(contentPromise),

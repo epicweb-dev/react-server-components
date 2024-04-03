@@ -11,6 +11,8 @@ import {
 } from 'react'
 import { createRoot } from 'react-dom/client'
 import * as RSC from 'react-server-dom-esm/client'
+// 💰 you're going to need this
+// import { contentCache, useContentCache, generateKey } from './content-cache.js'
 import { ErrorBoundary } from './error-boundary.js'
 import { shipFallbackSrc } from './img-utils.js'
 import { RouterContext, getGlobalLocation } from './router.js'
@@ -28,22 +30,36 @@ function createFromFetch(fetchPromise) {
 const initialLocation = getGlobalLocation()
 const initialContentPromise = createFromFetch(fetchContent(initialLocation))
 
+// 🐨 create an initialContentKey here assigned to window.history.state?.key
+// 🐨 if there's no initialContentKey
+//   - set it to a new generated one with generateKey
+//   - call window.history.replaceState with the initialContentKey
+
+// 🐨 use the initialContentKey to add the initialContentPromise in the contentCache
+
 function Root() {
 	const latestNav = useRef(null)
+	// 🐨 get the contentCache from useContentCache
 	const [nextLocation, setNextLocation] = useState(getGlobalLocation)
+	// 🐨 change this to contentKey
 	const [contentPromise, setContentPromise] = useState(initialContentPromise)
 	const [isPending, startTransition] = useTransition()
 
 	const location = useDeferredValue(nextLocation)
+	// 🐨 get the contentPromise from the contentCache by the contentKey
 
 	useEffect(() => {
 		function handlePopState() {
 			const nextLocation = getGlobalLocation()
 			setNextLocation(nextLocation)
+			// 🐨 get the historyKey from window.history.state?.key (or fallback to a new one with generateKey)
 
+			// 🐨 if the contentCache does not have an entry for the historyKey, then trigger this update:
 			const fetchPromise = fetchContent(nextLocation)
 			const nextContentPromise = createFromFetch(fetchPromise)
+			// 🐨 use the historyKey to add the nextContentPromise in the contentCache
 
+			// 🐨 change this to setContentKey(historyKey)
 			startTransition(() => setContentPromise(nextContentPromise))
 		}
 		window.addEventListener('popstate', handlePopState)
@@ -55,18 +71,24 @@ function Root() {
 		const thisNav = Symbol(`Nav for ${nextLocation}`)
 		latestNav.current = thisNav
 
+		// 🐨 create a nextContentKey with generateKey()
 		const nextContentPromise = createFromFetch(
 			fetchContent(nextLocation).then(response => {
 				if (thisNav !== latestNav.current) return
 				if (replace) {
+					// 🐨 add a key property here
 					window.history.replaceState({}, '', nextLocation)
 				} else {
+					// 🐨 add a key property here
 					window.history.pushState({}, '', nextLocation)
 				}
 				return response
 			}),
 		)
 
+		// 🐨 use the nextContentKey to add the nextContentPromise in the contentCache
+
+		// 🐨 update this to setContentKey(newContentKey)
 		startTransition(() => setContentPromise(nextContentPromise))
 	}
 
@@ -74,9 +96,9 @@ function Root() {
 		RouterContext.Provider,
 		{
 			value: {
-				location,
-				nextLocation: isPending ? nextLocation : location,
 				navigate,
+				location,
+				nextLocation,
 				isPending,
 			},
 		},

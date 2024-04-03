@@ -1,1 +1,49 @@
 # Client Router
+
+👨‍💼 In our <InlineFile file="src/ship-search.js" /> file, we have our search form
+and the list of results which have links. The form and the list of results
+technically all works, but triggers full page refreshes which we'd love to
+avoid. Now that we have client components, we've made this a client module with
+`'use client'` so we can use things like event handlers to prevent the default
+behavior and update the UI without a full page refresh.
+
+🧝‍♂️ I created <InlineFile file="src/router.js" /> which is just a couple
+utilities and a context for managing the state in a router along with a
+`useRouter()` hook for accessing the context. You'll use these utilities to
+navigate the user to the next destination as the user searches and selects
+ships.
+
+👨‍💼 Great, thank you Kellie! So what we need you to do is update
+our <InlineFile file="src/index.js" /> to render the `RouterContext.Provider`
+with the right values (you'll be implementing the `navigate` function) and then
+update the <InlineFile file="src/ship-search.js" /> module to use the
+`useRouter()` hook to navigate the user to the ship details page when they click
+on a ship link.
+
+🧝‍♂️ Here's a tip on the `mergeLocationState` utility you're going to need:
+
+```js
+import { mergeLocationState } from './router.js'
+
+const location = '/abc123?search=starship'
+
+const updatedSearch = mergeLocationState(location, { search: 'rocket' })
+// ^ '/abc123?search=rocket'
+
+const updatedShipId = mergeLocationState(location, { shipId: 'zxy987' })
+// ^ '/zxy987?search=starship'
+```
+
+Once you have the updated location, you can pass that to the `navigate` function
+you're gonna write.
+
+Another tip, you're going to be using the
+[`window.history`](https://developer.mozilla.org/en-US/docs/Web/API/History) API
+to update the URL in the browser without triggering a full-page reload. You'll
+want to use the `pushState` method when the user selects a ship and
+`replaceState` when the user types in the search. Feel free to read the docs to
+dive into the differences between those, but this means your `navigate` function
+will need to accept an option to determine if it should push or replace the
+state.
+
+Good luck!

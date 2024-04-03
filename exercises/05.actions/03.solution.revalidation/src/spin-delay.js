@@ -1,3 +1,4 @@
+// copied from npm.im/spin-delay to make it easier to use in this workshop
 import { useState, useEffect, useRef } from 'react'
 
 export const defaultOptions = {

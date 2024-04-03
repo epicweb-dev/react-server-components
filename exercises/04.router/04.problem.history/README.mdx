@@ -1,1 +1,21 @@
 # History
+
+👨‍💼 You may have noticed that hitting the back and forward buttons in the browser
+does not work. This is because the browser is not aware of the state changes
+that are happening in the application. To fix this, we need to add an event
+handler to when the browser history changes via the user clicking those buttons.
+
+The event that's fired when the history changes is called `popstate`. We can
+listen for this event and update the application state accordingly.
+
+```js
+function handlePopState() {
+	// do stuff
+}
+window.addEventListener(handlePopState)
+
+// then to clean up
+window.removeEventListener(handlePopState)
+```
+
+Please add this event listener in a `useEffect` in our router logic.

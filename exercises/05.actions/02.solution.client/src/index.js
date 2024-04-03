@@ -103,9 +103,9 @@ function Root() {
 		RouterContext.Provider,
 		{
 			value: {
-				location,
-				nextLocation: isPending ? nextLocation : location,
 				navigate,
+				location,
+				nextLocation,
 				isPending,
 			},
 		},

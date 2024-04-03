@@ -4,6 +4,8 @@ import {
 	startTransition,
 	use,
 	useDeferredValue,
+	// 💰 you're gonna need this
+	// useEffect,
 	useRef,
 	useState,
 	useTransition,
@@ -35,6 +37,16 @@ function Root() {
 
 	const location = useDeferredValue(nextLocation)
 
+	// 🐨 add a useEffect here to add a popstate listener
+	// 🐨 make a handlePopState function
+	//   - create a nextLocation variable set to getGlobalLocation()
+	//   - call setNextLocation with that nextLocation
+	//   - fetchContent for that nextLocation and set it to fetchPromise
+	//   - create a nextContentPromise using createFromFetch(fetchPromise)
+	//   - start an transition that sets the contentPromise to nextContentPromise
+	// 🐨 add that handlePopState as an event listener to the popstate event on window
+	// 🐨 don't forget to remove the event listener in the cleanup!
+
 	function navigate(nextLocation, { replace = false } = {}) {
 		setNextLocation(nextLocation)
 		const thisNav = Symbol(`Nav for ${nextLocation}`)
@@ -59,9 +71,9 @@ function Root() {
 		RouterContext.Provider,
 		{
 			value: {
-				location,
-				nextLocation: isPending ? nextLocation : location,
 				navigate,
+				location,
+				nextLocation,
 				isPending,
 			},
 		},

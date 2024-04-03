@@ -6,12 +6,11 @@ import { useSpinDelay } from './spin-delay.js'
 
 export function ShipDetailsPendingTransition({ children }) {
 	const { location, nextLocation } = useRouter()
-	const previousShipId = parseLocationState(nextLocation).shipId
-	const nextShipId = parseLocationState(location).shipId
-	const isShipDetailsPending = useSpinDelay(previousShipId !== nextShipId, {
-		delay: 300,
-		minDuration: 350,
-	})
+	const isShipDetailsPending = useSpinDelay(
+		parseLocationState(nextLocation).shipId !==
+			parseLocationState(location).shipId,
+		{ delay: 300, minDuration: 350 },
+	)
 
 	return h('div', {
 		className: 'details',

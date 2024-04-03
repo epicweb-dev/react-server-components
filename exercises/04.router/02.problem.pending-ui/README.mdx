@@ -1,1 +1,36 @@
 # Pending UI
+
+👨‍💼 Sometimes our users are on slow networks so we should give them good feedback
+when they interact with our application.
+
+To be able to do this effectively, we need a few things:
+
+1. Our transitions should take place within a `useTransition` `startTransition`
+2. The `location` to remain unchanged until the transition is complete
+3. We need a `nextLocation` state so we can determine what part of the location
+   is changing
+
+We've already got our transition wrapped in a `startTransition`, but this is the
+global one from `react`. We need to use one from `useTransition` instead so we
+get access to the `isPending` state.
+
+Then we'll change our `location` to be a `nextLocation` and then use
+`useDeferredValue` to get the `location` so that it remains unchanged until the
+transition is complete.
+
+Then we can add the `isPending` and `nextLocation` to our router context and use
+that to determine pending states for our UI.
+
+🧝‍♂️ You're going to want to use the `parseLocationState` utility I made for this
+one. Here's how it works:
+
+```js
+import { parseLocationState } from './router.js'
+
+const location = '/abc123?search=starship'
+const state = parseLocationState(location)
+// ^ { shipId: 'abc123', search: 'starship' }
+```
+
+You can use that to parse the current location and the next location. If the
+part you care about is different then you know you can show a pending state.

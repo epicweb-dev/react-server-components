@@ -1,1 +1,48 @@
 # Cache
+
+👨‍💼 When we hit the back/forward buttons, we're getting our suspense boundaries
+for a bit. This is confusing because we've wrapped our content state update
+in `startTransition` which should keep the old UI around until the new one is
+ready.
+
+This is actually intentional by the React team. They force suspense boundaries
+to be shown when we hit the back/forward buttons if anything suspends to manage
+things like scroll position and focus more accurately.
+
+So what do we do? Well, we need to make it so our component doesn't suspend. We
+do this by caching the content as the user navigates around, that way when they
+go back/forward, we can just show the cached content.
+
+The trick is, what should we use as the cache key? We can't use the URL because
+the user could have navigated to the same URL multiple times in their history
+and the content is not necessarily the same.
+
+The `window.history` API actually supports client-side `state` which the browser
+will manage for us:
+
+```js
+window.history.pushState({ key: 'some-unique-key' }, '', '/some-url')
+
+// then later
+const key = window.history.state?.key
+```
+
+This is perfect. So we can simply generate a random ID, store the content
+promise in a cache, then store the `contentKey` in state instead of the
+`contentPromise` directly. Then, whenever we navigate, or when `popstate` events
+happen, we can create a new `contentPromise` and update the cache and cache key.
+
+🧝‍♂️ I've implemented a special map that allows us to track whenever values change
+in it so React will rerender our app when we update the cache. So you can get
+the `contentCache` directly from <InlineFile file="src/content-cache.js" /> for
+use in the module, but within the `Root` component, you can use the
+`useContentCache()` hook to get a cache object that will trigger rerenders when
+you update it.
+
+👨‍💼 Great, thanks Kellie. Another thing you're going to want to do is make sure
+when we land on the page, if the history doesn't already have a key, we generate
+one, replace history with that key and get the content promise into the cache.
+
+And in the `popstate` case, if the key is already in the cache, we can just
+update the `contentKey` in state and let the component rerender with the cached
+content rather than fetching new content.

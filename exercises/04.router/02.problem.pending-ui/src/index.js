@@ -3,7 +3,11 @@ import {
 	createElement as h,
 	startTransition,
 	use,
+	// 💰 you'll need this
+	// useDeferredValue,
 	useState,
+	// 💰 you'll need this
+	// useTransition,
 } from 'react'
 import { createRoot } from 'react-dom/client'
 import * as RSC from 'react-server-dom-esm/client'
@@ -25,8 +29,12 @@ const initialLocation = getGlobalLocation()
 const initialContentPromise = createFromFetch(fetchContent(initialLocation))
 
 function Root() {
+	// 🐨 change this to nextLocation
 	const [location, setLocation] = useState(initialLocation)
 	const [contentPromise, setContentPromise] = useState(initialContentPromise)
+	// 🐨 call useTransition here to get isPending and startTransition
+
+	// 🐨 create a location variable set to useDeferredValue of the nextLocation
 
 	function navigate(nextLocation, { replace = false } = {}) {
 		setLocation(nextLocation)
@@ -49,8 +57,9 @@ function Root() {
 		RouterContext.Provider,
 		{
 			value: {
-				location,
 				navigate,
+				location,
+				// 🐨 add the nextLocation and isPending to this context value
 			},
 		},
 		use(contentPromise),

@@ -1,1 +1,49 @@
 # Race Conditions
+
+👨‍💼 Networks are unpredictable. Let's imagine the user clicks around a lot and
+that triggers several network requests:
+
+```
+*click* ------ request --------> update ui
+  *click* ------ request --------> update ui
+    *click* ------ request --------> update ui
+```
+
+That works nicely. But sometimes the requests come back in a different order for
+whatever reason (network latency, server load, etc):
+
+```
+*click* --------- request ----------> update ui
+  *click* ---- request ------> update ui
+    *click* ----- request -------> update ui
+```
+
+This would be a pretty bad user experience because the UI would be updating in
+a different order than the user clicked.
+
+What would be better is if we avoid updating the UI if there's a newer request
+going out.
+
+This is easier than you might think:
+
+```jsx
+const latestNav = useRef(null)
+
+// when we start a navigation:
+const thisNav = Symbol()
+latestNav.current = thisNav
+
+// when we're ready to update the UI:
+if (latestNav.current === thisNav) {
+	// update the UI
+}
+```
+
+That way any navigation that comes back out of order will be ignored.
+
+🧝‍♂️ I've added a bit of code in <InlineFile file="server/app.js" /> to allow you
+to simulate a race condition. Do a search for "star" and you'll notice after two
+seconds, the URL gets updated to "?search=st" because we have a delay for that
+search term. When you're finished, this should not happen.
+
+Go ahead and make that magic happen!

@@ -31,6 +31,18 @@ app.use((req, res, next) => {
 	}
 })
 
+// 🧝‍♂️ I've added this so you can simulate a race condition
+// type the search query "star" and you'll notice the URL gets
+// updated to have a search of "st" after two seconds because
+// this responds after later requests. When you're finished, this
+// should not happen.
+app.get('/rsc/:shipId?', async function (req, res, next) {
+	if (req.query.search === 'st') {
+		await new Promise(resolve => setTimeout(resolve, 2000))
+	}
+	next()
+})
+
 app.get('/rsc/:shipId?', async function (req, res) {
 	try {
 		const shipId = req.params.shipId || null

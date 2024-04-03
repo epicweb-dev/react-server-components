@@ -21,7 +21,7 @@ export function ShipSearch({ search, results, fallback }) {
 				// 🐨 add an onChange handler so we can update the search in the URL
 				// 🐨 use the mergeLocationState utility to create a newLocation that
 				// copies the state from the current location with an updated search value
-				// 🐨 navigate to the newLocation and replace
+				// 🐨 navigate to the newLocation and set the replace option to true
 			}),
 		),
 		h(

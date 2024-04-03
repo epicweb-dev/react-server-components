@@ -19,19 +19,31 @@ const initialLocation = getGlobalLocation()
 const initialContentPromise = createFromFetch(fetchContent(initialLocation))
 
 function Root() {
+	// 🐨 put this in state so we can update this as the user navigates
 	const location = initialLocation
+	// 🐨 put this in state so we can update this as the user navigates
 	const contentPromise = initialContentPromise
 
+	// 🐨 this function should accept the nextLocation and an optional options argument
+	// that has a replace option which defaults to false (this will be used to
+	// determine whether we should call replaceState or pushState)
 	function navigate() {
-		// TODO...
+		// 🐨 set the location to the nextLocation
+		// 🐨 create a nextContentFetchPromise which is set to fetchContent(nextLocation)
+		// 🐨 add a .then handler to the fetch promise
+		//   - if replace is true, call window.history.replaceState({}, '', nextLocation)
+		//   - otherwise, call window.history.pushState({}, '', nextLocation)
+		//   - return the response
+		// 🐨 create a nextContentPromise variable set to createFromFetch(nextContentFetchPromise)
+		// 🐨 set the content promise inside a startTransition
 	}
 
 	return h(
 		RouterContext.Provider,
 		{
 			value: {
-				location,
 				navigate,
+				location,
 			},
 		},
 		use(contentPromise),
