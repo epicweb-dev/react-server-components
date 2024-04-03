@@ -1,1 +1,28 @@
 # Router Optimizations
+
+As the user navigates around your application, you need to keep the UI
+up-to-date with what they should be looking at. Traditionally this means lazy
+loading code for the new routes and requesting relevant data.
+
+This is no different for React Server Components. However, instead of fetching
+code and data, we fetch the up-to-date RSC payload (which is kind of like code
+and data combined) and update the UI with that updated payload.
+
+There are a lot of things to consider with this. For one, we don't want a full
+page reload whenever users click links within the app as this is a poor user
+experience and makes it harder to manage things like scroll position and focus.
+
+We also want to do better than the browser can with regard to pending UI (really
+anything is better than just the favicon turning into a spinner). So the router
+needs to expose a mechanism to determine the location you're transitioning to
+so the existing UI can be updated with a loading state while the new UI is
+generated.
+
+You'll want to handle race conditions in case the user gets a little indecisive
+and clicks around a lot.
+
+Finally, you'll want to also handling forward/back buttons to update the UI
+to what it should be.
+
+All of this is rather involved and can be a bit tricky to get right. We're going
+to implement a simple version of a router in this exercise.

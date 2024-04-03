@@ -74,7 +74,8 @@ const moduleBasePath = new URL('../src', import.meta.url).href
 async function renderApp(res, returnValue) {
 	const shipId = res.req.params.shipId || null
 	const search = res.req.query.search || ''
-	shipDataStorage.run({ shipId, search }, () => {
+	const data = { shipId, search }
+	shipDataStorage.run(data, () => {
 		// 🐨 update this to be the Document export of ../src/app.js instead of the App
 		const root = h(App)
 		const payload = { returnValue, root }
