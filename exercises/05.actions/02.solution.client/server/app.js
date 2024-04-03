@@ -1,13 +1,8 @@
-import bodyParser from 'body-parser'
-import busboy from 'busboy'
 import closeWithGrace from 'close-with-grace'
 import compress from 'compression'
 import express from 'express'
 import { createElement as h } from 'react'
-import {
-	renderToPipeableStream,
-	decodeReplyFromBusboy,
-} from 'react-server-dom-esm/server'
+import { renderToPipeableStream } from 'react-server-dom-esm/server'
 import { App } from '../src/app.js'
 import { shipDataStorage } from './async-storage.js'
 
@@ -38,49 +33,28 @@ app.use((req, res, next) => {
 
 const moduleBasePath = new URL('../src', import.meta.url).href
 
-async function renderApp(res, returnValue) {
-	const shipId = res.req.params.shipId || null
-	const search = res.req.query.search || ''
-	const data = { shipId, search }
-	shipDataStorage.run(data, () => {
-		const root = h(App)
-		const payload = { returnValue, root }
-		const { pipe } = renderToPipeableStream(payload, moduleBasePath)
-		pipe(res)
-	})
+async function renderApp(res) {
+	try {
+		const shipId = res.req.params.shipId || null
+		const search = res.req.query.search || ''
+		const data = { shipId, search }
+		shipDataStorage.run(data, () => {
+			const root = h(App)
+			const payload = root
+			const { pipe } = renderToPipeableStream(payload, moduleBasePath)
+			pipe(res)
+		})
+	} catch (error) {
+		console.error(error)
+		res.status(500).json({ error: error.message })
+	}
 }
 
-app.get('/rsc/:shipId?', async function (req, res) {
-	await renderApp(res, null)
+app.get('/rsc/:shipId?', async (req, res) => {
+	await renderApp(res)
 })
 
-app.post('/action/:shipId?', bodyParser.text(), async function (req, res) {
-	const serverReference = req.get('rsc-action')
-	const [filepath, name] = serverReference.split('#')
-	const action = (await import(filepath))[name]
-	// Validate that this is actually a function we intended to expose and
-	// not the client trying to invoke arbitrary functions. In a real app,
-	// you'd have a manifest verifying this before even importing it.
-	if (action.$$typeof !== Symbol.for('react.server.reference')) {
-		throw new Error('Invalid action')
-	}
-
-	const bb = busboy({ headers: req.headers })
-	const reply = decodeReplyFromBusboy(bb, moduleBasePath)
-	req.pipe(bb)
-	const args = await reply
-	const result = action.apply(null, args)
-	try {
-		// Wait for any mutations
-		await result
-	} catch (x) {
-		// We handle the error on the client
-	}
-	// Refresh the client and return the value
-	await renderApp(res, result)
-})
-
-app.get('/:shipId?', async function (req, res) {
+app.get('/:shipId?', async (req, res) => {
 	res.set('Content-type', 'text/html')
 	return res.sendFile('index.html', { root: 'public' })
 })

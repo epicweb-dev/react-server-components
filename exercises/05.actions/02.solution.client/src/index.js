@@ -31,7 +31,7 @@ async function callServer(id, args) {
 	// using the global location to avoid a stale closure over the location
 	const fetchPromise = fetch(`/action${getGlobalLocation()}`, {
 		method: 'POST',
-		headers: { Accept: 'text/x-component', 'rsc-action': id },
+		headers: { 'rsc-action': id },
 		body: await RSC.encodeReply(args),
 	})
 	const actionResponsePromise = createFromFetch(fetchPromise)
@@ -109,7 +109,7 @@ function Root() {
 				isPending,
 			},
 		},
-		use(contentPromise).root,
+		use(contentPromise),
 	)
 }
 

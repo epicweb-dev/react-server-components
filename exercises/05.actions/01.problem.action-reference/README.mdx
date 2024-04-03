@@ -1,0 +1,39 @@
+# Action Reference
+
+👨‍💼 Our users want to be able to change the name of the space ships. So Kellie
+has brought in a new client component for editing the name. All you need to do
+is click on the name in the details view and you'll be able to edit it.
+
+Thanks to the work we did setting up the server for React Server Components,
+our server is already set up to handle server actions. By adding a
+`'use server'` to the top of the module, our Node.js loader we set up earlier
+will handle converting our server actions into references which we'll send to
+the client.
+
+In this step, we're going to wire the server action up to the client and you can
+take a look at the RSC output to find the reference in there.
+
+🐨 First, let's update the <InlineFile file="src/actions.js" /> file to respond
+properly. Then you can go to <InlineFile file="src/ship-details.js" /> to import
+that action and send it along to the client component.
+
+🐨 Finally in <InlineFile file="src/edit-text.js" /> you can accept the action
+and wire things up with the `useActionState()` hook from `'react'`.
+
+Once you've done this, then you should be able to the rsc endpoint for a ship
+(like <LinkToApp to="/rsc/1ff1991efe029" />) and you should be able to find the
+action reference in the output (search for "actions.js").
+
+<callout-warning>
+	This step is only part of the work. When you're finished with this step, you
+	won't have anything working quite yet. Continue onto the next step.
+</callout-warning>
+
+<callout-warning>
+	`react-server-dom-esm` does not allow you to specify a `method` or `encType`
+	on a `form` element when you specify an `action` that's a reference to a
+	server action. Instead, it will set those values at request time for you. I
+	personally don't agree with this decision (I would prefer to stick with the
+	platform defaults), but the React team feels like it's worth straying from the
+	platform defaults in this case.
+</callout-warning>

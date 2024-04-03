@@ -1,0 +1,14 @@
+# Revalidation
+
+👨‍💼 You might notice that once we make a change to the ship name, the list on the
+left doesn't update immediately. We are actually sending the updated UI so
+what's the problem?
+
+The problem is we're ignoring the RSC payload. We're only doing something with
+the `returnValue`. Instead, we need to use the `root` as well to update our
+component to use that value.
+
+But here's the tricky thing. The `callServer` function is outside our component
+so how can we call `setContentKey`?
+
+FIXME: This is not done!

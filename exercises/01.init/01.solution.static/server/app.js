@@ -28,7 +28,7 @@ app.use((req, res, next) => {
 	}
 })
 
-app.get('/api/:shipId?', async function (req, res) {
+app.get('/api/:shipId?', async (req, res) => {
 	try {
 		const shipId = req.params.shipId || null
 		const search = req.query.search || ''
@@ -42,7 +42,7 @@ app.get('/api/:shipId?', async function (req, res) {
 	}
 })
 
-app.get('/:shipId?', async function (req, res) {
+app.get('/:shipId?', async (req, res) => {
 	res.set('Content-type', 'text/html')
 	return res.sendFile('index.html', { root: 'public' })
 })

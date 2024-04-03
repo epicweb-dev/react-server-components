@@ -32,7 +32,7 @@ async function callServer(id, args) {
 	// using the global location to avoid a stale closure over the location
 	const fetchPromise = fetch(`/action${getGlobalLocation()}`, {
 		method: 'POST',
-		headers: { Accept: 'text/x-component', 'rsc-action': id },
+		headers: { 'rsc-action': id },
 		body: await RSC.encodeReply(args),
 	})
 	const contentKey = window.history.state?.key ?? generateKey()
@@ -68,10 +68,10 @@ function onStreamFinished(fetchPromise, onFinished) {
 
 function Root() {
 	const latestNav = useRef(null)
+	const contentCache = useContentCache()
 	const [nextLocation, setNextLocation] = useState(getGlobalLocation)
 	const [contentKey, setContentKey] = useState(initialContentKey)
 	const [isPending, startTransition] = useTransition()
-	const contentCache = useContentCache()
 
 	// set the updateContentKey function in a useEffect to avoid issues with
 	// concurrent rendering (useDeferredValue will create throw-away renders).

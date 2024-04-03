@@ -33,7 +33,7 @@ app.use((req, res, next) => {
 
 // 🐨 add an API endpoint to get data for our page:
 // 💰
-// app.get('/api/:shipId?', async function (req, res) {
+// app.get('/api/:shipId?', async (req, res) => {
 // 	try {
 // 		const shipId = req.params.shipId || null
 // 		const search = req.query.search || ''
@@ -50,7 +50,7 @@ app.use((req, res, next) => {
 // 🐨 add a handler for '/:shipId?' which means the ship is optional
 // 🐨 set the response Content-type to 'text/html' and send the file in public called index.html
 // 💰
-// app.get('/:shipId?', async function (req, res) {
+// app.get('/:shipId?', async (req, res) => {
 // 	res.set('Content-type', 'text/html')
 // 	return res.sendFile('index.html', { root: 'public' })
 // })

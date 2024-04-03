@@ -87,7 +87,7 @@ async function renderApp(res, returnValue) {
 // 🐨 in both SSR and RSC servers, remove the "/rsc" part of the URL here
 // 🐨 in RSC server, don't change anything else about this handler
 // 🐨 in the SSR server, we're going to server render! Follow the instructions below
-app.get('/rsc/:shipId?', async function (req, res) {
+app.get('/rsc/:shipId?', async (req, res) => {
 	// 🦉 in the SSR server, we're non longer rendering the app. Now we need to
 	// proxy this request to the RSC server.
 	// 💣 delete this call to renderApp
@@ -109,7 +109,7 @@ app.get('/rsc/:shipId?', async function (req, res) {
 	// req.url
 })
 
-app.post('/action/:shipId?', bodyParser.text(), async function (req, res) {
+app.post('/action/:shipId?', bodyParser.text(), async (req, res) => {
 	const serverReference = req.get('rsc-action')
 	const [filepath, name] = serverReference.split('#')
 	const action = (await import(filepath))[name]
@@ -124,19 +124,13 @@ app.post('/action/:shipId?', bodyParser.text(), async function (req, res) {
 	const reply = decodeReplyFromBusboy(bb, moduleBasePath)
 	req.pipe(bb)
 	const args = await reply
-	const result = action.apply(null, args)
-	try {
-		// Wait for any mutations
-		await result
-	} catch (x) {
-		// We handle the error on the client
-	}
-	// Refresh the client and return the value
+	const result = await action(...args)
+
 	await renderApp(res, result)
 })
 
 // 💣 remove this from both servers
-app.get('/:shipId?', async function (req, res) {
+app.get('/:shipId?', async (req, res) => {
 	res.set('Content-type', 'text/html')
 	return res.sendFile('index.html', { root: 'public' })
 })

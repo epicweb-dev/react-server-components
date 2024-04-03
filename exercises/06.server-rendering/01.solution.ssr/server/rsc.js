@@ -30,11 +30,11 @@ async function renderApp(res, returnValue) {
 	})
 }
 
-app.get('/rsc/:shipId?', async function (req, res) {
+app.get('/rsc/:shipId?', async (req, res) => {
 	await renderApp(res, null)
 })
 
-app.post('/action/:shipId?', bodyParser.text(), async function (req, res) {
+app.post('/action/:shipId?', bodyParser.text(), async (req, res) => {
 	const serverReference = req.get('rsc-action')
 	const [filepath, name] = serverReference.split('#')
 	const action = (await import(filepath))[name]
@@ -49,14 +49,8 @@ app.post('/action/:shipId?', bodyParser.text(), async function (req, res) {
 	const reply = decodeReplyFromBusboy(bb, moduleBasePath)
 	req.pipe(bb)
 	const args = await reply
-	const result = action.apply(null, args)
-	try {
-		// Wait for any mutations
-		await result
-	} catch (x) {
-		// We handle the error on the client
-	}
-	// Refresh the client and return the value
+	const result = await action(...args)
+
 	await renderApp(res, result)
 })
 

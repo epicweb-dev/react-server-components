@@ -23,8 +23,19 @@ function fetchContent(location) {
 function createFromFetch(fetchPromise) {
 	return RSC.createFromFetch(fetchPromise, {
 		moduleBaseURL: `${window.location.origin}/js/src`,
+		// 🐨 pass callServer here
 	})
 }
+
+// 🐨 create an async function called callServer
+// 🐨 it should accept an id and args
+// 🐨 it should fetch(`/action/${getGlobalLocation()}`)
+//   - the fetch method should be 'POST'
+//   - the headers should include {'rsc-action': id}
+//   - the body should be the encoded args via await RSC.encodeReply(args)
+// 🐨 then create a new actionResponsePromise using createFromFetch
+// 🐨 await the actionResponsePromise and destructure a property called "returnValue"
+// 🐨 return the returnValue
 
 const initialLocation = getGlobalLocation()
 const initialContentPromise = createFromFetch(fetchContent(initialLocation))
@@ -96,7 +107,7 @@ function Root() {
 				isPending,
 			},
 		},
-		use(contentPromise).root,
+		use(contentPromise),
 	)
 }
 

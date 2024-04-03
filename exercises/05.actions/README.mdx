@@ -1,1 +1,113 @@
 # Server Actions
+
+Most applications are better when you can interact with them and change the data
+they display. This is called "mutation."
+
+On the web, mutations happen via the `<form>` element. When you submit a form,
+the browser sends a request to the server, which processes the data and sends
+back a response.
+
+The challenge with forms is there's a pretty significant amount of indirection.
+The only thing connecting the form to the action it takes is the URL. If you're
+a developer working on a web app, finding the code that handles a form
+submission is often a challenge (and it's different in every app).
+
+In React's quest to "compose all the things," React has a solution to this
+problem in the form of "server actions."
+
+Server actions are similar to client components in many ways. The RSC payload
+carries with it a reference to the action you wish to perform and when the form
+is submitted, the server gets that reference so it knows the right function to
+call.
+
+In practice, what this means is you get to pass a server-only function to a
+client component and that component can call the function when it needs to.
+
+Here's an example of this:
+
+```jsx filename=src/hug-koala.js
+'use server'
+
+import { giveBigHug } from './utils.js'
+
+async function hugKoala(previousState, formData) {
+	const koalaName = formData.get('koalaName')
+	try {
+		await giveBigHug(koalaName)
+		return { status: 'success' }
+	} catch (error) {
+		return { status: 'error', error: error.message }
+	}
+}
+```
+
+```jsx filename=src/koala-form.js
+'use client'
+
+import { useActionState } from 'react'
+import { hugKoala } from './hug-koala.js'
+
+function KoalaForm() {
+	const [formState, formAction, isPending] = useActionState(hugKoala)
+
+	return (
+		<form action={formAction}>
+			<label>
+				Koala Name:
+				<input type="text" name="koalaName" />
+			</label>
+			<button type="submit">{isPending ? 'Hugging...' : 'Hug Koala'}</button>
+			{formState.status === 'error' ? <p>{formState.error}</p> : null}
+			{formState.status === 'success' ? <p>Koala hugged!</p> : null}
+		</form>
+	)
+}
+```
+
+That's all there is to it. For this to work, we need to make some client code
+changes as well as server code changes.
+
+## Client Changes
+
+`react-server-dom-esm` is responsible for handling our server actions when
+they're called. To do this, we configure a `callServer` function when we call
+`createFromFetch`. This makes sense because the server is going to send the
+actions references within the payload so its at that time that we need to
+tell it what to do with those action references.
+
+The `callServer` function will receive an `id` and `args`. The `id` is the
+server action reference and the `args` are the arguments that the server action
+needs to run (the form data).
+
+```js
+import * as RSC from 'react-server-dom-esm/client'
+
+function callAction(id, args) {
+  const fetchPromise = fetch(`/action${getGlobalLocation()}`, {
+    method: 'POST',
+    headers: { 'rsc-action': id },
+    body: await RSC.encodeReply(args),
+  })
+  // handle the fetchPromise similar to how we handle other content fetch
+  // promises
+}
+```
+
+Things get a little tricky here because this needs to be defined outside our
+component, but needs to update state within our component. That's an
+implementation detail we'll explore within the exercise.
+
+## Server Changes
+
+The server needs to handle the action that the client is sending. This is done
+by parsing the `rsc-action` header, parsing the request body and calling the
+appropriate function with the given arguments.
+
+One part of this is the need to return the result of the action to the client
+along with the updated RSC payload. So we change the payload from just the root
+element to an object with `root` and `returnValue` properties which we can then
+use on the client as needed.
+
+📜 Relevant Docs:
+
+- [`use-server`](https://react.dev/reference/react/use-server)

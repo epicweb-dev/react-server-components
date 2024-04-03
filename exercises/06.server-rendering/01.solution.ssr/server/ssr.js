@@ -59,7 +59,7 @@ app.use((req, res, next) => {
 	}
 })
 
-app.get('/rsc/:shipId?', async function (req, res) {
+app.get('/rsc/:shipId?', async (req, res) => {
 	try {
 		const rscResponse = await proxyReq(req)
 
@@ -67,8 +67,6 @@ app.get('/rsc/:shipId?', async function (req, res) {
 		Object.entries(rscResponse.headers).forEach(([header, value]) => {
 			res.set(header, value)
 		})
-
-		res.set('Content-type', 'text/x-component')
 
 		rscResponse.on('data', data => {
 			res.write(data)
@@ -93,8 +91,6 @@ app.post('/action/:shipId?', async (req, res) => {
 			res.set(header, value)
 		})
 
-		res.set('Content-type', 'text/x-component')
-
 		rscResponse.on('data', data => {
 			res.write(data)
 			res.flush()
@@ -109,7 +105,7 @@ app.post('/action/:shipId?', async (req, res) => {
 	}
 })
 
-app.get('/:shipId?', async function (req, res) {
+app.get('/:shipId?', async (req, res) => {
 	try {
 		const rscResponse = await proxyReq(req, `/rsc${req.url}`)
 		const moduleBasePath = new URL('../src', import.meta.url).href

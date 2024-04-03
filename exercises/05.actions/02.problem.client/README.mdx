@@ -1,10 +1,19 @@
 # Client Side
 
+When we fetch an RSC payload, it's going to have our action in there.
+`react-server-dom-esm/client` needs to be told what to do when the action is
+called.
+
+This is where the `callServer` function comes in. You pass that as an option
+to `createFromFetch` and whenever an action is called, it will call your
+function. It's your job to send the action to the server and return the
+return value.
+
+So please implement the `callServer` function
+in <InlineFile file="src/index.js" /> and make sure it sends the action to the
+server.
+
 <callout-warning>
-	`react-server-dom-esm` does not allow you to specify a `method` or `encType`
-	on a `form` element when you specify an `action` that's a reference to a
-	server action. Instead, it will set those values at request time for you. I
-	personally don't agree with this decision (I would prefer to stick with the
-	platform defaults), but the React team feels like it's worth straying from the
-	platform defaults in this case.
+	At this stage, our server doesn't handle the POST request yet, but you can
+	check the Network devtools to see that the request is being sent properly.
 </callout-warning>
