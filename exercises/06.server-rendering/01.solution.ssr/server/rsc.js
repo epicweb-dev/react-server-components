@@ -35,7 +35,6 @@ app.get('/rsc/:shipId?', async function (req, res) {
 
 app.post('/action/:shipId?', bodyParser.text(), async function (req, res) {
 	const serverReference = req.get('rsc-action')
-	// This is the client-side case
 	const [filepath, name] = serverReference.split('#')
 	const action = (await import(filepath))[name]
 	// Validate that this is actually a function we intended to expose and
@@ -68,10 +67,6 @@ closeWithGrace(async ({ signal, err }) => {
 	if (err) console.error('Shutting down server due to error', err)
 	else console.log('Shutting down server due to signal', signal)
 
-	await new Promise((resolve, reject) => {
-		server.close(err => {
-			if (err) reject(err)
-			else resolve()
-		})
-	})
+	await new Promise(resolve => server.close(resolve))
+	process.exit()
 })

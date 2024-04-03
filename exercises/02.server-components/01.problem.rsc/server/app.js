@@ -72,10 +72,6 @@ closeWithGrace(async ({ signal, err }) => {
 	if (err) console.error('Shutting down server due to error', err)
 	else console.log('Shutting down server due to signal', signal)
 
-	await new Promise((resolve, reject) => {
-		server.close(err => {
-			if (err) reject(err)
-			else resolve()
-		})
-	})
+	await new Promise(resolve => server.close(resolve))
+	process.exit()
 })

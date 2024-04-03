@@ -1,1 +1,258 @@
 # Client Components
+
+Rendering things on the server works well. We can even click on links and
+because we have state in the URL (whether in URL segment params or search query
+params), our application will update as the user navigates around. We could even
+make our server handle form submissions if we wanted to as well. Doing this,
+we'd be able to completely avoid client-side JavaScript.
+
+But we're not in the business of avoiding client-side JavaScript. We're in the
+business of excellent user experiences. And modern user experience demands
+client-side JavaScript. But we want to keep the composibility of React
+components in the client as well as the server. Especially because our RSC setup
+enables mixing server-rendered components with client-rendered components.
+
+## The Divide
+
+Server components should be used for things that come from the server and don't
+have client-side interactivity. For example, let's say you're building a todo
+list. The list of items can be rendered by the server. And the button to mark
+them as complete/uncomplete can even be rendered by the server as well.
+
+However, if you want to implement optimistic UI for the checkbox to make the
+user experience feel faster, you're going to need to manage state on the client
+to simulate the update optimistically. This is a good example where you'd need
+a client component.
+
+Another example would be a combobox. You need to manage state for the input
+value, the filter, the selected item, etc.
+
+The great thing is that client and server components can be intermixed. But
+there's an important caveat to how they're mixed as a result of the way server
+components and client components interact.
+
+## Caveats
+
+There are some interesting caveats to consider when mixing client and server
+components. The biggest one is the fact that server components can render client
+components, but client components can't render server components.
+
+Here's a simple example to explain why:
+
+```jsx
+'use client'
+import { ServerComponent } from './server-component.js'
+
+function ClientComponent() {
+	// some client stuff
+	return (
+		<div>
+			{/* some other stuff ...*/}
+			<ServerComponent />
+		</div>
+	)
+}
+```
+
+What happens when the `ClientComponent` renders? How would the client know
+what the server component would render? By definition, the server component
+code is not in the client, so it can't even have a reference to the server.
+
+In fact, that `import` for the `./server-component.js` module would even work in
+the client. That module could have secret environment variables or a database
+connection etc.
+
+So no, you cannot `import` server modules in client modules for safety reasons.
+
+However, you can do the opposite. Client modules can be imported into server
+modules. So if you need the structure of the example above, you would simply
+change the structure:
+
+```jsx
+'use client'
+
+function ClientComponent({ serverUI }) {
+	// some client stuff
+	return (
+		<div>
+			{/* some other stuff ...*/}
+			{serverUI}
+		</div>
+	)
+}
+```
+
+And then a parent server component would render the client component as well as
+the server component like so:
+
+```jsx
+import { ClientComponent } from './client-component.js'
+import { ServerComponent } from './server-component.js'
+
+function App() {
+	return <ClientComponent serverUI={<ServerComponent />} />
+}
+```
+
+This composition is safe because server modules can only be imported by other
+server modules, and client modules (which by definition are safe to send to the
+client) are imported by both server and client modules.
+
+## Client References
+
+There's another caveat to this and that is: what do we do with the client
+components in the serialized JSX? Remember that there are two ways to get UI to
+React to render in the browser:
+
+1. Data + Components in the client
+2. RSC Payload
+
+So when we're generating the RSC payload, should we include the client component
+code in the payload? If we did, then we would be duplicating the client
+component code in the payload and in the client bundle. This would be a waste
+of space. More than that, if the client component has already rendered on the
+client and has state changes already, then what do we do if we get an updated
+RSC payload? Blow away those state changes?
+
+No, we can't include client components in the RSC payload. So instead, the RSC
+payload will include a placeholder for the client component. This placeholder
+is a reference to the client component and the RSC payload will include
+information on how to retrieve the module for the client component.
+
+Let's take another look at an example RSC payload:
+
+```json nonumber
+1:D{"name":"App","env":"Server"}
+0:{"returnValue":null,"root":"$L1"}
+2:I["/ship-search.js","ShipSearch"]
+5:I["/ship-details-pending.js","ShipDetailsPendingTransition"]
+6:I["/error-boundary.js","ErrorBoundary"]
+8:"$Sreact.suspense"
+a:I["/img.js","ShipImg"]
+3:D{"name":"SearchResults","env":"Server"}
+4:D{"name":"SearchResultsFallback","env":"Server"}
+4:[["$","li","0",{"children":["$","a",null,{"href":"#","children":[["$","img",null,{"src":"/img/fallback-ship.png","alt":"loading"}],"... loading"]}]}],["$","li","1",{"children":["$","a",null,{"href":"#","children":[["$","img",null,{"src":"/img/fallback-ship.png","alt":"loading"}],"... loading"]}]}],["$","li","2",{"children":["$","a",null,{"href":"#","children":[["$","img",null,{"src":"/img/fallback-ship.png","alt":"loading"}],"... loading"]}]}],["$","li","3",{"children":["$","a",null,{"href":"#","children":[["$","img",null,{"src":"/img/fallback-ship.png","alt":"loading"}],"... loading"]}]}],["$","li","4",{"children":["$","a",null,{"href":"#","children":[["$","img",null,{"src":"/img/fallback-ship.png","alt":"loading"}],"... loading"]}]}],["$","li","5",{"children":["$","a",null,{"href":"#","children":[["$","img",null,{"src":"/img/fallback-ship.png","alt":"loading"}],"... loading"]}]}],["$","li","6",{"children":["$","a",null,{"href":"#","children":[["$","img",null,{"src":"/img/fallback-ship.png","alt":"loading"}],"... loading"]}]}],["$","li","7",{"children":["$","a",null,{"href":"#","children":[["$","img",null,{"src":"/img/fallback-ship.png","alt":"loading"}],"... loading"]}]}],["$","li","8",{"children":["$","a",null,{"href":"#","children":[["$","img",null,{"src":"/img/fallback-ship.png","alt":"loading"}],"... loading"]}]}],["$","li","9",{"children":["$","a",null,{"href":"#","children":[["$","img",null,{"src":"/img/fallback-ship.png","alt":"loading"}],"... loading"]}]}],["$","li","10",{"children":["$","a",null,{"href":"#","children":[["$","img",null,{"src":"/img/fallback-ship.png","alt":"loading"}],"... loading"]}]}],["$","li","11",{"children":["$","a",null,{"href":"#","children":[["$","img",null,{"src":"/img/fallback-ship.png","alt":"loading"}],"... loading"]}]}]]
+7:D{"name":"ShipError","env":"Server"}
+7:["$","div",null,{"className":"ship-info","children":[["$","div",null,{"className":"ship-info__img-wrapper","children":["$","img",null,{"src":"/img/broken-ship.webp","alt":"broken ship"}]}],["$","section",null,{"children":["$","h2",null,{"children":"There was an error"}]}],["$","section",null,{"children":["There was an error loading \"","0268fc4817ad1","\""]}]]}]
+9:D{"name":"ShipFallback","env":"Server"}
+9:["$","div",null,{"className":"ship-info","children":[["$","div",null,{"className":"ship-info__img-wrapper","children":["$","$La",null,{"src":"/img/ships/0268fc4817ad1.webp?size=200","alt":"0268fc4817ad1"}]}],["$","section",null,{"children":["$","h2",null,{"children":"Loading..."}]}],["$","div",null,{"children":["Top Speed: XX"," ",["$","small",null,{"children":"lyh"}]]}],["$","section",null,{"children":["$","ul",null,{"children":[["$","li","0",{"children":[["$","label",null,{"children":"loading"}],":"," ",["$","span",null,{"children":["XX ",["$","small",null,{"children":"(loading)"}]]}]]}],["$","li","1",{"children":[["$","label",null,{"children":"loading"}],":"," ",["$","span",null,{"children":["XX ",["$","small",null,{"children":"(loading)"}]]}]]}],["$","li","2",{"children":[["$","label",null,{"children":"loading"}],":"," ",["$","span",null,{"children":["XX ",["$","small",null,{"children":"(loading)"}]]}]]}]]}]}]]}]
+b:D{"name":"ShipDetails","env":"Server"}
+1:["$","div",null,{"className":"app","children":[["$","div",null,{"className":"search","children":["$","$L2",null,{"search":"m","results":"$L3","fallback":"$4"}]}],["$","$L5",null,{"children":["$","$L6",null,{"fallback":"$7","children":["$","$8",null,{"fallback":"$9","children":"$Lb"}]}]}]]}]
+c:I["/ship-search.js","SelectShipLink"]
+3:[["$","li","Bomber",{"children":["$","$Lc",null,{"shipId":"5c13d8b28a14a","highlight":false,"children":[["$","$La",null,{"src":"/img/ships/5c13d8b28a14a.webp?size=20","alt":"Bomber"}],"Bomber"]}]}],["$","li","Diplomatic Vessel",{"children":["$","$Lc",null,{"shipId":"6f375578ead88","highlight":false,"children":[["$","$La",null,{"src":"/img/ships/6f375578ead88.webp?size=20","alt":"Diplomatic Vessel"}],"Diplomatic Vessel"]}]}],["$","li","Mining Ship",{"children":["$","$Lc",null,{"shipId":"627c497212456","highlight":false,"children":[["$","$La",null,{"src":"/img/ships/627c497212456.webp?size=20","alt":"Mining Ship"}],"Mining Ship"]}]}],["$","li","Medical Ship",{"children":["$","$Lc",null,{"shipId":"0268fc4817ad1","highlight":true,"children":[["$","$La",null,{"src":"/img/ships/0268fc4817ad1.webp?size=20","alt":"Medical Ship"}],"Medical Ship"]}]}]]
+b:["$","div",null,{"className":"ship-info","children":[["$","div",null,{"className":"ship-info__img-wrapper","children":["$","$La",null,{"src":"/img/ships/0268fc4817ad1.webp?size=200","alt":"Medical Ship"}]}],["$","section",null,{"children":["$","h2",null,{"children":"Medical Ship"}]}],["$","div",null,{"children":["Top Speed: ",2," ",["$","small",null,{"children":"lyh"}]]}],["$","section",null,{"children":["$","p",null,{"children":"NOTE: This ship is not equipped with any weapons."}]}]]}]
+```
+
+We're not here to understand this format deeply (and it's possibly subject to
+change anyway). So let's cut out some of the bits in the payload to focus a bit
+and I'll format it to make it easier to read:
+
+```json nonumber
+...
+2:I["/ship-search.js","ShipSearch"]
+// ...
+1:[
+  "$",
+  "div",
+  null,
+  {
+    "className": "app",
+    "children": [
+      [
+        "$",
+        "div",
+        null,
+        {
+          "className": "search",
+          "children": [
+            "$",
+            "$L2",
+            null,
+            { "search": "m", "results": "$L3", "fallback": "$4" }
+          ]
+        }
+      ],
+      [
+        // ...
+      ]
+    ]
+  }
+]
+...
+```
+
+Notice there's an entry for the `I` type with the id of `2` and that's
+referenced in the `1` entry by `$L2`.
+
+So when React is processing the RSC payload, it sees that `$L2` is a reference,
+it looks up that reference, sees that it's a client component and knows which
+module to find it in. It imports `ShipSearch` from `/ship-search.js` and renders
+it in that place.
+
+This is how React avoids duplicating client component code in the RSC payload.
+
+## `use client`
+
+So then the question is, how do we avoid duplicating client component code in
+the server when we're importing those modules and rendering them in our server
+components?
+
+The answer is the bundler you're using. When you're creating the RSC bundler,
+you can tell it to replace certain modules with the reference to the client
+module. And you tell it using the `'use client'`.
+
+We can do this without a bundler by registering a custom
+[Node.js loader](https://nodejs.org/api/module.html#customization-hooks).
+Luckily, for us, `react-server-dom-esm` exports a loader for us to use and as
+this isn't a workshop about Node.js loaders, you won't be required to configure
+it yourself. But it's important that you understand what it's doing. So we'll
+have you toss a few `console.logs` around until you get it.
+
+## Importing Client Components
+
+One final thing you're going to need to understand about client components is
+how they're loaded. You're not responsible for loading them yourself.
+
+We hand off the RSC payload to `react-server-dom-esm/client` which will take
+care of loading the client components for you. All we have to do is tell it
+where to get the modules.
+
+You'll recall from the RSC format above that the client modules look like this:
+
+```json nonumber
+2:I["/ship-search.js","ShipSearch"]
+```
+
+The first item in the array is the path to the module and the second item is
+the name of the `export` in module. The full path to that module will be
+something like
+`file:///Users/kentcdodds/code/epicweb-dev/react-server-components/playground/src/ship-search.js`.
+
+So when we call `renderToPipeableStream` with the RSC payload, we'll also provide
+`react-server-dom-esm/client` with a `moduleBaseURL` option. This allows you to
+control where the client modules can be loaded from the file system and used to
+shorten the paths in the RSC payload:
+
+```js
+const moduleBasePath = new URL('../src', import.meta.url).href
+// moduleBasePath is something like `file:///Users/kentcdodds/code/epicweb-dev/react-server-components/playground/src`
+const { pipe } = renderToPipeableStream(payload, moduleBasePath)
+```
+
+With the full file path removed, we're left with the path to the module relative
+to our `src` directory. Our express server is configured to serve any file in
+`src` via `/js/src`.
+
+Because `react-server-dom-esm/client` is responsible for loading that module for
+us, we need to tell it the base URL to load modules from via an option called
+`moduleBaseURL`:
+
+```js
+createFromFetch(fetchPromise, {
+	moduleBaseURL: `${window.location.origin}/js/src`,
+})
+```
+
+Then when `react-server-dom-esm/client` needs to load a module, it will fetch
+the module from `${window.location.origin}/js/src/ship-search.js` and `import`
+the `ShipSearch` `export` from it.

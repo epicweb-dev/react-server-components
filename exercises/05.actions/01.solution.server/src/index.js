@@ -21,7 +21,9 @@ function fetchContent(location) {
 }
 
 function createFromFetch(fetchPromise) {
-	return RSC.createFromFetch(fetchPromise, { moduleBaseURL: '/js/src' })
+	return RSC.createFromFetch(fetchPromise, {
+		moduleBaseURL: `${window.location.origin}/js/src`,
+	})
 }
 
 const initialLocation = getGlobalLocation()

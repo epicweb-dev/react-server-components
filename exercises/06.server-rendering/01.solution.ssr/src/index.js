@@ -23,7 +23,7 @@ function updateContentKey() {
 
 function createFromFetch(fetchPromise) {
 	return RSC.createFromFetch(fetchPromise, {
-		moduleBaseURL: '/js/src',
+		moduleBaseURL: `${window.location.origin}/js/src`,
 		callServer,
 	})
 }

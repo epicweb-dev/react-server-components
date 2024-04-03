@@ -1,6 +1,4 @@
 import http from 'node:http'
-import { createRequire } from 'node:module'
-import path from 'node:path'
 import closeWithGrace from 'close-with-grace'
 import compress from 'compression'
 import express from 'express'
@@ -45,19 +43,6 @@ app.head('/', (req, res) => res.status(200).end())
 
 app.use(express.static('public', { index: false }))
 app.use('/js/src', express.static('src'))
-
-// we have to server this file from our own server so dynamic imports are
-// relative to our own server (this module is what loads client-side modules!)
-app.use('/js/react-server-dom-esm/client', (req, res) => {
-	const require = createRequire(import.meta.url)
-	const pkgPath = require.resolve('react-server-dom-esm')
-	const modulePath = path.join(
-		path.dirname(pkgPath),
-		'esm',
-		'react-server-dom-esm-client.browser.development.js',
-	)
-	res.sendFile(modulePath)
-})
 
 // This just cleans up the URL if the search ever gets cleared... Not important
 // for RSCs... Just ... I just can't help myself. I like URLs clean.
@@ -185,10 +170,6 @@ closeWithGrace(async ({ signal, err }) => {
 	if (err) console.error('Shutting down server due to error', err)
 	else console.log('Shutting down server due to signal', signal)
 
-	await new Promise((resolve, reject) => {
-		server.close(err => {
-			if (err) reject(err)
-			else resolve()
-		})
-	})
+	await new Promise(resolve => server.close(resolve))
+	process.exit()
 })

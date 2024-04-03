@@ -17,7 +17,8 @@ async function textLoad(url, context, defaultLoad) {
 }
 
 export async function load(url, context, defaultLoad) {
-	return await reactLoad(url, context, (u, c) => {
+	const result = await reactLoad(url, context, (u, c) => {
 		return textLoad(u, c, defaultLoad)
 	})
+	return result
 }
