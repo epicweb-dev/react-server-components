@@ -9,6 +9,78 @@ the `returnValue`. Instead, we need to use the `root` as well to update our
 component to use that value.
 
 But here's the tricky thing. The `callServer` function is outside our component
-so how can we call `setContentKey`?
+so how can we call `setContentKey` within our `startTransition`?
 
-FIXME: This is not done!
+We use fancy JavaScript tricks of course! Here's an example of what I mean:
+
+```js
+function increment() {
+	throw new Error('This was called before Counter rendered')
+}
+
+function Counter() {
+	const [count, setCount] = useState(0)
+
+	useEffect(() => {
+		increment = () => setCount(c => c + 1)
+	}, [])
+
+	return <button onClick={increment}>{count}</button>
+}
+```
+
+With this setup, you can call `increment` from anywhere in your code and it will
+update the `Counter` component. This is because we're using a closure to keep
+the `setCount` function around.
+
+This totally breaks reusability of the component, but in our case we only have
+a single `Root` component anyway, so it's perfectly safe.
+
+Another challenge we're going to have in this bit is we need to only update the
+cached value after the response has finished streaming, otherwise we'll just
+render the pending UI right away which would be annoying.
+
+You might think about doing something like this:
+
+```js
+const actionResponse = await createFromFetch(fetchPromise)
+contentCache.set(contentKey, actionResponse)
+updateContentKey(contentKey)
+return actionResponse.returnValue
+```
+
+Unfortunately, this won't work because the promise resolves as soon as the
+stream **starts** not when it ends. So we need something a little more fancy:
+
+```js
+function onStreamFinished(fetchPromise, onFinished) {
+	// create a promise chain that resolves when the stream is completely consumed
+	return (
+		fetchPromise
+			// clone the response so createFromFetch can use it (otherwise we lock the reader)
+			// and wait for the text to be consumed so we know the stream is finished
+			.then(response => response.clone().text())
+			.then(onFinished)
+	)
+}
+```
+
+Basically, we're cloning the response so we can read the text from it without
+locking the reader (otherwise we'd prevent `createFromFetch` from using it).
+This way we can know when the stream is finished and update:
+
+```js
+const fetchPromise = fetch(/*...*/)
+onStreamFinished(fetchPromise, () => {
+	updateContentKey(contentKey)
+})
+const actionResponsePromise = createFromFetch(fetchPromise)
+// ... etc
+```
+
+It's important that you call `onStreamFinished` before calling `createFromFetch`
+so we can make a copy of the response before `createFromFetch` starts consuming
+it.
+
+So yeah, doing a couple interesting things in this one, but it should result in
+a great user experience! Enjoy!

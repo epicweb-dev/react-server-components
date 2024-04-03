@@ -1,1 +1,13 @@
 # History Revalidation
+
+👨‍💼 You might notice that now if you make a change to one of the ships, then hit
+the back button the change will be lost. This is because the history is not
+being revalidated when the back button is clicked.
+
+Interestingly, this is the way the web platform works by default. When you
+navigate back to a page, the browser will use a cached version of that page and
+display it.
+
+But we can do better. Let's revalidate on `popstate` events as well!
+
+This will be similar to the revalidation we did earlier. Good luck!

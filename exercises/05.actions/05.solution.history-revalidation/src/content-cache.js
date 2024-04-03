@@ -5,10 +5,7 @@ import { useSyncExternalStore } from 'react'
  * change.
  */
 class ObservableMap extends Map {
-	constructor(entries) {
-		super(entries)
-		this.listeners = new Set()
-	}
+	listeners = new Set()
 	set(key, value) {
 		const result = super.set(key, value)
 		this.emitChange()
