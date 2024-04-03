@@ -15,7 +15,13 @@ reference registrations.
 
 👨‍💼 Thanks Kellie. So now, what you need to do is register the loader, update the
 `dev` script in <InlineFile file="package.json" /> to import the loader
-registration, and then create and use the `error-boundary.js` `'use client'`
+registration.
+
+```sh nonumber nolang
+node --watch --import ./server/register-rsc-loader.js --conditions=react-server server/app.js
+```
+
+Now create and use the `error-boundary.js` `'use client'`
 module.
 
 When you're finished, we'll not actually be loading modules yet, but we'll be
