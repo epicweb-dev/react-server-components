@@ -9,7 +9,9 @@ const getGlobalLocation = () =>
 
 const initialLocation = getGlobalLocation()
 const initialContentFetchPromise = fetch(`/rsc${initialLocation}`)
-const initialContentPromise = createFromFetch(initialContentFetchPromise)
+const initialContentPromise = createFromFetch(initialContentFetchPromise, {
+	// 🐨 add a moduleBaseURL option here set to `${window.location.origin}/js/src`
+})
 
 function Root() {
 	const content = use(initialContentPromise)

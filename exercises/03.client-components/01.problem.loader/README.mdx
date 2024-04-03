@@ -1,1 +1,25 @@
 # Node.js Loader
+
+👨‍💼 Alright, we're going to get our server ready to start handling `'use client'`
+modules because we want to add some client-side interactivity to our app.
+
+One thing that requires client-side state is Error Boundary components. So
+that's what we're going to start with.
+
+🧝‍♂️ I've already updated the `importmap`
+script in <InlineFile file="public/index.html" /> to handle bringing in
+`react-error-boundary`. I've also
+created <InlineFile file="server/rsc-loader.js" /> which you'll need to register
+with Node.js as a loader for turning `'use client'` module exports into
+reference registrations.
+
+👨‍💼 Thanks Kellie. So now, what you need to do is register the loader, update the
+`dev` script in <InlineFile file="package.json" /> to import the loader
+registration, and then create and use the `error-boundary.js` `'use client'`
+module.
+
+When you're finished, we'll not actually be loading modules yet, but we'll be
+almost ready to do it! I recommend you add a couple console logs so you can
+observe what the loader does to our `'use client'` module exports.
+
+💰 I've put a couple good ones in place for you.

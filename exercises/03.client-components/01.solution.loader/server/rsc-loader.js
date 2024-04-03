@@ -21,7 +21,7 @@ export async function load(url, context, defaultLoad) {
 		return textLoad(u, c, defaultLoad)
 	})
 	if (url.includes('error-boundary')) {
-		console.log(result)
+		console.log(result.source)
 	}
 	return result
 }

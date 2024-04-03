@@ -1,1 +1,18 @@
 # Module Resolution
+
+👨‍💼 Great! Now our server is all configured to create `'use client'` module
+references to properly separate our client and server code. And our client is
+configured to resolve those references to the client code necessary to run in
+the browser and make the components stateful and interactive!
+
+What's so cool about this is it allows us to have composition across the wire.
+We can compose our client and server code together!
+
+A common question at this point is "do I need to add `'use client'` to every
+module I want in the client." The answer is no! You only need to add `'use
+client'` to the top-level module that you want to run in the client. Think of
+`'use client'` as a `<script>` tag in the browser. It's the entry point to your
+client code (you can have many such entries). `'use client'` is a way to create
+a boundry between the server and client code.
+
+For a handy visualization, check out [this animation](https://twitter.com/delba_oliveira/status/1767958810356756798).

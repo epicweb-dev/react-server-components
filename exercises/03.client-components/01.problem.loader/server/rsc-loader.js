@@ -22,6 +22,7 @@ export async function load(url, context, defaultLoad) {
 	})
 	// 🐨 uncomment this so you can observe the changes the loader makes to our
 	// error-boundary.js module.
+	// 💰
 	// if (url.includes('error-boundary')) {
 	// 	console.log(result.source)
 	// }
