@@ -1,4 +1,28 @@
-# 🤹 React Server Components
+# React Server Components 🤹
+
+👨‍💼 Hello, my name is Peter the Product Manager. I'm here to help you get
+oriented and to give you your assignments for the workshop!
+
+Today we're going to implement a React framework based on React Server
+Components and Actions! When we're finished with this, you'll have a deep
+understanding of the primitives that power React Server Components and Actions
+which is the future of React.
+
+<callout-danger>
+	We're using experimental builds of React for this workshop. Some of this
+	material is subject to change in the future.
+</callout-danger>
+
+We'll be building this framework without **any build tools**. This means no
+TypeScript, no JSX, no Vite, nothing. We're going to be writing plain JavaScript
+and using Node.js/browser native APIs to build our framework.
+
+While this isn't entirely ergonomic, it will help you separate what React is
+offering us from the tools we use to build with React.
+
+The goal is for you to understand RSCs free of any abstractions so when you go
+to a tool that supports RSCs, you'll have a deep understanding of what's going
+on under the hood.
 
 <callout-danger>
 	One of the challenges you're going to have to face is understanding the
@@ -9,6 +33,17 @@
 	overall concepts and not get too bogged down in the specifics of this
 	implementation.
 </callout-danger>
+
+Because we're working with such primitive APIs, this will be one of the more
+challenging things you've done with React. Keep in mind that frameworks exist
+which enable you to offer an awesome user experience with React. This workshop
+is about understanding the primitives that power those frameworks now and in the
+future.
+
+## What are React Server Components?
+
+Let's take a look at a flowchart showing a typical Single Page Application (SPA)
+built with React:
 
 ![A flowchart for a Typical SPA as described below](/img/spa.png)
 
@@ -45,6 +80,12 @@
 
 </details>
 
+React server components (RSCs) are a new feature in React that allows you to
+stream React components from the server to the client. This means that instead
+of requesting data from the server and then rendering it on the client, you can
+make a request, have React generate the UI on the server, and send it back to
+the client.
+
 ![A flowchart for React Server Components and actions as described below](/img/super-simple-rsc.png)
 
 <details>
@@ -80,3 +121,19 @@
         - Browser updates streamed UI with `react-server-dom-esm/client.createFromFetch`
 
 </details>
+
+There are very subtle differences in the flowchart above, but the impact of the
+differences is profound.
+
+As a result of this architecture, no code for that UI needs to be sent to the
+client and the data doesn't even need to be sent to the client either. This
+solves some pretty significant performance and maintainability challenges with
+SPAs or even server rendered apps.
+
+<callout-info>
+	We'll be building this framework as a SPA which uses RSCs on the server. You
+	can absolutely enhance this further to support server rendering if you like,
+	but we're going to be skipping that optimization to keep things simple.
+</callout-info>
+
+Let's go!

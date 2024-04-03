@@ -32,11 +32,8 @@
 
 ## Prerequisites
 
-- TODO: add prerequisites
-- Some
-- Pre-requisite
-- links
-- here
+- Deep experience with React and features like Suspense
+- Some experience with Node.js will be helpful
 
 ## Pre-workshop Resources
 
