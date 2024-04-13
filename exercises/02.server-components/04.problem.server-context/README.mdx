@@ -40,7 +40,7 @@ import { AsyncLocalStorage } from 'node:async_hooks'
 
 const userStorage = new AsyncLocalStorage()
 
-// somwhere later in your code
+// somewhere later in your code
 const user = await getUser()
 try {
 	userStorage.run(user, () => {
