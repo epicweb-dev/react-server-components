@@ -1,1 +1,0 @@
-import './kcdshop/setup.js'
