@@ -19,8 +19,17 @@ const app = new Hono()
 
 app.use(compress())
 
-app.use(serveStatic({ root: 'public', index: false }))
-app.use('/js/src', serveStatic({ root: 'src' }))
+app.use(serveStatic({ root: './public/', index: false }))
+app.use(
+	'/js/src/*',
+	serveStatic({
+		root: './src',
+		index: false,
+		rewriteRequestPath(path) {
+			return path.replace(/^\/js\/src/, '')
+		},
+	}),
+)
 
 // This just cleans up the URL if the search ever gets cleared... Not important
 // for RSCs... Just ... I just can't help myself. I like URLs clean.
