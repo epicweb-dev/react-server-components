@@ -31,6 +31,7 @@
     "git": ">=2.18.0"
   },
   "devDependencies": {
+    "@types/node": "^20.12.7",
     "eslint": "^9.1.1",
     "eslint-plugin-import": "^2.29.1",
     "prettier": "^3.2.5"
@@ -73,15 +74,5 @@
         }
       }
     ]
-  },
-  "prettierIgnore": [
-    "node_modules",
-    "**/build/**",
-    "**/public/build/**",
-    ".env",
-    "**/package.json",
-    "**/tsconfig.json",
-    "**/package-lock.json",
-    "**/playwright-report/**"
-  ]
+  }
 }

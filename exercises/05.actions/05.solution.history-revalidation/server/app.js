@@ -1,6 +1,10 @@
 import { Readable } from 'node:stream'
+import { serve } from '@hono/node-server'
+import { serveStatic } from '@hono/node-server/serve-static'
 import busboy from 'busboy'
 import closeWithGrace from 'close-with-grace'
+import { Hono } from 'hono'
+import { compress } from 'hono/compress'
 import { createElement as h } from 'react'
 import {
 	renderToPipeableStream,
@@ -11,16 +15,9 @@ import { shipDataStorage } from './async-storage.js'
 
 const PORT = process.env.PORT || 3000
 
-import { Hono } from 'hono'
-import { compress } from 'hono/compress'
-import { serveStatic } from '@hono/node-server/serve-static'
-import { serve } from '@hono/node-server'
-
 const app = new Hono()
 
 app.use(compress())
-// this is here so the workshop app knows when the server has started
-app.get('/', () => new Response())
 
 app.use(serveStatic({ root: 'public', index: false }))
 app.use('/js/src', serveStatic({ root: 'src' }))
@@ -28,11 +25,7 @@ app.use('/js/src', serveStatic({ root: 'src' }))
 // This just cleans up the URL if the search ever gets cleared... Not important
 // for RSCs... Just ... I just can't help myself. I like URLs clean.
 app.use(({ req, redirect }) => {
-	if (req.query('search') === '') {
-		/**
-		 * @fixme Not sure what Kent means by
-		 * `req.query.search` and `req.search`.
-		 */
+	if (req.query.search === '') {
 		const searchParams = new URLSearchParams()
 		searchParams.delete('search')
 		const location = [req.path, searchParams.toString()]
@@ -44,20 +37,12 @@ app.use(({ req, redirect }) => {
 
 const moduleBasePath = new URL('../src', import.meta.url).href
 
-/**
- *
- * @param {import("hono").Context} context
- */
 async function renderApp(context, returnValue) {
 	const { req, res } = context
 	try {
 		const shipId = req.param('shipId') || null
 		const search = req.query('search') || ''
 		const data = { shipId, search }
-		// Since Hono operates with web streams
-		// and "react-server-dom-esm" with Node.js streams,
-		// create a Readable, pipe RSD there, and convert it
-		// to a web ReadableStream for response.
 		const readable = new Readable()
 		shipDataStorage.run(data, () => {
 			const root = h(App)
@@ -88,7 +73,6 @@ app.post('/action/:shipId?', async context => {
 	}
 
 	const bb = busboy({
-		// Busboy expects Node.js IncomingHeaders, which is an object.
 		headers: Object.fromEntries(context.req.raw.headers.entries()),
 	})
 	const reply = decodeReplyFromBusboy(bb, moduleBasePath)
@@ -101,16 +85,10 @@ app.post('/action/:shipId?', async context => {
 
 app.get('/:shipId?', serveStatic({ root: 'public', path: 'index.html' }))
 
-const server = serve(
-	{
-		port: PORT,
-		fetch: app.fetch,
-	},
-	() => {
-		console.log(`🚀  We have liftoff!`)
-		console.log(`http://localhost:${PORT}`)
-	},
-)
+const server = serve({ port: PORT, fetch: app.fetch }, () => {
+	console.log(`🚀  We have liftoff!`)
+	console.log(`http://localhost:${PORT}`)
+})
 
 closeWithGrace(async ({ signal, err }) => {
 	if (err) console.error('Shutting down server due to error', err)
