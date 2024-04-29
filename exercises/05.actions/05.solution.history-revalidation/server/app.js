@@ -1,8 +1,10 @@
-import bodyParser from 'body-parser'
+import { Readable } from 'node:stream'
+import { serve } from '@hono/node-server'
+import { serveStatic } from '@hono/node-server/serve-static'
 import busboy from 'busboy'
 import closeWithGrace from 'close-with-grace'
-import compress from 'compression'
-import express from 'express'
+import { Hono } from 'hono'
+import { compress } from 'hono/compress'
 import { createElement as h } from 'react'
 import {
 	renderToPipeableStream,
@@ -13,54 +15,54 @@ import { shipDataStorage } from './async-storage.js'
 
 const PORT = process.env.PORT || 3000
 
-const app = express()
-app.use(compress())
-// this is here so the workshop app knows when the server has started
-app.head('/', (req, res) => res.status(200).end())
+const app = new Hono()
 
-app.use(express.static('public', { index: false }))
-app.use('/js/src', express.static('src'))
+app.use(compress())
+
+app.use(serveStatic({ root: 'public', index: false }))
+app.use('/js/src', serveStatic({ root: 'src' }))
 
 // This just cleans up the URL if the search ever gets cleared... Not important
 // for RSCs... Just ... I just can't help myself. I like URLs clean.
-app.use((req, res, next) => {
+app.use(({ req, redirect }) => {
 	if (req.query.search === '') {
-		const searchParams = new URLSearchParams(req.search)
+		const searchParams = new URLSearchParams()
 		searchParams.delete('search')
 		const location = [req.path, searchParams.toString()]
 			.filter(Boolean)
 			.join('?')
-		return res.redirect(302, location)
-	} else {
-		next()
+		return redirect(location, 302)
 	}
 })
 
 const moduleBasePath = new URL('../src', import.meta.url).href
 
-async function renderApp(res, returnValue) {
+async function renderApp(context, returnValue) {
+	const { req, res } = context
 	try {
-		const shipId = res.req.params.shipId || null
-		const search = res.req.query.search || ''
+		const shipId = req.param('shipId') || null
+		const search = req.query('search') || ''
 		const data = { shipId, search }
+		const readable = new Readable()
 		shipDataStorage.run(data, () => {
 			const root = h(App)
 			const payload = { root, returnValue }
 			const { pipe } = renderToPipeableStream(payload, moduleBasePath)
-			pipe(res)
+			pipe(readable)
 		})
+		return new Response(Readable.toWeb(readable))
 	} catch (error) {
 		console.error(error)
 		res.status(500).json({ error: error.message })
 	}
 }
 
-app.get('/rsc/:shipId?', async (req, res) => {
-	await renderApp(res, null)
+app.get('/rsc/:shipId?', async context => {
+	await renderApp(context, null)
 })
 
-app.post('/action/:shipId?', bodyParser.text(), async (req, res) => {
-	const serverReference = req.get('rsc-action')
+app.post('/action/:shipId?', async context => {
+	const serverReference = context.req.get('rsc-action')
 	const [filepath, name] = serverReference.split('#')
 	const action = (await import(filepath))[name]
 	// Validate that this is actually a function we intended to expose and
@@ -70,21 +72,20 @@ app.post('/action/:shipId?', bodyParser.text(), async (req, res) => {
 		throw new Error('Invalid action')
 	}
 
-	const bb = busboy({ headers: req.headers })
+	const bb = busboy({
+		headers: Object.fromEntries(context.req.raw.headers.entries()),
+	})
 	const reply = decodeReplyFromBusboy(bb, moduleBasePath)
-	req.pipe(bb)
+	Readable.fromWeb(context.req.raw.body).pipe(bb)
 	const args = await reply
 	const result = await action(...args)
 
 	await renderApp(res, result)
 })
 
-app.get('/:shipId?', async (req, res) => {
-	res.set('Content-type', 'text/html')
-	return res.sendFile('index.html', { root: 'public' })
-})
+app.get('/:shipId?', serveStatic({ root: 'public', path: 'index.html' }))
 
-const server = app.listen(PORT, () => {
+const server = serve({ port: PORT, fetch: app.fetch }, () => {
 	console.log(`🚀  We have liftoff!`)
 	console.log(`http://localhost:${PORT}`)
 })
