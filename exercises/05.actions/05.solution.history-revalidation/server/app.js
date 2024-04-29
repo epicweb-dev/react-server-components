@@ -77,7 +77,7 @@ app.get('/rsc/:shipId?', async context => {
 })
 
 app.post('/action/:shipId?', async context => {
-	const serverReference = context.req.get('rsc-action')
+	const serverReference = context.req.header('rsc-action')
 	const [filepath, name] = serverReference.split('#')
 	const action = (await import(filepath))[name]
 	// Validate that this is actually a function we intended to expose and
