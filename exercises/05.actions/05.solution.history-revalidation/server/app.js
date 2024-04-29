@@ -1,28 +1,48 @@
-import bodyParser from 'body-parser'
-import busboy from 'busboy'
 import closeWithGrace from 'close-with-grace'
-import compress from 'compression'
-import express from 'express'
+import fastify from 'fastify'
+import compress from '@fastify/compress'
+import fastifyStatic from '@fastify/static'
 import { createElement as h } from 'react'
+import { PassThrough } from 'stream'
 import {
 	renderToPipeableStream,
-	decodeReplyFromBusboy,
+	decodeReply
 } from 'react-server-dom-esm/server'
 import { App } from '../src/app.js'
 import { shipDataStorage } from './async-storage.js'
+import { join } from 'path'
 
 const PORT = process.env.PORT || 3000
 
-const app = express()
-app.use(compress())
-// this is here so the workshop app knows when the server has started
-app.head('/', (req, res) => res.status(200).end())
+const app = fastify({
+  logger: {
+    transport: {
+      target: 'pino-pretty'
+    }
+  }
+})
 
-app.use(express.static('public', { index: false }))
-app.use('/js/src', express.static('src'))
+await app.register(compress)
+await app.register(fastifyStatic, {
+  root: join(import.meta.dirname, '..', 'public'),
+  index: false,
+  wildcard: false
+})
+
+await app.register(fastifyStatic, {
+  root: join(import.meta.dirname, '..', 'src'),
+  index: false,
+  wildcard: false,
+  decorateReply: false,
+  prefix: '/js/src'
+})
+
+// this is here so the workshop app knows when the server has started
+app.head('/', (req, res) => res.status(200))
 
 // This just cleans up the URL if the search ever gets cleared... Not important
 // for RSCs... Just ... I just can't help myself. I like URLs clean.
+/*
 app.use((req, res, next) => {
 	if (req.query.search === '') {
 		const searchParams = new URLSearchParams(req.search)
@@ -35,31 +55,32 @@ app.use((req, res, next) => {
 		next()
 	}
 })
+*/
 
 const moduleBasePath = new URL('../src', import.meta.url).href
 
-async function renderApp(res, returnValue) {
-	try {
-		const shipId = res.req.params.shipId || null
-		const search = res.req.query.search || ''
-		const data = { shipId, search }
-		shipDataStorage.run(data, () => {
-			const root = h(App)
-			const payload = { root, returnValue }
-			const { pipe } = renderToPipeableStream(payload, moduleBasePath)
-			pipe(res)
-		})
-	} catch (error) {
-		console.error(error)
-		res.status(500).json({ error: error.message })
-	}
+function renderApp(res, returnValue) {
+  const shipId = res.request.params.shipId || null
+  const search = res.request.query.search || ''
+  const data = { shipId, search }
+  return shipDataStorage.run(data, () => {
+    const root = h(App)
+    const payload = { root, returnValue }
+
+    const { pipe } = renderToPipeableStream(payload, moduleBasePath)
+    // TODO(mcollina): this is a workaround, it should not be needed but we are
+    // missing the primitive in the react-server-dom-esm package.
+    const stream = new PassThrough()
+    pipe(stream)
+    return stream
+  })
 }
 
-app.get('/rsc/:shipId?', async (req, res) => {
-	await renderApp(res, null)
+app.get('/rsc/:shipId?', (req, res) => {
+	res.type('text/html').send(renderApp(res, null))
 })
 
-app.post('/action/:shipId?', bodyParser.text(), async (req, res) => {
+app.post('/action/:shipId?', async (req, res) => {
 	const serverReference = req.get('rsc-action')
 	const [filepath, name] = serverReference.split('#')
 	const action = (await import(filepath))[name]
@@ -70,29 +91,31 @@ app.post('/action/:shipId?', bodyParser.text(), async (req, res) => {
 		throw new Error('Invalid action')
 	}
 
-	const bb = busboy({ headers: req.headers })
-	const reply = decodeReplyFromBusboy(bb, moduleBasePath)
-	req.pipe(bb)
+	const reply = decodeReply(req.body, moduleBasePath)
 	const args = await reply
 	const result = await action(...args)
 
 	await renderApp(res, result)
 })
 
-app.get('/:shipId?', async (req, res) => {
-	res.set('Content-type', 'text/html')
-	return res.sendFile('index.html', { root: 'public' })
+app.get('/', async (req, res) => {
+	res.type('text/html')
+	return res.sendFile('index.html')
 })
 
-const server = app.listen(PORT, () => {
-	console.log(`🚀  We have liftoff!`)
-	console.log(`http://localhost:${PORT}`)
+app.get('/:shipId', async (req, res) => {
+	res.type('text/html')
+	return res.sendFile('index.html')
 })
+
+await app.listen({ port: PORT })
 
 closeWithGrace(async ({ signal, err }) => {
-	if (err) console.error('Shutting down server due to error', err)
-	else console.log('Shutting down server due to signal', signal)
+  if (err) {
+    app.log.error(err, 'Shutting down server due to error')
+  } else if (signal) {
+    app.log.info({ signal }, 'Shutting down server due to signal')
+  }
 
-	await new Promise(resolve => server.close(resolve))
-	process.exit()
+	await app.close()
 })
