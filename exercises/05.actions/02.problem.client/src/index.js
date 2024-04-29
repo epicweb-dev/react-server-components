@@ -98,7 +98,7 @@ function Root() {
 	}
 
 	return h(
-		RouterContext.Provider,
+		RouterContext,
 		{
 			value: {
 				navigate,

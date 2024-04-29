@@ -137,7 +137,7 @@ function Root() {
 	}
 
 	return h(
-		RouterContext.Provider,
+		RouterContext,
 		{
 			value: {
 				navigate,
@@ -151,30 +151,30 @@ function Root() {
 }
 
 startTransition(() => {
-	createRoot(document.getElementById('root')).render(
+	const element = h(
+		'div',
+		{ className: 'app-wrapper' },
 		h(
-			'div',
-			{ className: 'app-wrapper' },
-			h(
-				ErrorBoundary,
-				{
-					fallback: h(
-						'div',
-						{ className: 'app-error' },
-						h('p', null, 'Something went wrong!'),
-					),
-				},
-				h(
-					Suspense,
-					{
-						fallback: h('img', {
-							style: { maxWidth: 400 },
-							src: shipFallbackSrc,
-						}),
-					},
-					h(Root),
+			ErrorBoundary,
+			{
+				fallback: h(
+					'div',
+					{ className: 'app-error' },
+					h('p', null, 'Something went wrong!'),
 				),
+			},
+			h(
+				Suspense,
+				{
+					fallback: h('img', {
+						style: { maxWidth: 400 },
+						src: shipFallbackSrc,
+					}),
+				},
+				h(Root),
 			),
 		),
 	)
+	console.log(element)
+	createRoot(document.getElementById('root')).render(element)
 })
