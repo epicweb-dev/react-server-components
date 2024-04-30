@@ -1,8 +1,10 @@
-import bodyParser from 'body-parser'
+import { readFile } from 'fs/promises'
+import { serve } from '@hono/node-server'
+import { serveStatic } from '@hono/node-server/serve-static'
+import { RESPONSE_ALREADY_SENT } from '@hono/node-server/utils/response'
 import busboy from 'busboy'
 import closeWithGrace from 'close-with-grace'
-import compress from 'compression'
-import express from 'express'
+import { Hono } from 'hono'
 import { createElement as h } from 'react'
 import {
 	renderToPipeableStream,
@@ -13,54 +15,59 @@ import { shipDataStorage } from './async-storage.js'
 
 const PORT = process.env.PORT || 3000
 
-const app = express()
-app.use(compress())
+const app = new Hono()
+
 // this is here so the workshop app knows when the server has started
-app.head('/', (req, res) => res.status(200).end())
+app.on('HEAD', '/', c => res.status(200))
 
-app.use(express.static('public', { index: false }))
-app.use('/js/src', express.static('src'))
+app.use(
+	'/js/src/*',
+	serveStatic({
+		root: './src',
+		onNotFound(path, c) {
+			c.text('Not found', 404)
+		},
+		rewriteRequestPath: path => path.replace('/js/src', ''),
+	}),
+)
 
-// This just cleans up the URL if the search ever gets cleared... Not important
-// for RSCs... Just ... I just can't help myself. I like URLs clean.
-app.use((req, res, next) => {
-	if (req.query.search === '') {
-		const searchParams = new URLSearchParams(req.search)
-		searchParams.delete('search')
-		const location = [req.path, searchParams.toString()]
-			.filter(Boolean)
-			.join('?')
-		return res.redirect(302, location)
-	} else {
-		next()
-	}
-})
+app.use(
+	serveStatic({
+		root: './public',
+	}),
+	async (c, next) => {
+		await next()
+	},
+)
 
 const moduleBasePath = new URL('../src', import.meta.url).href
 
-async function renderApp(res, returnValue) {
+async function renderApp(c, returnValue) {
 	try {
-		const shipId = res.req.params.shipId || null
-		const search = res.req.query.search || ''
+		const { outgoing } = c.env
+		const url = new URL(c.req.url)
+		const shipId = c.req.param('shipId') || null
+		const search = url.searchParams.get('search') || ''
 		const data = { shipId, search }
 		shipDataStorage.run(data, () => {
 			const root = h(App)
 			const payload = { root, returnValue }
 			const { pipe } = renderToPipeableStream(payload, moduleBasePath)
-			pipe(res)
+			pipe(outgoing)
 		})
+		return RESPONSE_ALREADY_SENT
 	} catch (error) {
 		console.error(error)
-		res.status(500).json({ error: error.message })
+		return c.json({ error: error.message }, 500)
 	}
 }
 
-app.get('/rsc/:shipId?', async (req, res) => {
-	await renderApp(res, null)
+app.get('/rsc/:shipId?', async c => {
+	return await renderApp(c, null)
 })
 
-app.post('/action/:shipId?', bodyParser.text(), async (req, res) => {
-	const serverReference = req.get('rsc-action')
+app.post('/action/:shipId?', async c => {
+	const serverReference = c.req.header('rsc-action')
 	const [filepath, name] = serverReference.split('#')
 	const action = (await import(filepath))[name]
 	// Validate that this is actually a function we intended to expose and
@@ -69,24 +76,26 @@ app.post('/action/:shipId?', bodyParser.text(), async (req, res) => {
 	if (action.$$typeof !== Symbol.for('react.server.reference')) {
 		throw new Error('Invalid action')
 	}
-
-	const bb = busboy({ headers: req.headers })
+	const { incoming } = c.env
+	const bb = busboy({ headers: incoming.headers })
 	const reply = decodeReplyFromBusboy(bb, moduleBasePath)
 	req.pipe(bb)
 	const args = await reply
 	const result = await action(...args)
 
-	await renderApp(res, result)
+	return await renderApp(res, result)
 })
 
-app.get('/:shipId?', async (req, res) => {
-	res.set('Content-type', 'text/html')
-	return res.sendFile('index.html', { root: 'public' })
+app.get('/:shipId?', async c => {
+	const html = await readFile('./public/index.html', 'utf8')
+	return c.html(html, 200)
 })
 
-const server = app.listen(PORT, () => {
-	console.log(`🚀  We have liftoff!`)
-	console.log(`http://localhost:${PORT}`)
+console.log(`🚀  starting server at http://localhost:${PORT}`)
+const server = serve({
+	fetch: app.fetch,
+	port: PORT,
+	overrideGlobalObjects: true,
 })
 
 closeWithGrace(async ({ signal, err }) => {
