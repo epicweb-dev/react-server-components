@@ -17,25 +17,30 @@ const PORT = process.env.PORT || 3000
 
 const app = new Hono({ strict: true })
 
+app.use(trimTrailingSlash())
+
+// This just cleans up the URL if the search ever gets cleared... Not important
+// for RSCs... Just ... I just can't help myself. I like URLs clean.
+app.use(async (c, next) => {
+	const url = new URL(c.req.url)
+	if (url.searchParams.get('search') === '') {
+		const searchParams = new URLSearchParams(url.search)
+		searchParams.delete('search')
+		const location = [url.pathname, searchParams.toString()]
+			.filter(Boolean)
+			.join('?')
+		return c.redirect(location, 302)
+	} else {
+		await next()
+	}
+})
+
 app.use(
-	trimTrailingSlash(),
+	'/*',
 	serveStatic({
 		root: './public',
 		index: '',
 	}),
-	async (c, next) => {
-		const url = new URL(c.req.url)
-		if (url.searchParams.get('search') === '') {
-			const searchParams = new URLSearchParams(url.search)
-			searchParams.delete('search')
-			const location = [url.pathname, searchParams.toString()]
-				.filter(Boolean)
-				.join('?')
-			return c.redirect(location, 302)
-		} else {
-			await next()
-		}
-	},
 )
 
 app.use(
