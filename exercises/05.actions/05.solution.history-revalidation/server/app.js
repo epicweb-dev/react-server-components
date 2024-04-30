@@ -2,14 +2,13 @@ import { readFile } from 'fs/promises'
 import { serve } from '@hono/node-server'
 import { serveStatic } from '@hono/node-server/serve-static'
 import { RESPONSE_ALREADY_SENT } from '@hono/node-server/utils/response'
-import busboy from 'busboy'
 import closeWithGrace from 'close-with-grace'
 import { Hono } from 'hono'
 import { trimTrailingSlash } from 'hono/trailing-slash'
 import { createElement as h } from 'react'
 import {
 	renderToPipeableStream,
-	decodeReplyFromBusboy,
+	decodeReply,
 } from 'react-server-dom-esm/server'
 import { App } from '../src/app.js'
 import { shipDataStorage } from './async-storage.js'
@@ -76,13 +75,10 @@ app.post('/action/:shipId?', async c => {
 	if (action.$$typeof !== Symbol.for('react.server.reference')) {
 		throw new Error('Invalid action')
 	}
-	const { incoming } = c.env
-	const bb = busboy({ headers: incoming.headers })
-	const reply = decodeReplyFromBusboy(bb, moduleBasePath)
-	req.pipe(bb)
-	const args = await reply
-	const result = await action(...args)
 
+	const formData = await c.req.formData()
+	const args = decodeReply(formData, moduleBasePath)
+	const result = await action(...args)
 	return await renderApp(res, result)
 })
 
