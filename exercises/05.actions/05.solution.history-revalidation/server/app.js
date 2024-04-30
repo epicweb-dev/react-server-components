@@ -17,7 +17,26 @@ const PORT = process.env.PORT || 3000
 
 const app = new Hono({ strict: true })
 
-app.use(trimTrailingSlash())
+app.use(
+	trimTrailingSlash(),
+	serveStatic({
+		root: './public',
+		index: '',
+	}),
+	async (c, next) => {
+		const url = new URL(c.req.url)
+		if (url.searchParams.get('search') === '') {
+			const searchParams = new URLSearchParams(url.search)
+			searchParams.delete('search')
+			const location = [url.pathname, searchParams.toString()]
+				.filter(Boolean)
+				.join('?')
+			return c.redirect(location, 302)
+		} else {
+			await next()
+		}
+	},
+)
 
 app.use(
 	'/js/src/*',
@@ -30,35 +49,21 @@ app.use(
 	}),
 )
 
-app.use(
-	serveStatic({
-		root: './public',
-	}),
-	async (c, next) => {
-		await next()
-	},
-)
-
 const moduleBasePath = new URL('../src', import.meta.url).href
 
 async function renderApp(c, returnValue) {
-	try {
-		const { outgoing } = c.env
-		const url = new URL(c.req.url)
-		const shipId = c.req.param('shipId') || null
-		const search = url.searchParams.get('search') || ''
-		const data = { shipId, search }
-		shipDataStorage.run(data, () => {
-			const root = h(App)
-			const payload = { root, returnValue }
-			const { pipe } = renderToPipeableStream(payload, moduleBasePath)
-			pipe(outgoing)
-		})
-		return RESPONSE_ALREADY_SENT
-	} catch (error) {
-		console.error(error)
-		return c.json({ error: error.message }, 500)
-	}
+	const { outgoing } = c.env
+	const url = new URL(c.req.url)
+	const shipId = c.req.param('shipId') || null
+	const search = url.searchParams.get('search') || ''
+	const data = { shipId, search }
+	shipDataStorage.run(data, () => {
+		const root = h(App)
+		const payload = { root, returnValue }
+		const { pipe } = renderToPipeableStream(payload, moduleBasePath)
+		pipe(outgoing)
+	})
+	return RESPONSE_ALREADY_SENT
 }
 
 app.get('/rsc/:shipId?', async c => {
@@ -82,7 +87,7 @@ app.post('/action/:shipId?', async c => {
 	return await renderApp(res, result)
 })
 
-app.get(['/', '/:shipId?'], async c => {
+app.get('/:shipId?', async c => {
 	const html = await readFile('./public/index.html', 'utf8')
 	return c.html(html, 200)
 })
@@ -96,7 +101,6 @@ console.log(`🚀  starting server at http://localhost:${PORT}`)
 const server = serve({
 	fetch: app.fetch,
 	port: PORT,
-	overrideGlobalObjects: true,
 })
 
 closeWithGrace(async ({ signal, err }) => {
