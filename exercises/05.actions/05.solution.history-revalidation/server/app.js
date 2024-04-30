@@ -5,6 +5,7 @@ import { RESPONSE_ALREADY_SENT } from '@hono/node-server/utils/response'
 import busboy from 'busboy'
 import closeWithGrace from 'close-with-grace'
 import { Hono } from 'hono'
+import { trimTrailingSlash } from 'hono/trailing-slash'
 import { createElement as h } from 'react'
 import {
 	renderToPipeableStream,
@@ -15,10 +16,9 @@ import { shipDataStorage } from './async-storage.js'
 
 const PORT = process.env.PORT || 3000
 
-const app = new Hono()
+const app = new Hono({ strict: true })
 
-// this is here so the workshop app knows when the server has started
-app.on('HEAD', '/', c => res.status(200))
+app.use(trimTrailingSlash())
 
 app.use(
 	'/js/src/*',
@@ -86,9 +86,14 @@ app.post('/action/:shipId?', async c => {
 	return await renderApp(res, result)
 })
 
-app.get('/:shipId?', async c => {
+app.get(['/', '/:shipId?'], async c => {
 	const html = await readFile('./public/index.html', 'utf8')
 	return c.html(html, 200)
+})
+
+app.onError((err, c) => {
+	console.error('error', err)
+	return c.json({ error: true, message: 'Something went wrong' }, 500)
 })
 
 console.log(`🚀  starting server at http://localhost:${PORT}`)
