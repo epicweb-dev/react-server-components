@@ -2,6 +2,7 @@ import closeWithGrace from 'close-with-grace'
 import fastify from 'fastify'
 import compress from '@fastify/compress'
 import fastifyStatic from '@fastify/static'
+import multipart from '@fastify/multipart'
 import { createElement as h } from 'react'
 import { PassThrough } from 'stream'
 import {
@@ -22,40 +23,29 @@ const app = fastify({
   }
 })
 
-await app.register(compress)
-await app.register(fastifyStatic, {
-  root: join(import.meta.dirname, '..', 'public'),
-  index: false,
-  wildcard: false
-})
-
-await app.register(fastifyStatic, {
-  root: join(import.meta.dirname, '..', 'src'),
-  index: false,
-  wildcard: false,
-  decorateReply: false,
-  prefix: '/js/src'
-})
+await app
+  .register(multipart, {
+    // Check out the documentation for the other options.
+    // You likely want to store all incoming files into disk
+    // and not keep them in memory.
+    attachFieldsToBody: true
+  })
+  .register(compress)
+  .register(fastifyStatic, {
+    root: join(import.meta.dirname, '..', 'public'),
+    index: false,
+    wildcard: false
+  })
+  .register(fastifyStatic, {
+    root: join(import.meta.dirname, '..', 'src'),
+    index: false,
+    wildcard: false,
+    decorateReply: false,
+    prefix: '/js/src'
+  })
 
 // this is here so the workshop app knows when the server has started
 app.head('/', (req, res) => res.status(200))
-
-// This just cleans up the URL if the search ever gets cleared... Not important
-// for RSCs... Just ... I just can't help myself. I like URLs clean.
-/*
-app.use((req, res, next) => {
-	if (req.query.search === '') {
-		const searchParams = new URLSearchParams(req.search)
-		searchParams.delete('search')
-		const location = [req.path, searchParams.toString()]
-			.filter(Boolean)
-			.join('?')
-		return res.redirect(302, location)
-	} else {
-		next()
-	}
-})
-*/
 
 const moduleBasePath = new URL('../src', import.meta.url).href
 
@@ -68,11 +58,7 @@ function renderApp(res, returnValue) {
     const payload = { root, returnValue }
 
     const { pipe } = renderToPipeableStream(payload, moduleBasePath)
-    // TODO(mcollina): this is a workaround, it should not be needed but we are
-    // missing the primitive in the react-server-dom-esm package.
-    const stream = new PassThrough()
-    pipe(stream)
-    return stream
+    return pipe(new PassThrough())
   })
 }
 
@@ -81,7 +67,7 @@ app.get('/rsc/:shipId?', (req, res) => {
 })
 
 app.post('/action/:shipId?', async (req, res) => {
-	const serverReference = req.get('rsc-action')
+	const serverReference = req.headers['rsc-action']
 	const [filepath, name] = serverReference.split('#')
 	const action = (await import(filepath))[name]
 	// Validate that this is actually a function we intended to expose and
@@ -91,21 +77,43 @@ app.post('/action/:shipId?', async (req, res) => {
 		throw new Error('Invalid action')
 	}
 
-	const reply = decodeReply(req.body, moduleBasePath)
+  // Convert the parsed body to a FormData object, as that's what decodeReply
+  // requires.
+  const formData = new FormData()
+  for (const [key, value] of Object.entries(req.body)) {
+    formData.append(key, value.value)
+  }
+	const reply = decodeReply(formData, moduleBasePath)
 	const args = await reply
 	const result = await action(...args)
 
-	await renderApp(res, result)
+  res.type('text/html')
+  return renderApp(res, result)
 })
 
-app.get('/', async (req, res) => {
-	res.type('text/html')
-	return res.sendFile('index.html')
-})
+// This just cleans up the URL if the search ever gets cleared... Not important
+// for RSCs... Just ... I just can't help myself. I like URLs clean.
+function redirectIfSearchIsEmpty(req, res, next) {
+	if (req.query.search === '') {
+		const searchParams = new URLSearchParams(req.query)
+		searchParams.delete('search')
+    const markIndex = req.url.indexOf('?')
+    const path = req.url.slice(0, markIndex)
+		const location = [path, searchParams.toString()]
+			.filter(Boolean)
+			.join('?')
+		res.redirect(302, location)
+    return
+	}
 
-app.get('/:shipId', async (req, res) => {
-	res.type('text/html')
-	return res.sendFile('index.html')
+  next()
+}
+
+app.get('/:shipId?', {
+  onRequest: redirectIfSearchIsEmpty
+}, function sendIndex(req, res) {
+  res.type('text/html')
+  return res.sendFile('index.html')
 })
 
 await app.listen({ port: PORT })
