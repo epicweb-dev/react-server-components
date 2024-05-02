@@ -6,10 +6,10 @@ exercise are:
 
 1. The `public/index.html` is what we want loaded for browser document requests
    to our application.
-2. The application is served by an express server that serves the static assets
-   and the API endpoint.
+2. The application is served by a [hono.js](https://hono.dev/) server that
+   serves the static assets and the API endpoint.
 
-This is not an node/express workshop, so we'll be really hand-holdy on things to
+This is not an node/hono.js workshop, so we'll be really hand-holdy on things to
 avoid you wasting time acquiring knowledge of things that you didn't come here
 to learn.
 
@@ -42,17 +42,17 @@ Here's an example of an `importmap` script:
 		}
 	}
 </script>
-<script type="module" src="/js/src/index.js"></script>
+<script type="module" src="/ui/index.js"></script>
 ```
 
-```js filename=src/index.js
+```js filename=ui/index.js
 // the importmap above will allow the browser to know where to go to get the
 // modules when they are imported.
 import { createElement as h } from 'react'
 import { renderRoot } from 'react-dom/client'
 
-// because this file was loaded from /js/src/index.js, the browser will know to
-// import this file from /js/src/app.js
+// because this file was loaded from /ui/index.js, the browser will know to
+// import this file from /ui/app.js
 import { App } from './app.js'
 
 // other stuff here...
@@ -66,27 +66,28 @@ you need to be connected to the internet to work through this workshop).
 - [esm.sh](https://esm.sh)
 - [MDN `importmap` docs](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap)
 
-## Express static
+## Hono.js static
 
-As mentioned, this is not a workshop about express, but we're using it to serve
+As mentioned, this is not a workshop about hono.js, but we're using it to serve
 our static assets and API endpoints. Here's how serving static assets works with
-express:
+hono.js:
 
 ```js filename=server/app.js
-import express from 'express'
+import { serveStatic } from '@hono/node-server/serve-static'
+import { Hono } from 'hono'
 
-const app = express()
+const app = new Hono({ strict: true })
 
-// this line tells express to serve the files in the public directory when a
+// this line tells hono.js to serve the files in the public directory when a
 // request is made to the root of the server.
-app.use(express.static('public'))
+app.use('/*', serveStatic({ root: './public' }))
 ```
 
-- [`express.static`](https://expressjs.com/en/starter/static-files.html).
+- [`serve-static`](https://hono.dev/getting-started/nodejs#serve-static-files).
 
-## Express Route Patterns
+## Hono.js Route Patterns
 
-Express has a special format for defining routes that can be used to match
+Hono.js has a special format for defining routes that can be used to match
 patterns in the URL. Here's an example of a route pattern:
 
 ```js filename=server/app.js
@@ -99,5 +100,4 @@ In this example, the `:id?` is a pattern that will match any URL that starts
 with `/api/` and has an optional `id` parameter. The `req.params.id` will be
 populated with the value of the `id` parameter in the URL.
 
-- [Express Routing](https://expressjs.com/en/guide/routing.html)
-- [`path-to-regexp`](https://www.npmjs.com/package/path-to-regexp)
+- [Hono.js Routing](https://hono.dev/api/routing)

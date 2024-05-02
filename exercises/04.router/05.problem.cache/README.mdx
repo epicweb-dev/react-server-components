@@ -34,7 +34,7 @@ happen, we can create a new `contentPromise` and update the cache and cache key.
 
 🧝‍♂️ I've implemented a special map that allows us to track whenever values change
 in it so React will rerender our app when we update the cache. So you can get
-the `contentCache` directly from <InlineFile file="src/content-cache.js" /> for
+the `contentCache` directly from <InlineFile file="ui/content-cache.js" /> for
 use in the module, but within the `Root` component, you can use the
 `useContentCache()` hook to get a cache object that will trigger rerenders when
 you update it.

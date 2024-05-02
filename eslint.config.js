@@ -4,6 +4,7 @@ export default {
 		import: (await import('eslint-plugin-import')).default,
 	},
 	rules: {
+		'no-unused-vars': 'warn',
 		'import/no-duplicates': ['warn', { 'prefer-inline': true }],
 		'import/consistent-type-specifier-style': ['warn', 'prefer-inline'],
 		'import/order': [

@@ -77,7 +77,7 @@ function exists(p) {
 	try {
 		fs.statSync(p)
 		return true
-	} catch (error) {
+	} catch {
 		return false
 	}
 }

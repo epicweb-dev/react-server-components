@@ -226,7 +226,7 @@ You'll recall from the RSC format above that the client modules look like this:
 The first item in the array is the path to the module and the second item is
 the name of the `export` in module. The full path to that module will be
 something like
-`file:///Users/kentcdodds/code/epicweb-dev/react-server-components/playground/src/ship-search.js`.
+`file:///Users/kentcdodds/code/epicweb-dev/react-server-components/playground/ui/ship-search.js`.
 
 So when we call `renderToPipeableStream` with the RSC payload, we'll also provide
 `react-server-dom-esm/client` with a `moduleBaseURL` option. This allows you to
@@ -234,14 +234,14 @@ control where the client modules can be loaded from the file system and used to
 shorten the paths in the RSC payload:
 
 ```js
-const moduleBasePath = new URL('../src', import.meta.url).href
-// moduleBasePath is something like `file:///Users/kentcdodds/code/epicweb-dev/react-server-components/playground/src`
+const moduleBasePath = new URL('../ui', import.meta.url).href
+// moduleBasePath is something like `file:///Users/kentcdodds/code/epicweb-dev/react-server-components/playground/ui`
 const { pipe } = renderToPipeableStream(payload, moduleBasePath)
 ```
 
 With the full file path removed, we're left with the path to the module relative
-to our `src` directory. Our express server is configured to serve any file in
-`src` via `/js/src`.
+to our `ui` directory. Our hono.js server is configured to serve any file in
+`ui` via `/ui`.
 
 Because `react-server-dom-esm/client` is responsible for loading that module for
 us, we need to tell it the base URL to load modules from via an option called
@@ -249,12 +249,12 @@ us, we need to tell it the base URL to load modules from via an option called
 
 ```js
 createFromFetch(fetchPromise, {
-	moduleBaseURL: `${window.location.origin}/js/src`,
+	moduleBaseURL: `${window.location.origin}/ui`,
 })
 ```
 
 Then when `react-server-dom-esm/client` needs to load a module, it will fetch
-the module from `${window.location.origin}/js/src/ship-search.js` and `import`
+the module from `${window.location.origin}/ui/ship-search.js` and `import`
 the `ShipSearch` `export` from it.
 
 📜 Relevant Docs:

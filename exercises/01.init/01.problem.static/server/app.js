@@ -1,63 +1,70 @@
+// 💰 you're gonna need this
+// import { readFile } from 'fs/promises'
+import { serve } from '@hono/node-server'
+// 💰 you're gonna need this
+// import { serveStatic } from '@hono/node-server/serve-static'
 import closeWithGrace from 'close-with-grace'
-import compress from 'compression'
-import express from 'express'
+import { Hono } from 'hono'
+import { trimTrailingSlash } from 'hono/trailing-slash'
 // 💰 you're gonna need these:
 // import { getShip, searchShips } from '../db/ship-api.js'
 
 const PORT = process.env.PORT || 3000
 
-const app = express()
-app.use(compress())
-// this is here so the workshop app knows when the server has started
-app.head('/', (req, res) => res.status(200).end())
+const app = new Hono({ strict: true })
+app.use(trimTrailingSlash())
 
-// 🐨 add a static express handler for the public folder, but leave out the index.html
-// 💰 app.use(express.static('public', { index: false }))
-// 🐨 add a handler for requests to '/js/src' that serves static files from 'src'
-// 💰 app.use('/js/src', express.static('src'))
+// 🐨 add a static hono.js handler for the public folder, but leave out the index.html
+// 💰 app.use('/*', serveStatic({ root: './public', index: '' }))
+
+// 🐨 add a handler for requests to '/ui' that serves static files from 'ui'
+// 💰
+// app.use(
+// 	'/ui/*',
+// 	serveStatic({
+// 		root: './ui',
+// 		onNotFound: (path, context) => context.text('File not found', 404),
+// 		rewriteRequestPath: path => path.replace('/ui', ''),
+// 	}),
+// )
 
 // This just cleans up the URL if the search ever gets cleared... Not important
 // for RSCs... Just ... I just can't help myself. I like URLs clean.
-app.use((req, res, next) => {
-	if (req.query.search === '') {
-		const searchParams = new URLSearchParams(req.search)
+app.use(async (context, next) => {
+	if (context.req.query('search') === '') {
+		const searchParams = new URLSearchParams(url.search)
 		searchParams.delete('search')
-		const location = [req.path, searchParams.toString()]
+		const location = [url.pathname, searchParams.toString()]
 			.filter(Boolean)
 			.join('?')
-		return res.redirect(302, location)
+		return context.redirect(location, 302)
 	} else {
-		next()
+		await next()
 	}
 })
 
 // 🐨 add an API endpoint to get data for our page:
 // 💰
-// app.get('/api/:shipId?', async (req, res) => {
-// 	try {
-// 		const shipId = req.params.shipId || null
-// 		const search = req.query.search || ''
-// 		const ship = shipId ? await getShip({ shipId }) : null
-// 		const shipResults = await searchShips({ search })
-// 		const data = { shipId, search, ship, shipResults }
-// 		return res.json(data)
-// 	} catch (error) {
-// 		console.error(error)
-// 		res.status(500).json({ error: error.message })
-// 	}
+// app.get('/api/:shipId?', async context => {
+// 	const shipId = context.req.param('shipId') || null
+// 	const search = context.req.query('search') || ''
+// 	const ship = shipId ? await getShip({ shipId }) : null
+// 	const shipResults = await searchShips({ search })
+// 	const data = { shipId, search, ship, shipResults }
+// 	return context.json(data)
 // })
 
 // 🐨 add a handler for '/:shipId?' which means the ship is optional
 // 🐨 set the response Content-type to 'text/html' and send the file in public called index.html
 // 💰
-// app.get('/:shipId?', async (req, res) => {
-// 	res.set('Content-type', 'text/html')
-// 	return res.sendFile('index.html', { root: 'public' })
+// app.get('/:shipId?', async context => {
+// 	const html = await readFile('./public/index.html', 'utf8')
+// 	return context.html(html, 200)
 // })
 
-const server = app.listen(PORT, () => {
-	console.log(`🚀  We have liftoff!`)
-	console.log(`http://localhost:${PORT}`)
+const server = serve({ fetch: app.fetch, port: PORT }, info => {
+	const url = `http://localhost:${info.port}`
+	console.log(`🚀  We have liftoff!\n${url}`)
 })
 
 closeWithGrace(async ({ signal, err }) => {

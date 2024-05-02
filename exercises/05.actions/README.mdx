@@ -25,7 +25,7 @@ client component and that component can call the function when it needs to.
 
 Here's an example of this:
 
-```jsx filename=src/hug-koala.js
+```jsx filename=ui/hug-koala.js
 'use server'
 
 import { giveBigHug } from './utils.js'
@@ -41,7 +41,7 @@ async function hugKoala(previousState, formData) {
 }
 ```
 
-```jsx filename=src/koala-form.js
+```jsx filename=ui/koala-form.js
 'use client'
 
 import { useActionState } from 'react'

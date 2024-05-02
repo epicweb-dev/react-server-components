@@ -1,18 +1,18 @@
 # Static React App
 
-👨‍💼 We've got an app all ready to go, we just need things wired up so the express
+👨‍💼 We've got an app all ready to go, we just need things wired up so the hono.js
 app serves our static assets properly as well as our endpoint for data.
 
 You'll find the database in <InlineFile file="db/ships.json" /> and the db
 client in <InlineFile file="db/ship-api.js" />.
 
-Your job here is to get the express app to serve the static assets and serve the
+Your job here is to get the hono.js app to serve the static assets and serve the
 ship data from the database. Do this in <InlineFile file="server/app.js" />.
 
 Then fix our `importmap` in <InlineFile file="public/index.html" /> so the
 browser knows how to resolve imports for our dependencies and add a script tag
-to load our <InlineFile file="src/index.js" /> from the express server via
-`/js/src/index.js`.
+to load our <InlineFile file="ui/index.js" /> from the hono.js server via
+`/ui/index.js`.
 
 💰 I'm going to be **extremely** hand-holdy on this one because this is really
 just a warm up for you to get to know the codebase a bit. We'll get to the

@@ -80,6 +80,6 @@ export const shipDataStorage = new AsyncLocalStorage()
 
 From there, you can import it in <InlineFile file="server/app.js" /> to provide
 the `search` and `shipId` to the rendered components, remove all the prop
-drilling from <InlineFile file="src/app.js" /> and access the values necessary
-from the async storage in <InlineFile file="src/ship-details.js" />
-and <InlineFile file="src/ship-search-results.js" />.
+drilling from <InlineFile file="ui/app.js" /> and access the values necessary
+from the async storage in <InlineFile file="ui/ship-details.js" />
+and <InlineFile file="ui/ship-search-results.js" />.

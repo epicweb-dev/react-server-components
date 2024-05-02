@@ -1,94 +1,97 @@
-// 💰 you'll need these
-// import bodyParser from 'body-parser'
-// import busboy from 'busboy'
+import { readFile } from 'fs/promises'
+import { serve } from '@hono/node-server'
+import { serveStatic } from '@hono/node-server/serve-static'
+import { RESPONSE_ALREADY_SENT } from '@hono/node-server/utils/response'
 import closeWithGrace from 'close-with-grace'
-import compress from 'compression'
-import express from 'express'
+import { Hono } from 'hono'
+import { trimTrailingSlash } from 'hono/trailing-slash'
 import { createElement as h } from 'react'
 import {
 	renderToPipeableStream,
 	// 💰 you'll need this
-	// decodeReplyFromBusboy,
+	// decodeReply,
 } from 'react-server-dom-esm/server'
-import { App } from '../src/app.js'
+import { App } from '../ui/app.js'
 import { shipDataStorage } from './async-storage.js'
 
 const PORT = process.env.PORT || 3000
 
-const app = express()
-app.use(compress())
-// this is here so the workshop app knows when the server has started
-app.head('/', (req, res) => res.status(200).end())
+const app = new Hono({ strict: true })
+app.use(trimTrailingSlash())
 
-app.use(express.static('public', { index: false }))
-app.use('/js/src', express.static('src'))
+app.use('/*', serveStatic({ root: './public', index: '' }))
+
+app.use(
+	'/ui/*',
+	serveStatic({
+		root: './ui',
+		onNotFound: (path, context) => context.text('File not found', 404),
+		rewriteRequestPath: path => path.replace('/ui', ''),
+	}),
+)
 
 // This just cleans up the URL if the search ever gets cleared... Not important
 // for RSCs... Just ... I just can't help myself. I like URLs clean.
-app.use((req, res, next) => {
-	if (req.query.search === '') {
-		const searchParams = new URLSearchParams(req.search)
+app.use(async (context, next) => {
+	if (context.req.query('search') === '') {
+		const searchParams = new URLSearchParams(url.search)
 		searchParams.delete('search')
-		const location = [req.path, searchParams.toString()]
+		const location = [url.pathname, searchParams.toString()]
 			.filter(Boolean)
 			.join('?')
-		return res.redirect(302, location)
+		return context.redirect(location, 302)
 	} else {
-		next()
+		await next()
 	}
 })
 
-const moduleBasePath = new URL('../src', import.meta.url).href
+const moduleBasePath = new URL('../ui', import.meta.url).href
 
 // 🐨 add a returnValue argument here
-async function renderApp(res) {
-	try {
-		const shipId = res.req.params.shipId || null
-		const search = res.req.query.search || ''
-		const data = { shipId, search }
-		shipDataStorage.run(data, () => {
-			const root = h(App)
-			// 🐨 change the payload to an object that has { root, returnValue }
-			// 🦉 this will break the app until you update the src/index.js file!
-			const payload = root
-			const { pipe } = renderToPipeableStream(payload, moduleBasePath)
-			pipe(res)
-		})
-	} catch (error) {
-		console.error(error)
-		res.status(500).json({ error: error.message })
-	}
+async function renderApp(context) {
+	const shipId = context.req.param('shipId') || null
+	const search = context.req.query('search') || ''
+	const data = { shipId, search }
+	shipDataStorage.run(data, () => {
+		const root = h(App)
+		// 🐨 change the payload to an object that has { root, returnValue }
+		// 🦉 this will break the app until you update the ui/index.js file!
+		const payload = root
+		const { pipe } = renderToPipeableStream(payload, moduleBasePath)
+		pipe(context.env.outgoing)
+	})
+	return RESPONSE_ALREADY_SENT
 }
 
-app.get('/rsc/:shipId?', async (req, res) => {
-	await renderApp(res)
-})
+app.get('/rsc/:shipId?', async context => await renderApp(context))
 
-// 🐨 add a app.post to handle POST requests to /action/:shipId? that uses bodyParser
-// 💰 This isn't an express workshop, so this'll get you started:
-// app.post('/action/:shipId?', bodyParser.text(), async (req, res) => {})
+// 🐨 add an app.post to handle POST requests to /action/:shipId?
+// 💰 This isn't a hono.js workshop, so this'll get you started:
+// app.post('/action/:shipId?', async context => {})
 // 🐨 in the body of the POST handler, you'll want to:
-// 1. get the serverReference from the rsc-action header
+// 1. get the serverReference from the rsc-action header (💰 context.req.header('rsc-action'))
 // 2. split the serverReference by '#' to get the filepath and export name
 // 3. dynamically import the action from the filepath and name
 //    💰 (await import(filepath))[name]
 // 💯 Bonus: validate the action is a valid server reference. console.log(action.$$typeof) to see how you might determine that
-// 4. parse the args: 💰
-// 		const bb = busboy({ headers: req.headers })
-// 		const reply = decodeReplyFromBusboy(bb, moduleBasePath)
-// 		req.pipe(bb)
-// 		const args = await reply
-// 5. call the action with the ...args
-// 6. call renderApp with the res and the returnValue of the action
+// 4. get the formData object from the quest (💰 await context.req.formData())
+// 5. decode the reply from the formData object (await decodeReply(formData, moduleBasePath))
+// 6. call the action with the ...args
+// 7. call renderApp with the res and the returnValue of the action
 
-app.get('/:shipId?', async (req, res) => {
-	res.set('Content-type', 'text/html')
-	return res.sendFile('index.html', { root: 'public' })
+app.get('/:shipId?', async context => {
+	const html = await readFile('./public/index.html', 'utf8')
+	return context.html(html, 200)
 })
 
-const server = app.listen(PORT, () => {
-	console.log(`🚀  We have liftoff!`)
-	console.log(`http://localhost:${PORT}`)
+app.onError((err, context) => {
+	console.error('error', err)
+	return context.json({ error: true, message: 'Something went wrong' }, 500)
+})
+
+const server = serve({ fetch: app.fetch, port: PORT }, info => {
+	const url = `http://localhost:${info.port}`
+	console.log(`🚀  We have liftoff!\n${url}`)
 })
 
 closeWithGrace(async ({ signal, err }) => {

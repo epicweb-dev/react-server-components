@@ -1,71 +1,83 @@
+import { readFile } from 'fs/promises'
+import { serve } from '@hono/node-server'
+import { serveStatic } from '@hono/node-server/serve-static'
+// 💰 you're gonna need this
+// import { RESPONSE_ALREADY_SENT } from '@hono/node-server/utils/response'
 import closeWithGrace from 'close-with-grace'
-import compress from 'compression'
-import express from 'express'
+import { Hono } from 'hono'
+import { trimTrailingSlash } from 'hono/trailing-slash'
 // 💰 you'll need these
 // import { createElement as h } from 'react'
 // import { renderToPipeableStream } from 'react-server-dom-esm/server'
 import { getShip, searchShips } from '../db/ship-api.js'
 // 💰 you'll want this too:
-// import { App } from '../src/app.js'
+// import { App } from '../ui/app.js'
 
 const PORT = process.env.PORT || 3000
 
-const app = express()
-app.use(compress())
-// this is here so the workshop app knows when the server has started
-app.head('/', (req, res) => res.status(200).end())
+const app = new Hono({ strict: true })
+app.use(trimTrailingSlash())
 
-app.use(express.static('public', { index: false }))
-app.use('/js/src', express.static('src'))
+app.use('/*', serveStatic({ root: './public', index: '' }))
+
+app.use(
+	'/ui/*',
+	serveStatic({
+		root: './ui',
+		onNotFound: (path, context) => context.text('File not found', 404),
+		rewriteRequestPath: path => path.replace('/ui', ''),
+	}),
+)
 
 // This just cleans up the URL if the search ever gets cleared... Not important
 // for RSCs... Just ... I just can't help myself. I like URLs clean.
-app.use((req, res, next) => {
-	if (req.query.search === '') {
-		const searchParams = new URLSearchParams(req.search)
+app.use(async (context, next) => {
+	if (context.req.query('search') === '') {
+		const searchParams = new URLSearchParams(url.search)
 		searchParams.delete('search')
-		const location = [req.path, searchParams.toString()]
+		const location = [url.pathname, searchParams.toString()]
 			.filter(Boolean)
 			.join('?')
-		return res.redirect(302, location)
+		return context.redirect(location, 302)
 	} else {
-		next()
+		await next()
 	}
 })
 
 // 🐨 change this from /api to /rsc
-app.get('/api/:shipId?', async (req, res) => {
-	try {
-		const shipId = req.params.shipId || null
-		const search = req.query.search || ''
-		const ship = shipId ? await getShip({ shipId }) : null
-		const shipResults = await searchShips({ search })
-		// 🐨 rename data to props
-		const data = { shipId, search, ship, shipResults }
-		// 🐨 remove res.json and instead call renderToPipeableStream from react-server-dom-esm/server
-		// and pass it the App component and the props
-		// 💰 remember, we don't have a JSX transformer here, so you'll use
-		// createElement directly which we aliased to `h` for brievity above.
-		return res.json(data)
-		// 🐨 Now pipe the stream into the response
-		// 💰 pipe(res)
-
-		// 📜 the API for this is about the same as it is in the react-dom package
-		// https://react.dev/reference/react-dom/server/renderToPipeableStream
-	} catch (error) {
-		console.error(error)
-		res.status(500).json({ error: error.message })
-	}
+app.get('/api/:shipId?', async context => {
+	const shipId = context.req.param('shipId') || null
+	const search = context.req.query('search') || ''
+	const ship = shipId ? await getShip({ shipId }) : null
+	const shipResults = await searchShips({ search })
+	// 🐨 rename data to props
+	const data = { shipId, search, ship, shipResults }
+	// 💣 remove this return context.json
+	return context.json(data)
+	// 🐨 call renderToPipeableStream from react-server-dom-esm/server
+	// and pass it the App component and the props
+	// 💰 remember, we don't have a JSX transformer here, so you'll use
+	// createElement directly which we aliased to `h` for brievity above.
+	// 🦉 renderToPipeableStream returns an object with a pipe function
+	// 🐨 pipe the content through the outgoing response
+	// 💰 pipe(context.env.outgoing)
+	// 🐨 let Hono know we're going to stream on the response
+	// 💰 return RESPONSE_ALREADY_SENT
 })
 
-app.get('/:shipId?', async (req, res) => {
-	res.set('Content-type', 'text/html')
-	return res.sendFile('index.html', { root: 'public' })
+app.get('/:shipId?', async context => {
+	const html = await readFile('./public/index.html', 'utf8')
+	return context.html(html, 200)
 })
 
-const server = app.listen(PORT, () => {
-	console.log(`🚀  We have liftoff!`)
-	console.log(`http://localhost:${PORT}`)
+app.onError((err, context) => {
+	console.error('error', err)
+	return context.json({ error: true, message: 'Something went wrong' }, 500)
+})
+
+const server = serve({ fetch: app.fetch, port: PORT }, info => {
+	const url = `http://localhost:${info.port}`
+	console.log(`🚀  We have liftoff!\n${url}`)
 })
 
 closeWithGrace(async ({ signal, err }) => {

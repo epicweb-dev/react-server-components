@@ -1,22 +1,22 @@
 # Client Router
 
-👨‍💼 In our <InlineFile file="src/ship-search.js" /> file, we have our search form
+👨‍💼 In our <InlineFile file="ui/ship-search.js" /> file, we have our search form
 and the list of results which have links. The form and the list of results
 technically all works, but triggers full page refreshes which we'd love to
 avoid. Now that we have client components, we've made this a client module with
 `'use client'` so we can use things like event handlers to prevent the default
 behavior and update the UI without a full page refresh.
 
-🧝‍♂️ I created <InlineFile file="src/router.js" /> which is just a couple
+🧝‍♂️ I created <InlineFile file="ui/router.js" /> which is just a couple
 utilities and a context for managing the state in a router along with a
 `useRouter()` hook for accessing the context. You'll use these utilities to
 navigate the user to the next destination as the user searches and selects
 ships.
 
 👨‍💼 Great, thank you Kellie! So what we need you to do is update
-our <InlineFile file="src/index.js" /> to render the `RouterContext`
+our <InlineFile file="ui/index.js" /> to render the `RouterContext`
 with the right values (you'll be implementing the `navigate` function) and then
-update the <InlineFile file="src/ship-search.js" /> module to use the
+update the <InlineFile file="ui/ship-search.js" /> module to use the
 `useRouter()` hook to navigate the user to the ship details page when they click
 on a ship link.
 
