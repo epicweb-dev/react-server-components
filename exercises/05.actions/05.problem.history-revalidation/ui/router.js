@@ -11,6 +11,7 @@ export function useRouter() {
 	return context
 }
 
+// Thanks Devon: https://twitter.com/devongovett/status/1672307153699471360
 export function useLinkHandler(navigate) {
 	useEffect(() => {
 		function onClick(event) {
