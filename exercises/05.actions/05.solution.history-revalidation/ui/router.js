@@ -1,4 +1,5 @@
 import { createContext, use } from 'react'
+import { useEffect } from 'react'
 
 export const RouterContext = createContext()
 
@@ -8,6 +9,36 @@ export function useRouter() {
 		throw new Error('useRouter must be used within a Router')
 	}
 	return context
+}
+
+export function useLinkHandler(navigate) {
+	useEffect(() => {
+		function onClick(event) {
+			const link = event.target.closest('a')
+			if (
+				link &&
+				link instanceof HTMLAnchorElement &&
+				link.href &&
+				(!link.target || link.target === '_self') &&
+				link.origin === location.origin &&
+				!link.hasAttribute('download') &&
+				event.button === 0 && // left clicks only
+				!event.metaKey && // open in new tab (mac)
+				!event.ctrlKey && // open in new tab (windows)
+				!event.altKey && // download
+				!event.shiftKey &&
+				!event.defaultPrevented
+			) {
+				event.preventDefault()
+				navigate(link.pathname + link.search)
+			}
+		}
+
+		document.addEventListener('click', onClick)
+		return () => {
+			document.removeEventListener('click', onClick)
+		}
+	}, [navigate])
 }
 
 export const getGlobalLocation = () =>

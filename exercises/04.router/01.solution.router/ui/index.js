@@ -9,7 +9,7 @@ import { createRoot } from 'react-dom/client'
 import * as RSC from 'react-server-dom-esm/client'
 import { ErrorBoundary } from './error-boundary.js'
 import { shipFallbackSrc } from './img-utils.js'
-import { RouterContext, getGlobalLocation } from './router.js'
+import { RouterContext, getGlobalLocation, useLinkHandler } from './router.js'
 
 function fetchContent(location) {
 	return fetch(`/rsc${location}`)
@@ -45,6 +45,8 @@ function Root() {
 
 		startTransition(() => setContentPromise(nextContentPromise))
 	}
+
+	useLinkHandler(navigate)
 
 	return h(
 		RouterContext,

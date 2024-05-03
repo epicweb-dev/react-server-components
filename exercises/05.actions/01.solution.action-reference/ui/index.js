@@ -14,7 +14,7 @@ import * as RSC from 'react-server-dom-esm/client'
 import { contentCache, useContentCache, generateKey } from './content-cache.js'
 import { ErrorBoundary } from './error-boundary.js'
 import { shipFallbackSrc } from './img-utils.js'
-import { RouterContext, getGlobalLocation } from './router.js'
+import { RouterContext, getGlobalLocation, useLinkHandler } from './router.js'
 
 function fetchContent(location) {
 	return fetch(`/rsc${location}`)
@@ -85,6 +85,8 @@ function Root() {
 		contentCache.set(newContentKey, nextContentPromise)
 		startTransition(() => setContentKey(newContentKey))
 	}
+
+	useLinkHandler(navigate)
 
 	return h(
 		RouterContext,

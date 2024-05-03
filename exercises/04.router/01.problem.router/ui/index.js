@@ -3,7 +3,12 @@ import { createRoot } from 'react-dom/client'
 import * as RSC from 'react-server-dom-esm/client'
 import { ErrorBoundary } from './error-boundary.js'
 import { shipFallbackSrc } from './img-utils.js'
-import { RouterContext, getGlobalLocation } from './router.js'
+import {
+	RouterContext,
+	getGlobalLocation,
+	// 💰 you'll need this
+	// useLinkHandler,
+} from './router.js'
 
 function fetchContent(location) {
 	return fetch(`/rsc${location}`)
@@ -37,6 +42,8 @@ function Root() {
 		// 🐨 create a nextContentPromise variable set to createFromFetch(nextContentFetchPromise)
 		// 🐨 set the content promise inside a startTransition
 	}
+
+	// 🐨 call useLinkHandler with navigate so all links will navigate when clicked
 
 	return h(
 		RouterContext,

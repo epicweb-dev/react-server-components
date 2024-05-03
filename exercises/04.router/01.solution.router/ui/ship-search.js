@@ -36,24 +36,11 @@ export function ShipSearch({ search, results, fallback }) {
 }
 
 export function SelectShipLink({ shipId, highlight, children }) {
-	const { location, navigate } = useRouter()
+	const { location } = useRouter()
 	return h('a', {
 		children,
-		href: `/${shipId}`,
+		href: mergeLocationState(location, { shipId }),
 		style: { fontWeight: highlight ? 'bold' : 'normal' },
-		onClick: event => {
-			if (
-				event.ctrlKey ||
-				event.metaKey ||
-				event.shiftKey ||
-				event.button !== 0
-			) {
-				return
-			}
-			event.preventDefault()
-			const newLocation = mergeLocationState(location, { shipId })
-			navigate(newLocation)
-		},
 	})
 }
 
