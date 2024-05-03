@@ -42,7 +42,14 @@ export function SelectShipLink({ shipId, highlight, children }) {
 		href: `/${shipId}`,
 		style: { fontWeight: highlight ? 'bold' : 'normal' },
 		onClick: event => {
-			if (event.ctrlKey || event.metaKey || event.shiftKey) return
+			if (
+				event.ctrlKey ||
+				event.metaKey ||
+				event.shiftKey ||
+				event.button !== 0
+			) {
+				return
+			}
 			event.preventDefault()
 			const newLocation = mergeLocationState(location, { shipId })
 			navigate(newLocation)
