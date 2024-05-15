@@ -3,8 +3,11 @@
 👨‍💼 Alright, we're going to get our server ready to start handling `'use client'`
 modules because we want to add some client-side interactivity to our app.
 
-One thing that requires client-side state is Error Boundary components. So
-that's what we're going to start with.
+We're planning on adding the ability to change the ship names by clicking on
+them. The idea is, the ship name is a button and when you click on it, it'll
+change to a form with an input which you can then submit and that will update
+the name. We'll get to the actual implementation for updating later, but for now
+we just need to get our client-side code for the edit state working.
 
 🧝‍♂️ I've already updated the `importmap`
 script in <InlineFile file="public/index.html" /> to handle bringing in
@@ -21,8 +24,8 @@ registration.
 node --watch --import ./server/register-rsc-loader.js --conditions=react-server server/app.js
 ```
 
-Now create and use the `error-boundary.js` `'use client'`
-module.
+Now update the <InlineFile file="ui/edit-text.js" /> to add `'use client'` to
+the top of the module.
 
 When you're finished, we'll not actually be loading modules yet, but we'll be
 almost ready to do it! I recommend you add a couple console logs so you can
