@@ -1,12 +1,7 @@
 import { Fragment, Suspense, createElement as h } from 'react'
 import { shipDataStorage } from '../server/async-storage.js'
-import { ErrorBoundary } from './error-boundary.js'
-import { ShipDetails, ShipError, ShipFallback } from './ship-details.js'
-import {
-	SearchResults,
-	SearchResultsFallback,
-	ShipResultsErrorFallback,
-} from './ship-search-results.js'
+import { ShipDetails, ShipFallback } from './ship-details.js'
+import { SearchResults, SearchResultsFallback } from './ship-search-results.js'
 
 export function App() {
 	const { shipId, search } = shipDataStorage.getStore()
@@ -31,30 +26,18 @@ export function App() {
 					}),
 				),
 				h(
-					ErrorBoundary,
-					{ fallback: h(ShipResultsErrorFallback) },
-					h(
-						'ul',
-						null,
-						h(
-							Suspense,
-							{ fallback: h(SearchResultsFallback) },
-							h(SearchResults),
-						),
-					),
+					'ul',
+					null,
+					h(Suspense, { fallback: h(SearchResultsFallback) }, h(SearchResults)),
 				),
 			),
 		),
 		h(
 			'div',
 			{ className: 'details' },
-			h(
-				ErrorBoundary,
-				{ fallback: h(ShipError) },
-				shipId
-					? h(Suspense, { fallback: h(ShipFallback) }, h(ShipDetails))
-					: h('p', null, 'Select a ship from the list to see details'),
-			),
+			shipId
+				? h(Suspense, { fallback: h(ShipFallback) }, h(ShipDetails))
+				: h('p', null, 'Select a ship from the list to see details'),
 		),
 	)
 }

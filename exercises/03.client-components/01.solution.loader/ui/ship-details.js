@@ -1,7 +1,10 @@
 import { createElement as h } from 'react'
 import { getShip } from '../db/ship-api.js'
 import { shipDataStorage } from '../server/async-storage.js'
+import { EditableText } from './edit-text.js'
 import { getImageUrlForShip } from './img-utils.js'
+
+console.log(EditableText.toString())
 
 export async function ShipDetails() {
 	const { shipId } = shipDataStorage.getStore()

@@ -1,7 +1,12 @@
 import { createElement as h } from 'react'
 import { getShip } from '../db/ship-api.js'
 import { shipDataStorage } from '../server/async-storage.js'
+// 🐨 import the EditText component from the client module
+// import { EditText } from './error-boundary.js'
 import { getImageUrlForShip } from './img-utils.js'
+
+// 🐨 log the EditText to the console so you can see what the server sees
+// 💰 console.log(EditText.toString())
 
 export async function ShipDetails() {
 	const { shipId } = shipDataStorage.getStore()

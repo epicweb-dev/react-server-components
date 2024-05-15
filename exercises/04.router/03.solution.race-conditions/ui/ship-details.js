@@ -1,6 +1,7 @@
 import { createElement as h } from 'react'
 import { getShip } from '../db/ship-api.js'
 import { shipDataStorage } from '../server/async-storage.js'
+import { EditableText } from './edit-text.js'
 import { getImageUrlForShip } from './img-utils.js'
 import { ShipImg } from './img.js'
 
@@ -16,7 +17,19 @@ export async function ShipDetails() {
 			{ className: 'ship-info__img-wrapper' },
 			h(ShipImg, { src: shipImgSrc, alt: ship.name }),
 		),
-		h('section', null, h('h2', null, ship.name)),
+		h(
+			'section',
+			null,
+			h(
+				'h2',
+				null,
+				h(EditableText, {
+					key: shipId,
+					shipId,
+					initialValue: ship.name,
+				}),
+			),
+		),
 		h('div', null, 'Top Speed: ', ship.topSpeed, ' ', h('small', null, 'lyh')),
 		h(
 			'section',

@@ -1,10 +1,7 @@
 import { Fragment, Suspense, createElement as h } from 'react'
 import { shipDataStorage } from '../server/async-storage.js'
-import { ErrorBoundary } from './error-boundary.js'
 import { ShipDetails, ShipFallback } from './ship-details.js'
 import { SearchResults, SearchResultsFallback } from './ship-search-results.js'
-
-console.log(ErrorBoundary.toString())
 
 export function App() {
 	const { shipId, search } = shipDataStorage.getStore()

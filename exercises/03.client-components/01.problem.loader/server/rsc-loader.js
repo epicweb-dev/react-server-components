@@ -21,9 +21,9 @@ export async function load(url, context, defaultLoad) {
 		return textLoad(u, c, defaultLoad)
 	})
 	// 🐨 uncomment this so you can observe the changes the loader makes to our
-	// error-boundary.js module.
+	// edit-text.js module.
 	// 💰
-	// if (url.includes('error-boundary')) {
+	// if (url.includes('edit-text')) {
 	// 	console.log(result.source)
 	// }
 	return result

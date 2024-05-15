@@ -2,12 +2,19 @@
 
 👨‍💼 Great job!
 
-🦉 So when Node.js imports the `error-boundary.js` file, instead of this:
+🦉 So when Node.js imports the <InlineFile file="ui/edit-text.js" /> file,
+instead of this:
 
 ```tsx
 'use client'
+import { createElement as h, useRef, useState } from 'react'
+import { flushSync } from 'react-dom'
 
-export * from 'react-error-boundary'
+// ...
+
+export function EditableText({ id, shipId, initialValue = '' }) {
+	// ...
+}
 ```
 
 It's getting this:
@@ -15,11 +22,18 @@ It's getting this:
 {/* prettier-ignore */}
 ```js nonumber nolang
 import {registerClientReference} from "react-server-dom-esm/server";
-export const ErrorBoundary = registerClientReference(function() {throw new Error("Attempted to call ErrorBoundary() from the server but ErrorBoundary is on the client. It's not possible to invoke a client function from the server, it can only be rendered as a Component or passed to props of a Client Component.");},"file:///Users/kentcdodds/code/epicweb-dev/react-server-components/playground/ui/error-boundary.js","ErrorBoundary");
-export const ErrorBoundaryContext = registerClientReference(function() {throw new Error("Attempted to call ErrorBoundaryContext() from the server but ErrorBoundaryContext is on the client. It's not possible to invoke a client function from the server, it can only be rendered as a Component or passed to props of a Client Component.");},"file:///Users/kentcdodds/code/epicweb-dev/react-server-components/playground/ui/error-boundary.js","ErrorBoundaryContext");
-export const useErrorBoundary = registerClientReference(function() {throw new Error("Attempted to call useErrorBoundary() from the server but useErrorBoundary is on the client. It's not possible to invoke a client function from the server, it can only be rendered as a Component or passed to props of a Client Component.");},"file:///Users/kentcdodds/code/epicweb-dev/react-server-components/playground/ui/error-boundary.js","useErrorBoundary");
-export const withErrorBoundary = registerClientReference(function() {throw new Error("Attempted to call withErrorBoundary() from the server but withErrorBoundary is on the client. It's not possible to invoke a client function from the server, it can only be rendered as a Component or passed to props of a Client Component.");},"file:///Users/kentcdodds/code/epicweb-dev/react-server-components/playground/ui/error-boundary.js","withErrorBoundary");
+export const EditableText = registerClientReference(function() {throw new Error("Attempted to call EditableText() from the server but EditableText is on the client. It's not possible to invoke a client function from the server, it can only be rendered as a Component or passed to props of a Client Component.");},"file:///Users/kentcdodds/code/epicweb-dev/react-server-components/playground/ui/edit-text.js","EditableText");
 ```
+
+And when I `console.log(EditableText.toString())`
+in <InlineFile file="ui/ship-details.js" />, I'm getting this:
+
+{/* prettier-ignore */}
+```js nonumber nolang
+function() {throw new Error("Attempted to call EditableText() from the server but EditableText is on the client. It's not possible to invoke a client function from the server, it can only be rendered as a Component or passed to props of a Client Component.");}
+```
+
+Meaning if I try to call it in the RSC environment, I get an error.
 
 (If you added the logs, you should have seen something like that in the
 console). That transformation is happening thanks to the loader you've

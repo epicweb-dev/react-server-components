@@ -1,6 +1,7 @@
 import { createElement as h } from 'react'
 import { getShip } from '../db/ship-api.js'
 import { shipDataStorage } from '../server/async-storage.js'
+import { EditableText } from './edit-text.js'
 import { getImageUrlForShip } from './img-utils.js'
 
 export async function ShipDetails() {
@@ -15,7 +16,19 @@ export async function ShipDetails() {
 			{ className: 'ship-info__img-wrapper' },
 			h('img', { src: shipImgSrc, alt: ship.name }),
 		),
-		h('section', null, h('h2', null, ship.name)),
+		h(
+			'section',
+			null,
+			h(
+				'h2',
+				null,
+				h(EditableText, {
+					key: shipId,
+					shipId,
+					initialValue: ship.name,
+				}),
+			),
+		),
 		h('div', null, 'Top Speed: ', ship.topSpeed, ' ', h('small', null, 'lyh')),
 		h(
 			'section',
@@ -80,20 +93,5 @@ export function ShipFallback() {
 				),
 			),
 		),
-	)
-}
-
-export function ShipError() {
-	const { shipId } = shipDataStorage.getStore()
-	return h(
-		'div',
-		{ className: 'ship-info' },
-		h(
-			'div',
-			{ className: 'ship-info__img-wrapper' },
-			h('img', { src: '/img/broken-ship.webp', alt: 'broken ship' }),
-		),
-		h('section', null, h('h2', null, 'There was an error')),
-		h('section', null, 'There was an error loading "', shipId, '"'),
 	)
 }
