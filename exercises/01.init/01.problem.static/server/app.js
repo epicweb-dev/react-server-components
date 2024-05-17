@@ -62,6 +62,11 @@ app.use(async (context, next) => {
 // 	return context.html(html, 200)
 // })
 
+app.onError((err, context) => {
+	console.error('error', err)
+	return context.json({ error: true, message: 'Something went wrong' }, 500)
+})
+
 const server = serve({ fetch: app.fetch, port: PORT }, info => {
 	const url = `http://localhost:${info.port}`
 	console.log(`🚀  We have liftoff!\n${url}`)
