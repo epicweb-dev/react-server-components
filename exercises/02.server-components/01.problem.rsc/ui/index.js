@@ -11,16 +11,13 @@ const getGlobalLocation = () =>
 	window.location.pathname + window.location.search
 
 const initialLocation = getGlobalLocation()
-// 🐨 rename this to something more accurate like initialContentFetchPromise
-const initialDataPromise = fetch(
-	// 🐨 replace /api with /rsc
-	`/api${initialLocation}`,
-	// 💣 we no longer accept application/json. Delete these headers
-	{ headers: { Accept: 'application/json' } },
-)
+// 🐨 rename initialDataPromise to something more accurate
+// (💰 like initialContentFetchPromise)
+// 🐨 also replace /api with /rsc
+const initialDataPromise = fetch(`/api${initialLocation}`)
 	// 💣 we no longer process the response into JSON, instead react-server-dom-esm
 	// will process it for us. Delete this `then` call:
-	.then(r => (r.ok ? r.json() : Promise.reject(r)))
+	.then(r => r.json())
 
 // 🐨 create a variable called initialContentPromise set to createFromFetch(initialContentFetchPromise)
 
