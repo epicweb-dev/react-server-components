@@ -11,6 +11,8 @@ export async function searchShips({
 	search,
 	delay = Math.random() * (MAX_DELAY - MIN_DELAY) + MIN_DELAY,
 }) {
+	// 🧝‍♂️ I've added this for you so you can test things out for this exercise
+	delay = 4000
 	const endTime = Date.now() + delay
 	const ships = shipData
 		.filter(ship => ship.name.toLowerCase().includes(search.toLowerCase()))
