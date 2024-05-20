@@ -28,7 +28,6 @@ function createFromFetch(fetchPromise) {
 }
 
 async function callServer(id, args) {
-	// using the global location to avoid a stale closure over the location
 	const fetchPromise = fetch(`/action${getGlobalLocation()}`, {
 		method: 'POST',
 		headers: { 'rsc-action': id },
