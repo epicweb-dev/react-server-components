@@ -32,15 +32,26 @@ export function ShipSearch({ search, results, fallback }) {
 	)
 }
 
-export function SelectShipLink({ shipId, highlight, children }) {
+// 💣 you can remove the search prop here now that we can use the location from
+// the router
+export function SelectShipLink({ shipId, search, highlight, children }) {
 	// 🐨 get the current location from useRouter
 
 	// 🦉 the useLinkHandler you'll add in ui/index.js will set up an event handler
 	// to listen to clicks to anchor elements and navigate properly.
+
+	// right now we're merging manually, but now you can use our
+	// mergeLocationState utility.
+	// 🐨 update href to be mergeLocationState(location, { shipId })
+	const href = [
+		`/${shipId}`,
+		search ? `search=${encodeURIComponent(search)}` : null,
+	]
+		.filter(Boolean)
+		.join('?')
 	return h('a', {
 		children,
-		// 🐨 update href to be mergeLocationState(location, { shipId })
-		href: `/${shipId}`,
+		href,
 		style: { fontWeight: highlight ? 'bold' : 'normal' },
 	})
 }

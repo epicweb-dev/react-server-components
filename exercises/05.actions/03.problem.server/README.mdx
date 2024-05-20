@@ -3,6 +3,16 @@
 👨‍💼 Now that we send that reference and any arguments to the backend when we
 submit the form. We need an endpoint that will handle that POST request.
 
+The POST request we're making includes the id of the action in the `rsc-action`
+header:
+
+```
+file:///Users/kentcdodds/code/epicweb-dev/react-server-components/playground/ui/actions.js#updateShipName
+```
+
+We can use that to find the module and module function to call in our server
+handler.
+
 We'll be using a few server-side modules for parsing the form submission data.
 As this is not a Node.js/hono.js course, some of this will be given to you. You
 will be responsible for parsing out the action file to `import` and calling it

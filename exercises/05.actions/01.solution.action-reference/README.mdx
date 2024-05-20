@@ -1,6 +1,42 @@
 # Action Reference
 
-👨‍💼 Great! So this is what a reference looks like in the client:
+👨‍💼 Great! So this is what our Node.js loader does to the `actions.js` module:
+
+```
+'use server'
+
+import * as db from '../db/ship-api.js'
+
+export async function updateShipName(previousState, formData) {
+  try {
+          await db.updateShipName({
+                  shipId: formData.get('shipId'),
+                  shipName: formData.get('shipName'),
+          })
+          return { status: 'success', message: 'Success!' }
+  } catch (error) {
+          return { status: 'error', message: error?.message || String(error) }
+  }
+}
+
+
+;import {registerServerReference} from "react-server-dom-esm/server";
+registerServerReference(updateShipName,"file:///Users/kentcdodds/code/epicweb-dev/react-server-components/playground/ui/actions.js","updateShipName");
+```
+
+The `registerServerReference` function attaches this additional information onto
+our `updateShipName` function:
+
+```json
+{
+	"$$typeof": "Symbol(react.server.reference)",
+	"$$id": "file:///Users/kentcdodds/code/epicweb-dev/react-server-components/playground/ui/actions.js#updateShipName",
+	"$$bound": null,
+	"bind": "function bind() {\n  // $FlowFixMe[unsupported-syntax]\n  var newFn = FunctionBind.apply(this, arguments);\n\n  if (this.$$typeof === SERVER_REFERENCE_TAG) {\n    // $FlowFixMe[method-unbinding]\n    var args = ArraySlice.call(arguments, 1);\n    return Object.defineProperties(newFn, {\n      $$typeof: {\n        value: SERVER_REFERENCE_TAG\n      },\n      $$id: {\n        value: this.$$id\n      },\n      $$bound: {\n        value: this.$$bound ? this.$$bound.concat(args) : args\n      },\n      bind: {\n        value: bind\n      }\n    });\n  }\n\n  return newFn;\n}"
+}
+```
+
+The serialized version of this function looks like this in our RSC payload:
 
 ```
 d:{"id":"file:///Users/kentcdodds/code/epicweb-dev/react-server-components/playground/ui/actions.js#updateShipName","bound":null}

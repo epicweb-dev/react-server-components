@@ -14,7 +14,9 @@ export async function SearchResults() {
 			{ key: ship.name },
 			h(
 				SelectShipLink,
-				{ shipId: ship.id, highlight: ship.id === currentShipId },
+				// 💣 you can remove the search prop here now that this information is
+				// in our router.
+				{ shipId: ship.id, search, highlight: ship.id === currentShipId },
 				h(ShipImg, {
 					src: getImageUrlForShip(ship.id, { size: 20 }),
 					alt: ship.name,

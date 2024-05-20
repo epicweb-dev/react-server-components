@@ -6,6 +6,22 @@ import { EditableText } from './edit-text.js'
 import { getImageUrlForShip } from './img-utils.js'
 import { ShipImg } from './img.js'
 
+const properties = {}
+for (const [key, descriptor] of Object.entries(
+	Object.getOwnPropertyDescriptors(updateShipName),
+)) {
+	properties[key] = descriptor.value
+}
+
+console.log(updateShipName.toString())
+console.log(
+	JSON.stringify(
+		properties,
+		(key, value) => (typeof value === 'object' ? value : String(value)),
+		2,
+	),
+)
+
 export async function ShipDetails() {
 	const { shipId } = shipDataStorage.getStore()
 	const ship = await getShip({ shipId })

@@ -20,5 +20,9 @@ export async function load(url, context, defaultLoad) {
 	const result = await reactLoad(url, context, (u, c) => {
 		return textLoad(u, c, defaultLoad)
 	})
+	// 💰 uncomment this to see how our loader transforms the actions file
+	// if (url.includes('actions.js')) {
+	// 	console.log(result.source)
+	// }
 	return result
 }

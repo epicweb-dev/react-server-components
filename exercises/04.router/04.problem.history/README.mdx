@@ -12,10 +12,10 @@ listen for this event and update the application state accordingly.
 function handlePopState() {
 	// do stuff
 }
-window.addEventListener(handlePopState)
+window.addEventListener('popstate', handlePopState)
 
 // then to clean up
-window.removeEventListener(handlePopState)
+window.removeEventListener('popstate', handlePopState)
 ```
 
 Please add this event listener in a `useEffect` in our router logic.
