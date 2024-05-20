@@ -4,7 +4,21 @@ import { shipDataStorage } from '../server/async-storage.js'
 import { EditableText } from './edit-text.js'
 import { getImageUrlForShip } from './img-utils.js'
 
+const properties = {}
+for (const [key, descriptor] of Object.entries(
+	Object.getOwnPropertyDescriptors(EditableText),
+)) {
+	properties[key] = descriptor.value
+}
+
 console.log(EditableText.toString())
+console.log(
+	JSON.stringify(
+		properties,
+		(key, value) => (typeof value === 'object' ? value : String(value)),
+		2,
+	),
+)
 
 export async function ShipDetails() {
 	const { shipId } = shipDataStorage.getStore()

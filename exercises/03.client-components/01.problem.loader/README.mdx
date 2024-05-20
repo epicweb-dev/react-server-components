@@ -21,7 +21,7 @@ reference registrations.
 registration.
 
 ```sh nonumber nolang
-node --watch --import ./server/register-rsc-loader.js --conditions=react-server server/app.js
+node --import ./server/register-rsc-loader.js --conditions=react-server --watch server/app.js
 ```
 
 Now update the <InlineFile file="ui/edit-text.js" /> to add `'use client'` to

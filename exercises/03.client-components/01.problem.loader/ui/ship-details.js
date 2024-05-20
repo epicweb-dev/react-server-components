@@ -1,12 +1,27 @@
 import { createElement as h } from 'react'
 import { getShip } from '../db/ship-api.js'
 import { shipDataStorage } from '../server/async-storage.js'
-// 🐨 import the EditText component from the client module
-// import { EditText } from './error-boundary.js'
+// 🐨 import the EditableText component from the client module
+// import { EditableText } from './edit-text.js'
 import { getImageUrlForShip } from './img-utils.js'
 
-// 🐨 log the EditText to the console so you can see what the server sees
-// 💰 console.log(EditText.toString())
+// 🐨 log the EditableText to the console so you can see what the server sees
+// 💰 This will log the value itself as well as all the properties
+// const properties = {}
+// for (const [key, descriptor] of Object.entries(
+// 	Object.getOwnPropertyDescriptors(EditableText),
+// )) {
+// 	properties[key] = descriptor.value
+// }
+
+// console.log(EditableText.toString())
+// console.log(
+// 	JSON.stringify(
+// 		properties,
+// 		(key, value) => (typeof value === 'object' ? value : String(value)),
+// 		2,
+// 	),
+// )
 
 export async function ShipDetails() {
 	const { shipId } = shipDataStorage.getStore()
