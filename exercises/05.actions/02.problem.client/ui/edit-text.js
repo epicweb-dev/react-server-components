@@ -49,6 +49,7 @@ export function EditableText({ id, shipId, action, initialValue = '' }) {
 						style: {
 							border: 'none',
 							background: 'none',
+							width: '100%',
 							...inheritStyles,
 						},
 						onKeyDown: event => {

@@ -2,26 +2,29 @@
 
 👨‍💼 Great! So this is what our Node.js loader does to the `actions.js` module:
 
-```
+```js
 'use server'
 
 import * as db from '../db/ship-api.js'
 
 export async function updateShipName(previousState, formData) {
-  try {
-          await db.updateShipName({
-                  shipId: formData.get('shipId'),
-                  shipName: formData.get('shipName'),
-          })
-          return { status: 'success', message: 'Success!' }
-  } catch (error) {
-          return { status: 'error', message: error?.message || String(error) }
-  }
+	try {
+		await db.updateShipName({
+			shipId: formData.get('shipId'),
+			shipName: formData.get('shipName'),
+		})
+		return { status: 'success', message: 'Success!' }
+	} catch (error) {
+		return { status: 'error', message: error?.message || String(error) }
+	}
 }
 
-
-;import {registerServerReference} from "react-server-dom-esm/server";
-registerServerReference(updateShipName,"file:///Users/kentcdodds/code/epicweb-dev/react-server-components/playground/ui/actions.js","updateShipName");
+import { registerServerReference } from 'react-server-dom-esm/server'
+registerServerReference(
+	updateShipName,
+	'file:///Users/kentcdodds/code/epicweb-dev/react-server-components/playground/ui/actions.js',
+	'updateShipName',
+)
 ```
 
 The `registerServerReference` function attaches this additional information onto
