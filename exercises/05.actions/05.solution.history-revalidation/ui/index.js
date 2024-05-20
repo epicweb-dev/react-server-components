@@ -92,13 +92,10 @@ function Root() {
 			setNextLocation(nextLocation)
 			const historyKey = window.history.state?.key ?? generateKey()
 
-			const thisNav = Symbol(`Popstate for ${nextLocation}`)
-			latestNav.current = thisNav
-
 			let nextContentPromise
 			const fetchPromise = fetchContent(nextLocation)
 			onStreamFinished(fetchPromise, () => {
-				contentCache.set(historyKey, nextContentPromise)
+				startTransition(() => contentCache.set(historyKey, nextContentPromise))
 			})
 			nextContentPromise = createFromFetch(fetchPromise)
 

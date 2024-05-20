@@ -92,13 +92,10 @@ function Root() {
 			setNextLocation(nextLocation)
 			const historyKey = window.history.state?.key ?? generateKey()
 
-			// 🐨 handle race conditions for this revalidation similar to what we do
-			// in navigate below with the latestNav ref.
-
 			// 🐨 declare "let nextContentPromise" here
 			// 🐨 move the fetchPromise up from the if statement below because now we're going to revalidate all the time
 			// 🐨 when the fetchPromise stream is finished (💰 onStreamFinished):
-			//   set the historyKey in the contentCache to nextContentPromise
+			//   set the historyKey in the contentCache to nextContentPromise in a startTransition
 			// 🐨 assign nextContentPromise to createFromFetch(fetchPromise)
 
 			if (!contentCache.has(historyKey)) {
