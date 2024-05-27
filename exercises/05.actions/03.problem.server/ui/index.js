@@ -74,7 +74,7 @@ function Root() {
 		}
 		window.addEventListener('popstate', handlePopState)
 		return () => window.removeEventListener('popstate', handlePopState)
-	}, [])
+	}, [contentCache])
 
 	function navigate(nextLocation, { replace = false } = {}) {
 		setNextLocation(nextLocation)

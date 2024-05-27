@@ -18,9 +18,6 @@
   "keywords": [],
   "author": "Kent C. Dodds <me@kentcdodds.com> (https://kentcdodds.com/)",
   "license": "GPL-3.0-only",
-  "eslintIgnore": [
-    "/node_modules"
-  ],
   "workspaces": [
     "exercises/*/*",
     "examples/*"
@@ -31,48 +28,15 @@
     "git": ">=2.18.0"
   },
   "devDependencies": {
+    "@epic-web/config": "^1.5.4",
+    "eslint-plugin-react-hooks": "5.1.0-beta-94eed63c49-20240425",
     "@types/node": "^20.12.7",
     "eslint": "^9.1.1",
-    "eslint-plugin-import": "^2.29.1",
-    "prettier": "^3.2.5"
+    "prettier": "^3.2.5",
+    "typescript": "^5.4.5"
   },
-  "prettier": {
-    "arrowParens": "avoid",
-    "bracketSameLine": false,
-    "bracketSpacing": true,
-    "embeddedLanguageFormatting": "auto",
-    "endOfLine": "lf",
-    "htmlWhitespaceSensitivity": "css",
-    "insertPragma": false,
-    "jsxSingleQuote": false,
-    "printWidth": 80,
-    "proseWrap": "always",
-    "quoteProps": "as-needed",
-    "requirePragma": false,
-    "semi": false,
-    "singleAttributePerLine": false,
-    "singleQuote": true,
-    "tabWidth": 2,
-    "trailingComma": "all",
-    "useTabs": true,
-    "overrides": [
-      {
-        "files": [
-          "**/*.json"
-        ],
-        "options": {
-          "useTabs": false
-        }
-      },
-      {
-        "files": [
-          "**/*.mdx"
-        ],
-        "options": {
-          "proseWrap": "preserve",
-          "htmlWhitespaceSensitivity": "ignore"
-        }
-      }
-    ]
-  }
+  "overrides": {
+    "eslint-plugin-react-hooks": "$eslint-plugin-react-hooks"
+  },
+  "prettier": "@epic-web/config/prettier"
 }
