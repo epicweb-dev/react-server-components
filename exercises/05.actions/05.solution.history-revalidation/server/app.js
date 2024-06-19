@@ -34,6 +34,7 @@ app.use(
 // for RSCs... Just ... I just can't help myself. I like URLs clean.
 app.use(async (context, next) => {
 	if (context.req.query('search') === '') {
+		const url = new URL(context.req.url)
 		const searchParams = new URLSearchParams(url.search)
 		searchParams.delete('search')
 		const location = [url.pathname, searchParams.toString()]
