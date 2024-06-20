@@ -35,7 +35,7 @@ function Root() {
 	function navigate() {
 		// 🐨 set the location to the nextLocation
 		// 🐨 create a nextContentFetchPromise which is set to fetchContent(nextLocation)
-		// 🐨 add a .then handler to the fetch promise
+		// 🐨 add a .then handler to the fetch promise which accepts the response
 		//   - if replace is true, call window.history.replaceState({}, '', nextLocation)
 		//   - otherwise, call window.history.pushState({}, '', nextLocation)
 		//   - return the response

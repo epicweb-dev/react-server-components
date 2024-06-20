@@ -78,7 +78,7 @@ app.get('/rsc/:shipId?', async context => await renderApp(context))
 // 4. get the formData object from the quest (💰 await context.req.formData())
 // 5. decode the reply from the formData object (await decodeReply(formData, moduleBasePath))
 // 6. call the action with the ...args
-// 7. call renderApp with the res and the returnValue of the action
+// 7. call renderApp with the context and the returnValue of the action
 
 app.get('/:shipId?', async context => {
 	const html = await readFile('./public/index.html', 'utf8')
