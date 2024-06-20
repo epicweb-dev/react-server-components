@@ -9,11 +9,8 @@ change to a form with an input which you can then submit and that will update
 the name. We'll get to the actual implementation for updating later, but for now
 we just need to get our client-side code for the edit state working.
 
-🧝‍♂️ I've already updated the `importmap`
-script in <InlineFile file="public/index.html" /> to handle bringing in
-`react-error-boundary`. I've also
-created <InlineFile file="server/rsc-loader.js" /> which you'll need to register
-with Node.js as a loader for turning `'use client'` module exports into
+🧝‍♂️ I've created <InlineFile file="server/rsc-loader.js" /> which you'll need to
+register with Node.js as a loader for turning `'use client'` module exports into
 reference registrations.
 
 👨‍💼 Thanks Kellie. So now, what you need to do is register the loader, update the

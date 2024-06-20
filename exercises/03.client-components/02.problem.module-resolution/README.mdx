@@ -9,10 +9,20 @@ browser.
 On the server-side, we need to tell `renderToPipeableStream` how to convert the
 full-path file URL of our client modules into relative URLs the browser can use.
 This will also allow `renderToPipeableStream` to warn us if any client modules
-are imported outside of the proper base directory.
+are imported outside of the proper base directory. So you need to pass the path
+to the base directory of our client modules as the second argument to
+`renderToPipeableStream`:
+
+```js
+renderToPipeableStream(h(App), moduleBasePath)
+```
 
 On the client-side, we need to tell `createFromFetch` how to convert the
 relative path into a full URL for fetching the client module.
+
+```js
+createFromFetch(promise, { moduleBaseURL })
+```
 
 <callout-warning>
 	Because `react-server-dom-esm` is the one performing the dymamic import, all
