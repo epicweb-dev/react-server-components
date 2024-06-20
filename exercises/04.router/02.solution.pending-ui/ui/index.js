@@ -33,19 +33,22 @@ function Root() {
 
 	const location = useDeferredValue(nextLocation)
 
+	const navigateType = useRef()
+
+	useEffect(() => {
+		if (location === nextLocation && getGlobalLocation() !== nextLocation) {
+			if (navigateType.current) {
+				window.history.replaceState({}, '', nextLocation)
+			} else {
+				window.history.pushState({}, '', nextLocation)
+			}
+		}
+	}, [location, nextLocation])
+
 	function navigate(nextLocation, { replace = false } = {}) {
 		setNextLocation(nextLocation)
-
-		const nextContentPromise = createFromFetch(
-			fetchContent(nextLocation).then(response => {
-				if (replace) {
-					window.history.replaceState({}, '', nextLocation)
-				} else {
-					window.history.pushState({}, '', nextLocation)
-				}
-				return response
-			}),
-		)
+		navigateType.current = replace
+		const nextContentPromise = createFromFetch(fetchContent(nextLocation))
 
 		startTransition(() => setContentPromise(nextContentPromise))
 	}
