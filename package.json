@@ -3,7 +3,13 @@
   "private": true,
   "epicshop": {
     "title": "React Server Components 🤹",
-    "githubRoot": "https://github.com/epicweb-dev/react-server-components/blob/main"
+    "githubRoot": "https://github.com/epicweb-dev/react-server-components/blob/main",
+    "subtitle": "Understand React Server Components and Server Actions by building a framework with them.",
+    "instructor": {
+      "name": "Kent C. Dodds",
+      "avatar": "/images/instructor.png",
+      "𝕏": "kentcdodds"
+    }
   },
   "type": "module",
   "scripts": {
