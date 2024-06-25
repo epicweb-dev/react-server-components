@@ -58,9 +58,9 @@ What happens when the `ClientComponent` renders? How would the client know
 what the server component would render? By definition, the server component
 code is not in the client, so it can't even have a reference to the server.
 
-In fact, that `import` for the `./server-component.js` module would even work in
-the client. That module could have secret environment variables or a database
-connection etc.
+In fact, that `import` for the `./server-component.js` module would not even
+work in the client. That module could have secret environment variables or a
+database connection etc.
 
 So no, you cannot `import` server modules in client modules for safety reasons.
 
