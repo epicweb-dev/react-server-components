@@ -1,6 +1,6 @@
 {
   "type": "module",
   "dependencies": {
-    "@epic-web/workshop-app": "^4.8.2"
+    "@epic-web/workshop-app": "^4.8.3"
   }
 }
