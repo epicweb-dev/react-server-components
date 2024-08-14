@@ -82,7 +82,7 @@ needs to run (the form data).
 ```js
 import * as RSC from 'react-server-dom-esm/client'
 
-function callAction(id, args) {
+function callServer(id, args) {
   const fetchPromise = fetch(`/action${getGlobalLocation()}`, {
     method: 'POST',
     headers: { 'rsc-action': id },
