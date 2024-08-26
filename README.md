@@ -32,7 +32,7 @@
 
 ## Prerequisites
 
-- Deep experience with React and features like Suspense
+- Deep experience with React and features like Suspense and useDeferredValue
 - Some experience with Node.js will be helpful
 
 ## Pre-workshop Resources
@@ -40,6 +40,7 @@
 Here are some resources you can read before taking the workshop to get you up to
 speed on some of the tools and concepts we'll be covering:
 
+- [React Suspense Workshop](https://www.epicreact.dev/workshops/react-suspense)
 - ["Mind The Gap" by Ryan Florence at Big Sky Dev Con 2024](https://www.youtube.com/watch?v=zqhE-CepH2g)
 - [React for Two Computers - Dan Abramov at React Conf 2024](https://www.youtube.com/watch?v=wcj5LSVcxJc)
 - [Introducing Zero-Bundle-Size React Server Components](https://react.dev/blog/2020/12/21/data-fetching-with-react-server-components)
