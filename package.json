@@ -5,6 +5,13 @@
     "title": "React Server Components 🤹",
     "githubRoot": "https://github.com/epicweb-dev/react-server-components/blob/main",
     "subtitle": "Understand React Server Components and Server Actions by building a framework with them.",
+    "product": {
+      "host": "www.epicreact.dev",
+      "slug": "react-server-components",
+      "displayName": "EpicReact.dev",
+      "displayNameShort": "EpicReact",
+      "logo": "/logo.svg"
+    },
     "instructor": {
       "name": "Kent C. Dodds",
       "avatar": "/images/instructor.png",
