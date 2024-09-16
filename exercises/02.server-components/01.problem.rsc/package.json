@@ -6,7 +6,8 @@
   "description": "Super simple implementation of RSCs with minimal deps",
   "main": "index.js",
   "scripts": {
-    "dev": "node --watch server/app.js"
+    "dev": "node --watch server/app.js",
+    "test": "playwright test --config=./tests/playwright.config.js"
   },
   "keywords": [],
   "author": "Kent C. Dodds <me@kentcdodds.com> (https://kentcdodds.com/)",
