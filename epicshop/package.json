@@ -2,6 +2,9 @@
   "type": "module",
   "dependencies": {
     "@epic-web/workshop-app": "^4.27.0",
-    "execa": "^9.3.1"
+    "enquirer": "^2.4.1",
+    "execa": "^9.4.0",
+    "match-sorter": "^6.3.4",
+    "p-limit": "^6.1.0"
   }
 }

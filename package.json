@@ -29,6 +29,7 @@
     "postinstall": "cd ./epicshop && npm install",
     "start": "npx --prefix ./epicshop epicshop start",
     "dev": "npx --prefix ./epicshop epicshop start",
+    "test": "node ./epicshop/test.js",
     "setup": "node ./epicshop/setup.js",
     "setup:custom": "node ./epicshop/setup-custom.js",
     "format": "prettier --write .",
