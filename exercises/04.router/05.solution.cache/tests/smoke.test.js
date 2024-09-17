@@ -10,10 +10,17 @@ test('should display the home page and perform search', async ({ page }) => {
 
 	// Perform a search
 	await filterInput.fill('hopper')
-	await filterInput.press('Enter')
 
 	// Verify URL change with search params
 	await expect(page).toHaveURL('/?search=hopper')
+
+	const shipList = page.getByRole('list').first()
+
+	// Wait for the list to be filtered down to two items
+	await expect(async () => {
+		const items = await shipList.getByRole('listitem').all()
+		expect(items.length).toBe(2)
+	}).toPass()
 
 	// Verify filtered results
 	const shipLinks = page
