@@ -32,6 +32,32 @@ function captureOutput() {
 	}
 }
 
+function printTestSummary(results) {
+	const label = '--- Test Summary ---'
+	console.log(`\n${label}`)
+	for (const [appPath, result] of results) {
+		let emoji
+		switch (result) {
+			case 'Passed':
+				emoji = '✅'
+				break
+			case 'Failed':
+				emoji = '❌'
+				break
+			case 'Error':
+				emoji = '💥'
+				break
+			case 'Incomplete':
+				emoji = '⏳'
+				break
+			default:
+				emoji = '❓'
+		}
+		console.log(`${emoji} ${appPath}`)
+	}
+	console.log(`${'-'.repeat(label.length)}\n`)
+}
+
 async function main() {
 	const allApps = await getApps()
 
@@ -128,6 +154,7 @@ async function main() {
 		let hasFailures = false
 		const runningProcesses = new Map()
 		let isShuttingDown = false
+		const results = new Map()
 
 		const shutdownHandler = () => {
 			if (isShuttingDown) return
@@ -142,7 +169,12 @@ async function main() {
 				} else {
 					console.log(`ℹ️  No output captured for ${app.relativePath}`)
 				}
+				// Set result for incomplete tests
+				if (!results.has(app.relativePath)) {
+					results.set(app.relativePath, 'Incomplete')
+				}
 			}
+			printTestSummary(results)
 			// Allow some time for output to be written before exiting
 			setTimeout(() => process.exit(1), 100)
 		}
@@ -182,8 +214,10 @@ async function main() {
 						console.error(`\n❌ Tests failed for ${app.relativePath}:\n\n`)
 						output.replay()
 						console.log('\n\n')
+						results.set(app.relativePath, 'Failed')
 					} else {
 						console.log(`✅ Finished tests for ${app.relativePath}`)
+						results.set(app.relativePath, 'Passed')
 					}
 				} catch (error) {
 					runningProcesses.delete(app)
@@ -194,11 +228,15 @@ async function main() {
 					console.error(error.message)
 					output.replay()
 					console.log('\n\n')
+					results.set(app.relativePath, 'Error') // Add this line
 				}
 			}),
 		)
 
 		await Promise.all(tasks)
+
+		// Print summary output
+		printTestSummary(results)
 
 		if (hasFailures) {
 			process.exit(1)
