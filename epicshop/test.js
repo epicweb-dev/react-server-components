@@ -79,7 +79,7 @@ async function main() {
 			choices: ['All', ...choices],
 			multiple: true,
 			suggest: (input, choices) => {
-				return matchSorter(choices, input)
+				return matchSorter(choices, input, { keys: ['name'] })
 			},
 		})
 
@@ -88,6 +88,18 @@ async function main() {
 			: response.appDisplayNames.map(appDisplayName =>
 					displayNameMap.get(appDisplayName),
 				)
+
+		// Update this block to use process.argv
+		const appPattern =
+			selectedApps.length === allApps.length
+				? '*'
+				: selectedApps
+						.map(app => `${app.exerciseNumber}.${app.stepNumber}.${app.type}`)
+						.join(',')
+		const additionalArgsString =
+			additionalArgs.length > 0 ? ` -- ${additionalArgs.join(' ')}` : ''
+		console.log(`\nℹ️  To skip the prompt next time, use this command:`)
+		console.log(`npm test -- ${appPattern}${additionalArgsString}\n`)
 	}
 
 	if (selectedApps.length === 0) {
@@ -124,10 +136,11 @@ async function main() {
 			console.log('Outputting results of running tests:')
 			for (const [app, output] of runningProcesses.entries()) {
 				if (output.hasOutput()) {
-					console.log(`\nPartial results for ${app.relativePath}:`)
+					console.log(`\nPartial results for ${app.relativePath}:\n\n`)
 					output.replay()
+					console.log('\n\n')
 				} else {
-					console.log(`ℹ️ No output captured for ${app.relativePath}`)
+					console.log(`ℹ️  No output captured for ${app.relativePath}`)
 				}
 			}
 			// Allow some time for output to be written before exiting
@@ -166,8 +179,9 @@ async function main() {
 
 					if (exitCode !== 0) {
 						hasFailures = true
-						console.error(`\n❌ Tests failed for ${app.relativePath}:`)
+						console.error(`\n❌ Tests failed for ${app.relativePath}:\n\n`)
 						output.replay()
+						console.log('\n\n')
 					} else {
 						console.log(`✅ Finished tests for ${app.relativePath}`)
 					}
@@ -175,10 +189,11 @@ async function main() {
 					runningProcesses.delete(app)
 					hasFailures = true
 					console.error(
-						`\n❌ An error occurred while running tests for ${app.relativePath}:`,
+						`\n❌ An error occurred while running tests for ${app.relativePath}:\n\n`,
 					)
 					console.error(error.message)
 					output.replay()
+					console.log('\n\n')
 				}
 			}),
 		)
