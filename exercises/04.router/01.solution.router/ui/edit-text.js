@@ -64,7 +64,6 @@ export function EditableText({ id, shipId, initialValue = '' }) {
 			: h(
 					'button',
 					{
-						'aria-label': 'Ship Name',
 						ref: buttonRef,
 						type: 'button',
 						style: {
