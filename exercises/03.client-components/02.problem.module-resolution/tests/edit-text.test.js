@@ -5,7 +5,7 @@ test('should display the home page and perform search', async ({ page }) => {
 	const {
 		ships: [ship],
 	} = await searchShips({ search: 'hopper' })
-	const newName = `${ship.name} 🚀`
+	const newName = `${ship.name} ${Math.random().toString(16).slice(2, 5)}`
 	await page.goto(`/${ship.id}`)
 
 	// Wait for the loading state to disappear

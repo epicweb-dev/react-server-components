@@ -12,7 +12,7 @@ test('Submitting the form posts to the action endpoint correctly', async ({
 
 	await page.getByRole('button', { name: ship.name }).click()
 
-	const newName = `${ship.name} 🚀`
+	const newName = `${ship.name} ${Math.random().toString(16).slice(2, 5)}`
 
 	// Change the value of the input
 	await page.getByRole('textbox', { name: 'Ship Name' }).fill(newName)
