@@ -7,9 +7,9 @@ const PORT = process.env.PORT || '3000'
 const tmpDir = path.join(os.tmpdir(), 'epicreact-server-components')
 
 export default defineConfig({
-	timeout: 10000 * (process.env.CI ? 5 : 1),
+	timeout: 10000 * (process.env.CI ? 10 : 1),
 	expect: {
-		timeout: 5000 * (process.env.CI ? 5 : 1),
+		timeout: 5000 * (process.env.CI ? 10 : 1),
 	},
 	outputDir: path.join(tmpDir, 'playwright-test-output'),
 	reporter: [
