@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test'
 
 test('should display the home page and perform search', async ({ page }) => {
 	await page.goto('/')
+	await page.waitForLoadState('networkidle')
 	await expect(page).toHaveTitle('Starship Deets')
 
 	// Check for the filter input

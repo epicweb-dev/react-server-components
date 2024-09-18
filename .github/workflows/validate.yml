@@ -29,6 +29,9 @@ jobs:
       - name: ▶️ Run setup script
         run: npm run setup
 
+      - name: ▶️ Run tests
+        run: npm run test ..s
+
   deploy:
     name: 🚀 Deploy
     runs-on: ubuntu-latest

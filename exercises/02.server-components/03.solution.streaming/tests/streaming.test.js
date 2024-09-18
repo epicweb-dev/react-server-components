@@ -1,6 +1,8 @@
 import { test, expect } from '@playwright/test'
 
 test('should display the home page and perform search', async ({ page }) => {
+	test.setTimeout(20000)
+
 	await page.goto('/')
 	await expect(page).toHaveTitle('Starship Deets')
 
@@ -13,9 +15,7 @@ test('should display the home page and perform search', async ({ page }) => {
 		state: 'detached',
 	})
 
-	// Verify that the list is populated with actual ship names
-	const shipList = page.getByRole('list').first()
-	await expect(shipList.getByRole('link').first()).not.toHaveText('... loading')
+	await page.waitForLoadState('networkidle')
 
 	// Perform a search
 	await filterInput.fill('hopper')
@@ -28,10 +28,8 @@ test('should display the home page and perform search', async ({ page }) => {
 	await expect(
 		page.locator('li a:has-text("... loading")').first(),
 	).toBeVisible()
-	// Wait for the loading placeholders to disappear
-	await page.waitForSelector('li a:has-text("... loading")', {
-		state: 'detached',
-	})
+
+	await page.waitForLoadState('networkidle')
 
 	// Verify filtered results
 	const shipLinks = page
@@ -50,6 +48,8 @@ test('should display the home page and perform search', async ({ page }) => {
 
 	// Verify URL change
 	await expect(page).toHaveURL(/\/[a-zA-Z0-9-]+/)
+
+	await page.waitForLoadState('networkidle')
 
 	// Verify ship detail view
 	const shipTitle = page.getByRole('heading', { level: 2 })

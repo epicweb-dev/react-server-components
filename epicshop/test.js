@@ -1,4 +1,5 @@
 import path from 'node:path'
+import { performance } from 'perf_hooks'
 import { fileURLToPath } from 'url'
 import {
 	getApps,
@@ -35,7 +36,7 @@ function captureOutput() {
 function printTestSummary(results) {
 	const label = '--- Test Summary ---'
 	console.log(`\n${label}`)
-	for (const [appPath, result] of results) {
+	for (const [appPath, { result, duration }] of results) {
 		let emoji
 		switch (result) {
 			case 'Passed':
@@ -53,7 +54,7 @@ function printTestSummary(results) {
 			default:
 				emoji = '❓'
 		}
-		console.log(`${emoji} ${appPath}`)
+		console.log(`${emoji} ${appPath} (${duration.toFixed(2)}s)`)
 	}
 	console.log(`${'-'.repeat(label.length)}\n`)
 }
@@ -136,6 +137,7 @@ async function main() {
 	if (selectedApps.length === 1) {
 		const app = selectedApps[0]
 		console.log(`🚀 Running tests for ${app.relativePath}\n\n`)
+		const startTime = performance.now()
 		try {
 			await execa('npm', ['run', 'test', '--silent', '--', ...additionalArgs], {
 				cwd: app.fullPath,
@@ -145,12 +147,19 @@ async function main() {
 					PORT: app.dev.portNumber,
 				},
 			})
+			const duration = (performance.now() - startTime) / 1000
+			console.log(
+				`✅ Finished tests for ${app.relativePath} (${duration.toFixed(2)}s)`,
+			)
 		} catch {
-			console.error(`❌ Tests failed for ${app.relativePath}`)
+			const duration = (performance.now() - startTime) / 1000
+			console.error(
+				`❌ Tests failed for ${app.relativePath} (${duration.toFixed(2)}s)`,
+			)
 			process.exit(1)
 		}
 	} else {
-		const limit = pLimit(4)
+		const limit = pLimit(1)
 		let hasFailures = false
 		const runningProcesses = new Map()
 		let isShuttingDown = false
@@ -188,6 +197,7 @@ async function main() {
 				console.log(`🚀 Starting tests for ${app.relativePath}`)
 				const output = captureOutput()
 				runningProcesses.set(app, output)
+				const startTime = performance.now()
 				try {
 					const subprocess = execa(
 						'npm',
@@ -206,29 +216,39 @@ async function main() {
 					subprocess.stderr.on('data', chunk => output.write(chunk, 'stderr'))
 
 					const { exitCode } = await subprocess
+					const duration = (performance.now() - startTime) / 1000
 
 					runningProcesses.delete(app)
 
 					if (exitCode !== 0) {
 						hasFailures = true
-						console.error(`\n❌ Tests failed for ${app.relativePath}:\n\n`)
+						console.error(
+							`\n❌ Tests failed for ${app.relativePath} (${duration.toFixed(2)}s):\n\n`,
+						)
 						output.replay()
 						console.log('\n\n')
-						results.set(app.relativePath, 'Failed')
+						results.set(app.relativePath, { result: 'Failed', duration })
+						// Set result for incomplete tests
+						if (!results.has(app.relativePath)) {
+							results.set(app.relativePath, 'Incomplete')
+						}
 					} else {
-						console.log(`✅ Finished tests for ${app.relativePath}`)
-						results.set(app.relativePath, 'Passed')
+						console.log(
+							`✅ Finished tests for ${app.relativePath} (${duration.toFixed(2)}s)`,
+						)
+						results.set(app.relativePath, { result: 'Passed', duration })
 					}
 				} catch (error) {
+					const duration = (performance.now() - startTime) / 1000
 					runningProcesses.delete(app)
 					hasFailures = true
 					console.error(
-						`\n❌ An error occurred while running tests for ${app.relativePath}:\n\n`,
+						`\n❌ An error occurred while running tests for ${app.relativePath} (${duration.toFixed(2)}s):\n\n`,
 					)
 					console.error(error.message)
 					output.replay()
 					console.log('\n\n')
-					results.set(app.relativePath, 'Error') // Add this line
+					results.set(app.relativePath, { result: 'Error', duration })
 				}
 			}),
 		)
