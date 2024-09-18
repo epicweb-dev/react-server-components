@@ -17,10 +17,7 @@ test('should display the home page and perform search', async ({ page }) => {
 	const shipList = page.getByRole('list').first()
 
 	// Wait for the list to be filtered down to two items
-	await expect(async () => {
-		const items = await shipList.getByRole('listitem').all()
-		expect(items.length).toBe(2)
-	}).toPass()
+	await expect(shipList.getByRole('listitem')).toHaveCount(2)
 
 	// Verify filtered results
 	const shipLinks = page
