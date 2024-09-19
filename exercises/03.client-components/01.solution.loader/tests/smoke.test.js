@@ -16,6 +16,8 @@ test('should display the home page and perform search', async ({ page }) => {
 	// Verify URL change with search params
 	await expect(page).toHaveURL('/?search=hopper')
 
+	await page.waitForLoadState('networkidle')
+
 	// Verify filtered results
 	const shipLinks = page
 		.getByRole('list')
