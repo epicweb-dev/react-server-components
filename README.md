@@ -1,10 +1,10 @@
 <div>
-  <h1 align="center"><a href="https://www.epicweb.dev/workshops">React Server Components and Actions</a></h1>
+  <h1 align="center"><a href="https://www.epicweb.dev/workshops">React Server Components and Functions</a></h1>
   <strong>
-    Understand React Server Components and Server Actions by building a framework with them.
+    Understand React Server Components and Server Functions by building a framework with them.
   </strong>
   <p>
-    In this workshop we'll be building a framework built on React Server Components and Server Actions from scratch. No build tools. No TypeScript, no Vite, no JSX. Just the Browser, Node.js, and React. This is how you develop a <strong>deep</strong> understanding of something. Let's go!
+    In this workshop we'll be building a framework built on React Server Components and Server Functions from scratch. No build tools. No TypeScript, no Vite, no JSX. Just the Browser, Node.js, and React. This is how you develop a <strong>deep</strong> understanding of something. Let's go!
   </p>
 </div>
 

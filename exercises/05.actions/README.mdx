@@ -17,12 +17,26 @@ submission is often a challenge (and it's different in every app).
 In React's quest to "compose all the things," React has a solution to this
 problem in the form of "server actions."
 
-Server actions are similar to client components in many ways. The RSC payload
-carries with it a reference to the action you wish to perform and when the form
-is submitted, the server gets that reference so it knows the right function to
-call.
+Server actions are a subset of server functions. Server functions are similar to
+client components in many ways. The RSC payload carries with it a reference to
+the function you wish to perform and when the form is submitted, the server gets
+that reference so it knows the right function to call.
 
-In practice, what this means is you get to pass a server-only function to a
+To expose these server functions to be called from the client, you use the
+`'use server'` directive. Rather than rewriting the module to not contain the
+function, the `'use server'` directive adds reference information so the RSC
+payload generation can work.
+
+When that function is called, it can be wrapped inside a `startTransition`
+which gives you a pending state for while that server function runs and that
+transition is pending.
+
+To take it a step further, `useActionState` turns that server function into an
+action which resembles the way native form actions without the URL indirection.
+This approach even support progressive enhancement such that if the JavaScript
+has not yet been loaded, the form will act like a normal form submission.
+
+In practice, what this all means is you get to pass a server-only function to a
 client component and that component can call the function when it needs to.
 
 Here's an example of this:
@@ -113,3 +127,10 @@ use on the client as needed.
 📜 Relevant Docs:
 
 - [`use-server`](https://react.dev/reference/react/use-server)
+- [Server Functions](https://19.react.dev/reference/rsc/server-functions)
+
+<callout-warning>
+	Originally, there was a single concept called "server actions" but later this
+	was split into two concepts: "server actions" and "server functions". Server
+	actions are a subset of server functions, specifically for form submissions.
+</callout-warning>
