@@ -27,7 +27,7 @@ createFromFetch(promise, { moduleBaseURL })
 ```
 
 <callout-warning>
-	Because `react-server-dom-esm` is the one performing the dymamic import, all
+	Because `react-server-dom-esm` is the one performing the dynamic import, all
 	imports will be relative to that module. On the client, we're loading it from
 	[esm.sh](https://esm.sh), so we'll want to make sure we give the full URL to
 	our server including the origin.
