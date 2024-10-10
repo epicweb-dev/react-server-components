@@ -1,7 +1,7 @@
 {
   "type": "module",
   "dependencies": {
-    "@epic-web/workshop-app": "^5.3.7",
+    "@epic-web/workshop-app": "^5.3.8",
     "enquirer": "^2.4.1",
     "execa": "^9.4.0",
     "match-sorter": "^6.3.4",
