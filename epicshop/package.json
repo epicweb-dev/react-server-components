@@ -3,8 +3,8 @@
   "dependencies": {
     "@epic-web/workshop-app": "^5.9.0",
     "enquirer": "^2.4.1",
-    "execa": "^9.4.0",
-    "match-sorter": "^6.3.4",
+    "execa": "^9.5.1",
+    "match-sorter": "^8.0.0",
     "p-limit": "^6.1.0"
   }
 }
