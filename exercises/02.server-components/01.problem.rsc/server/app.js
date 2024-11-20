@@ -58,7 +58,7 @@ app.get('/api/:shipId?', async context => {
 	// 🐨 call renderToPipeableStream from react-server-dom-esm/server
 	// and pass it the App component and the props
 	// 💰 remember, we don't have a JSX transformer here, so you'll use
-	// createElement directly which we aliased to `h` for brievity above.
+	// createElement directly which we aliased to `h` for brevity above.
 	// 🦉 renderToPipeableStream returns an object with a pipe function
 	// 🐨 pipe the content through the outgoing response
 	// 💰 pipe(context.env.outgoing)
