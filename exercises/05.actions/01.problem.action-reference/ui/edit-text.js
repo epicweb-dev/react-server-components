@@ -22,6 +22,8 @@ export function EditableText({ id, shipId, initialValue = '' }) {
 	const buttonRef = useRef(null)
 	return h(
 		'div',
+		// 🐨 set the style prop on this div to decrease the opacity when the form is submitting
+		// something like { opacity: isPending ? 0.6 : 1 } should work
 		null,
 		edit
 			? h(
