@@ -49,12 +49,8 @@
   },
   "devDependencies": {
     "@epic-web/config": "^1.16.3",
-    "eslint-plugin-react-hooks": "5.1.0-beta-94eed63c49-20240425",
-    "eslint": "^9.15.0",
-    "prettier": "^3.3.3"
-  },
-  "overrides": {
-    "eslint-plugin-react-hooks": "$eslint-plugin-react-hooks"
+    "eslint": "^9.16.0",
+    "prettier": "^3.4.2"
   },
   "prettier": "@epic-web/config/prettier"
 }
