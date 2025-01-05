@@ -82,7 +82,7 @@ function Root() {
 	const [contentKey, setContentKey] = useState(initialContentKey)
 	const [isPending, startTransition] = useTransition()
 
-	// 🐨 add a useEffect here that reassigns updateConentKey to a function that
+	// 🐨 add a useEffect here that reassigns updateContentKey to a function that
 	// accepts a newContentKey and calls setContentKey(newContentKey) in a startTransition
 
 	const location = useDeferredValue(nextLocation)
