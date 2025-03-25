@@ -18,7 +18,7 @@ test('Submitting the form posts to the action endpoint correctly', async ({
 	await page.getByRole('textbox', { name: 'Ship Name' }).fill(newName)
 
 	// Intercept the request to /action
-	const actionRequest = page.waitForRequest(request => {
+	const actionRequest = page.waitForRequest((request) => {
 		return request.url().includes('/action') && request.method() === 'POST'
 	})
 

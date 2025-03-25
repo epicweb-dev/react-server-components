@@ -73,7 +73,7 @@ function Root() {
 
 		// 🐨 create a nextContentKey with generateKey()
 		const nextContentPromise = createFromFetch(
-			fetchContent(nextLocation).then(response => {
+			fetchContent(nextLocation).then((response) => {
 				if (thisNav !== latestNav.current) return
 				if (replace) {
 					// 🐨 add a key property here

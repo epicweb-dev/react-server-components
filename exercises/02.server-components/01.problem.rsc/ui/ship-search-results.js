@@ -2,7 +2,7 @@ import { createElement as h } from 'react'
 import { getImageUrlForShip } from './img-utils.js'
 
 export function SearchResults({ shipId: currentShipId, shipResults, search }) {
-	return shipResults.ships.map(ship => {
+	return shipResults.ships.map((ship) => {
 		const href = [
 			`/${ship.id}`,
 			search ? `search=${encodeURIComponent(search)}` : null,

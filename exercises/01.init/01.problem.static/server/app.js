@@ -68,7 +68,7 @@ app.onError((err, context) => {
 	return context.json({ error: true, message: 'Something went wrong' }, 500)
 })
 
-const server = serve({ fetch: app.fetch, port: PORT }, info => {
+const server = serve({ fetch: app.fetch, port: PORT }, (info) => {
 	const url = `http://localhost:${info.port}`
 	console.log(`🚀  We have liftoff!\n${url}`)
 })
@@ -77,6 +77,6 @@ closeWithGrace(async ({ signal, err }) => {
 	if (err) console.error('Shutting down server due to error', err)
 	else console.log('Shutting down server due to signal', signal)
 
-	await new Promise(resolve => server.close(resolve))
+	await new Promise((resolve) => server.close(resolve))
 	process.exit()
 })

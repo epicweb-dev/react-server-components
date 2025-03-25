@@ -7,7 +7,7 @@ const getGlobalLocation = () =>
 	window.location.pathname + window.location.search
 
 const initialLocation = getGlobalLocation()
-const initialDataPromise = fetch(`/api${initialLocation}`).then(r => r.json())
+const initialDataPromise = fetch(`/api${initialLocation}`).then((r) => r.json())
 
 function Root() {
 	const { shipId, search, ship, shipResults } = use(initialDataPromise)

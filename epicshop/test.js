@@ -74,10 +74,10 @@ async function main() {
 
 	if (process.argv[2]) {
 		const patterns = process.argv[2].toLowerCase().split(',')
-		selectedApps = allApps.filter(app => {
+		selectedApps = allApps.filter((app) => {
 			const { exerciseNumber, stepNumber, type } = app
 
-			return patterns.some(pattern => {
+			return patterns.some((pattern) => {
 				let [patternExercise = '*', patternStep = '*', patternType = '*'] =
 					pattern.split('.')
 
@@ -95,7 +95,7 @@ async function main() {
 		})
 	} else {
 		const displayNameMap = new Map(
-			allApps.map(app => [getAppDisplayName(app, allApps), app]),
+			allApps.map((app) => [getAppDisplayName(app, allApps), app]),
 		)
 		const choices = displayNameMap.keys()
 
@@ -112,7 +112,7 @@ async function main() {
 
 		selectedApps = response.appDisplayNames.includes('All')
 			? allApps
-			: response.appDisplayNames.map(appDisplayName =>
+			: response.appDisplayNames.map((appDisplayName) =>
 					displayNameMap.get(appDisplayName),
 				)
 
@@ -121,7 +121,7 @@ async function main() {
 			selectedApps.length === allApps.length
 				? '*'
 				: selectedApps
-						.map(app => `${app.exerciseNumber}.${app.stepNumber}.${app.type}`)
+						.map((app) => `${app.exerciseNumber}.${app.stepNumber}.${app.type}`)
 						.join(',')
 		const additionalArgsString =
 			additionalArgs.length > 0 ? ` -- ${additionalArgs.join(' ')}` : ''
@@ -191,7 +191,7 @@ async function main() {
 		process.on('SIGINT', shutdownHandler)
 		process.on('SIGTERM', shutdownHandler)
 
-		const tasks = selectedApps.map(app =>
+		const tasks = selectedApps.map((app) =>
 			limit(async () => {
 				if (isShuttingDown) return
 				console.log(`🚀 Starting tests for ${app.relativePath}`)
@@ -212,8 +212,8 @@ async function main() {
 						},
 					)
 
-					subprocess.stdout.on('data', chunk => output.write(chunk, 'stdout'))
-					subprocess.stderr.on('data', chunk => output.write(chunk, 'stderr'))
+					subprocess.stdout.on('data', (chunk) => output.write(chunk, 'stdout'))
+					subprocess.stderr.on('data', (chunk) => output.write(chunk, 'stderr'))
 
 					const { exitCode } = await subprocess
 					const duration = (performance.now() - startTime) / 1000
@@ -264,7 +264,7 @@ async function main() {
 	}
 }
 
-main().catch(error => {
+main().catch((error) => {
 	if (error) {
 		console.error('❌ An error occurred:', error)
 	}

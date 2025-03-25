@@ -7,7 +7,7 @@ import { getImageUrlForShip } from './img-utils.js'
 export function SearchResults({ shipId: currentShipId, shipResults, search }) {
 	// 🐨 get the shipResults from searchShips({ search })
 	// 💰 you can use async/await!
-	return shipResults.ships.map(ship => {
+	return shipResults.ships.map((ship) => {
 		const href = [
 			`/${ship.id}`,
 			search ? `search=${encodeURIComponent(search)}` : null,

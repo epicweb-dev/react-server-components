@@ -32,7 +32,7 @@ function Root() {
 		setLocation(nextLocation)
 
 		const nextContentFetchPromise = fetchContent(nextLocation).then(
-			response => {
+			(response) => {
 				if (replace) {
 					window.history.replaceState({}, '', nextLocation)
 				} else {

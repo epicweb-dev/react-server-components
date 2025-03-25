@@ -25,7 +25,7 @@ app.use(
 	serveStatic({
 		root: './ui',
 		onNotFound: (path, context) => context.text('File not found', 404),
-		rewriteRequestPath: path => path.replace('/ui', ''),
+		rewriteRequestPath: (path) => path.replace('/ui', ''),
 	}),
 )
 
@@ -46,7 +46,7 @@ app.use(async (context, next) => {
 })
 
 // 🐨 change this from /api to /rsc
-app.get('/api/:shipId?', async context => {
+app.get('/api/:shipId?', async (context) => {
 	const shipId = context.req.param('shipId') || null
 	const search = context.req.query('search') || ''
 	const ship = shipId ? await getShip({ shipId }) : null
@@ -66,7 +66,7 @@ app.get('/api/:shipId?', async context => {
 	// 💰 return RESPONSE_ALREADY_SENT
 })
 
-app.get('/:shipId?', async context => {
+app.get('/:shipId?', async (context) => {
 	const html = await readFile('./public/index.html', 'utf8')
 	return context.html(html, 200)
 })
@@ -76,7 +76,7 @@ app.onError((err, context) => {
 	return context.json({ error: true, message: 'Something went wrong' }, 500)
 })
 
-const server = serve({ fetch: app.fetch, port: PORT }, info => {
+const server = serve({ fetch: app.fetch, port: PORT }, (info) => {
 	const url = `http://localhost:${info.port}`
 	console.log(`🚀  We have liftoff!\n${url}`)
 })
@@ -85,6 +85,6 @@ closeWithGrace(async ({ signal, err }) => {
 	if (err) console.error('Shutting down server due to error', err)
 	else console.log('Shutting down server due to signal', signal)
 
-	await new Promise(resolve => server.close(resolve))
+	await new Promise((resolve) => server.close(resolve))
 	process.exit()
 })

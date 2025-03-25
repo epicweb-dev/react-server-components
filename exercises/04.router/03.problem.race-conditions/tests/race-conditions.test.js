@@ -4,10 +4,10 @@ test('should not update URL for out-of-order responses', async ({ page }) => {
 	await page.goto('/')
 
 	// Simulate varying network delays
-	await page.route('/rsc/*', async route => {
+	await page.route('/rsc/*', async (route) => {
 		const url = route.request().url()
 		if (url.includes('search=st')) {
-			await new Promise(resolve => setTimeout(resolve, 2000)) // Longer delay for 'st'
+			await new Promise((resolve) => setTimeout(resolve, 2000)) // Longer delay for 'st'
 		}
 		await route.continue()
 	})

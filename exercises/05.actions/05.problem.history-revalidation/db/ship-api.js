@@ -13,11 +13,11 @@ export async function searchShips({
 }) {
 	const endTime = Date.now() + delay
 	const ships = shipData
-		.filter(ship => ship.name.toLowerCase().includes(search.toLowerCase()))
+		.filter((ship) => ship.name.toLowerCase().includes(search.toLowerCase()))
 		.slice(0, 13)
-	await new Promise(resolve => setTimeout(resolve, endTime - Date.now()))
+	await new Promise((resolve) => setTimeout(resolve, endTime - Date.now()))
 	return {
-		ships: ships.map(ship => ({ name: ship.name, id: ship.id })),
+		ships: ships.map((ship) => ({ name: ship.name, id: ship.id })),
 	}
 }
 
@@ -29,8 +29,8 @@ export async function getShip({
 	if (!shipId) {
 		throw new Error('No shipId provided')
 	}
-	const ship = shipData.find(ship => ship.id === shipId)
-	await new Promise(resolve => setTimeout(resolve, endTime - Date.now()))
+	const ship = shipData.find((ship) => ship.id === shipId)
+	await new Promise((resolve) => setTimeout(resolve, endTime - Date.now()))
 	if (!ship) {
 		throw new Error(`No ship with the id "${shipId}"`)
 	}
@@ -43,8 +43,8 @@ export async function updateShipName({
 	delay = Math.random() * (MAX_DELAY - MIN_DELAY) + MIN_DELAY,
 }) {
 	const endTime = Date.now() + delay
-	const ship = shipData.find(ship => ship.id === shipId)
-	await new Promise(resolve => setTimeout(resolve, endTime - Date.now()))
+	const ship = shipData.find((ship) => ship.id === shipId)
+	await new Promise((resolve) => setTimeout(resolve, endTime - Date.now()))
 	if (!ship) {
 		throw new Error(`No ship with the id "${shipId}"`)
 	}

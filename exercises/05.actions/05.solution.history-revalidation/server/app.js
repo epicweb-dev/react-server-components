@@ -26,7 +26,7 @@ app.use(
 	serveStatic({
 		root: './ui',
 		onNotFound: (path, context) => context.text('File not found', 404),
-		rewriteRequestPath: path => path.replace('/ui', ''),
+		rewriteRequestPath: (path) => path.replace('/ui', ''),
 	}),
 )
 
@@ -61,9 +61,9 @@ async function renderApp(context, returnValue) {
 	return RESPONSE_ALREADY_SENT
 }
 
-app.get('/rsc/:shipId?', async context => renderApp(context, null))
+app.get('/rsc/:shipId?', async (context) => renderApp(context, null))
 
-app.post('/action/:shipId?', async context => {
+app.post('/action/:shipId?', async (context) => {
 	const serverReference = context.req.header('rsc-action')
 	const [filepath, name] = serverReference.split('#')
 	const action = (await import(filepath))[name]
@@ -80,7 +80,7 @@ app.post('/action/:shipId?', async context => {
 	return await renderApp(context, result)
 })
 
-app.get('/:shipId?', async context => {
+app.get('/:shipId?', async (context) => {
 	const html = await readFile('./public/index.html', 'utf8')
 	return context.html(html, 200)
 })
@@ -90,7 +90,7 @@ app.onError((err, context) => {
 	return context.json({ error: true, message: 'Something went wrong' }, 500)
 })
 
-const server = serve({ fetch: app.fetch, port: PORT }, info => {
+const server = serve({ fetch: app.fetch, port: PORT }, (info) => {
 	const url = `http://localhost:${info.port}`
 	console.log(`🚀  We have liftoff!\n${url}`)
 })
@@ -99,6 +99,6 @@ closeWithGrace(async ({ signal, err }) => {
 	if (err) console.error('Shutting down server due to error', err)
 	else console.log('Shutting down server due to signal', signal)
 
-	await new Promise(resolve => server.close(resolve))
+	await new Promise((resolve) => server.close(resolve))
 	process.exit()
 })

@@ -8,7 +8,7 @@ import { SelectShipLink } from './ship-search.js'
 export async function SearchResults() {
 	const { shipId: currentShipId, search } = shipDataStorage.getStore()
 	const shipResults = await searchShips({ search })
-	return shipResults.ships.map(ship =>
+	return shipResults.ships.map((ship) =>
 		h(
 			'li',
 			{ key: ship.name },

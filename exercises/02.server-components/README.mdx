@@ -141,7 +141,7 @@ import { renderToPipeableStream } from 'react-server-dom-esm/server'
 
 // some server code...
 
-app.get('/rsc', context => {
+app.get('/rsc', (context) => {
 	const { pipe } = renderToPipeableStream(h(App))
 	pipe(context.env.outgoing)
 	return RESPONSE_ALREADY_SENT

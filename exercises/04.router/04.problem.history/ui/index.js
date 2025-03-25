@@ -53,7 +53,7 @@ function Root() {
 		latestNav.current = thisNav
 
 		const nextContentPromise = createFromFetch(
-			fetchContent(nextLocation).then(response => {
+			fetchContent(nextLocation).then((response) => {
 				if (thisNav !== latestNav.current) return
 				if (replace) {
 					window.history.replaceState({}, '', nextLocation)

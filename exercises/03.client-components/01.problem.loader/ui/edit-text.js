@@ -23,7 +23,7 @@ export function EditableText({ id, shipId, initialValue = '' }) {
 			? h(
 					'form',
 					{
-						onSubmit: event => {
+						onSubmit: (event) => {
 							event.preventDefault()
 							setValue(inputRef.current?.value ?? '')
 							flushSync(() => {
@@ -51,7 +51,7 @@ export function EditableText({ id, shipId, initialValue = '' }) {
 							width: '100%',
 							...inheritStyles,
 						},
-						onKeyDown: event => {
+						onKeyDown: (event) => {
 							if (event.key === 'Escape') {
 								flushSync(() => {
 									setEdit(false)

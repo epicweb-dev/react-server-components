@@ -42,7 +42,7 @@ function Root() {
 		// 🐨 set the latestNav.current to this nav
 
 		const nextContentPromise = createFromFetch(
-			fetchContent(nextLocation).then(response => {
+			fetchContent(nextLocation).then((response) => {
 				// 🐨 if the latestNav.current is no longer set to this nav, return early
 				if (replace) {
 					window.history.replaceState({}, '', nextLocation)

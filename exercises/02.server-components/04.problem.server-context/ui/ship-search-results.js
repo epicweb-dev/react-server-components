@@ -10,7 +10,7 @@ export async function SearchResults(
 ) {
 	// 🐨 get the shipId and search from shipDataStorage.getStore()
 	const shipResults = await searchShips({ search })
-	return shipResults.ships.map(ship => {
+	return shipResults.ships.map((ship) => {
 		const href = [
 			`/${ship.id}`,
 			search ? `search=${encodeURIComponent(search)}` : null,

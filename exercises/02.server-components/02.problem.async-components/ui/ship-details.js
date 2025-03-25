@@ -25,7 +25,7 @@ export function ShipDetails({ ship }) {
 				? h(
 						'ul',
 						null,
-						ship.weapons.map(weapon =>
+						ship.weapons.map((weapon) =>
 							h(
 								'li',
 								{ key: weapon.name },

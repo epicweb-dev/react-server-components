@@ -17,7 +17,7 @@ const initialLocation = getGlobalLocation()
 const initialDataPromise = fetch(`/api${initialLocation}`)
 	// 💣 we no longer process the response into JSON, instead react-server-dom-esm
 	// will process it for us. Delete this `then` call:
-	.then(r => r.json())
+	.then((r) => r.json())
 
 // 🐨 create a variable called initialContentPromise set to createFromFetch(initialContentFetchPromise)
 

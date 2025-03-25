@@ -22,7 +22,7 @@ app.use(
 	serveStatic({
 		root: './ui',
 		onNotFound: (path, context) => context.text('File not found', 404),
-		rewriteRequestPath: path => path.replace('/ui', ''),
+		rewriteRequestPath: (path) => path.replace('/ui', ''),
 	}),
 )
 
@@ -42,14 +42,14 @@ app.use(async (context, next) => {
 	}
 })
 
-app.get('/rsc/:shipId?', async context => {
+app.get('/rsc/:shipId?', async (context) => {
 	// 🧝‍♂️ I've added this so you can simulate a race condition
 	// type the search query "star" and you'll notice the URL gets
 	// updated to have a search of "st" after two seconds because
 	// this responds after later requests. When you're finished, this
 	// should not happen.
 	if (context.req.query('search') === 'st') {
-		await new Promise(resolve => setTimeout(resolve, 2000))
+		await new Promise((resolve) => setTimeout(resolve, 2000))
 	}
 	const shipId = context.req.param('shipId') || null
 	const search = context.req.query('search') || ''
@@ -62,7 +62,7 @@ app.get('/rsc/:shipId?', async context => {
 	return RESPONSE_ALREADY_SENT
 })
 
-app.get('/:shipId?', async context => {
+app.get('/:shipId?', async (context) => {
 	const html = await readFile('./public/index.html', 'utf8')
 	return context.html(html, 200)
 })
@@ -72,7 +72,7 @@ app.onError((err, context) => {
 	return context.json({ error: true, message: 'Something went wrong' }, 500)
 })
 
-const server = serve({ fetch: app.fetch, port: PORT }, info => {
+const server = serve({ fetch: app.fetch, port: PORT }, (info) => {
 	const url = `http://localhost:${info.port}`
 	console.log(`🚀  We have liftoff!\n${url}`)
 })
@@ -81,6 +81,6 @@ closeWithGrace(async ({ signal, err }) => {
 	if (err) console.error('Shutting down server due to error', err)
 	else console.log('Shutting down server due to signal', signal)
 
-	await new Promise(resolve => server.close(resolve))
+	await new Promise((resolve) => server.close(resolve))
 	process.exit()
 })

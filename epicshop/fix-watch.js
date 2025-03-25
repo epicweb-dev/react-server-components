@@ -27,7 +27,7 @@ watcher
 		// Only act if path contains two slashes (excluding the leading `./`)
 		debouncedRun()
 	})
-	.on('error', error => console.log(`Watcher error: ${error}`))
+	.on('error', (error) => console.log(`Watcher error: ${error}`))
 
 /**
  * Simple debounce implementation

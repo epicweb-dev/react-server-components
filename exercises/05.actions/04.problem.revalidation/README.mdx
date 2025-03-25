@@ -24,7 +24,7 @@ function Counter() {
 	const [count, setCount] = useState(0)
 
 	useEffect(() => {
-		increment = () => setCount(c => c + 1)
+		increment = () => setCount((c) => c + 1)
 	}, [])
 
 	return <button onClick={increment}>{count}</button>
@@ -61,7 +61,7 @@ function onStreamFinished(fetchPromise, onFinished) {
 		fetchPromise
 			// clone the response so createFromFetch can use it (otherwise we lock the reader)
 			// and wait for the text to be consumed so we know the stream is finished
-			.then(response => response.clone().text())
+			.then((response) => response.clone().text())
 			.then(onFinished)
 	)
 }

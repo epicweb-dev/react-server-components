@@ -8,8 +8,8 @@ test('going forward and backward in history updates the UI', async ({
 	await page.waitForLoadState('networkidle')
 
 	// simulate a slow network for the /rsc endpoint so we force the pending UI to show up
-	await page.route('/rsc/*', async route => {
-		await new Promise(resolve =>
+	await page.route('/rsc/*', async (route) => {
+		await new Promise((resolve) =>
 			setTimeout(resolve, process.env.CI ? 1000 : 400),
 		)
 		await route.continue()

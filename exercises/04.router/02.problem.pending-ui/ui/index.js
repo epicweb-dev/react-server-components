@@ -40,7 +40,7 @@ function Root() {
 		setLocation(nextLocation)
 
 		const nextContentPromise = createFromFetch(
-			fetchContent(nextLocation).then(response => {
+			fetchContent(nextLocation).then((response) => {
 				if (replace) {
 					window.history.replaceState({}, '', nextLocation)
 				} else {

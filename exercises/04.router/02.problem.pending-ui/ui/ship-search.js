@@ -21,14 +21,14 @@ export function ShipSearch({ search, results, fallback }) {
 		null,
 		h(
 			'form',
-			{ onSubmit: e => e.preventDefault() },
+			{ onSubmit: (e) => e.preventDefault() },
 			h('input', {
 				placeholder: 'Filter ships...',
 				type: 'search',
 				defaultValue: search,
 				name: 'search',
 				autoFocus: true,
-				onChange: event => {
+				onChange: (event) => {
 					const newLocation = mergeLocationState(location, {
 						search: event.currentTarget.value,
 					})

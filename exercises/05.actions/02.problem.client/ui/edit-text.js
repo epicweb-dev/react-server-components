@@ -52,7 +52,7 @@ export function EditableText({ id, shipId, action, initialValue = '' }) {
 							width: '100%',
 							...inheritStyles,
 						},
-						onKeyDown: event => {
+						onKeyDown: (event) => {
 							if (event.key === 'Escape') {
 								flushSync(() => {
 									setEdit(false)

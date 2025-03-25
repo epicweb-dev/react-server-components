@@ -14,8 +14,8 @@ test('should display pending UI when performing a search and selecting a ship', 
 	})
 
 	// simulate a slow network for the /rsc endpoint so we force the pending UI to show up
-	await page.route('/rsc/*', async route => {
-		await new Promise(resolve =>
+	await page.route('/rsc/*', async (route) => {
+		await new Promise((resolve) =>
 			setTimeout(resolve, process.env.CI ? 1000 : 400),
 		)
 		await route.continue()

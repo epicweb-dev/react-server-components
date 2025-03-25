@@ -30,7 +30,7 @@ export function EditableText({ id, shipId, initialValue = '' }) {
 					'form',
 					{
 						// 🐨 add an action prop and set it to formAction
-						onSubmit: event => {
+						onSubmit: (event) => {
 							// 🐨 remove preventDefault here since the action handles this for you
 							event.preventDefault()
 							setValue(inputRef.current?.value ?? '')
@@ -59,7 +59,7 @@ export function EditableText({ id, shipId, initialValue = '' }) {
 							width: '100%',
 							...inheritStyles,
 						},
-						onKeyDown: event => {
+						onKeyDown: (event) => {
 							if (event.key === 'Escape') {
 								flushSync(() => {
 									setEdit(false)

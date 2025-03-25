@@ -6,7 +6,7 @@ import { getImageUrlForShip, shipFallbackSrc } from './img-utils.js'
 export async function SearchResults() {
 	const { shipId: currentShipId, search } = shipDataStorage.getStore()
 	const shipResults = await searchShips({ search })
-	return shipResults.ships.map(ship => {
+	return shipResults.ships.map((ship) => {
 		const href = [
 			`/${ship.id}`,
 			search ? `search=${encodeURIComponent(search)}` : null,
