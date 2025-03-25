@@ -48,9 +48,9 @@
     "git": ">=2.18.0"
   },
   "devDependencies": {
-    "@epic-web/config": "^1.16.3",
-    "eslint": "^9.16.0",
-    "prettier": "^3.4.2"
+    "@epic-web/config": "^1.18.2",
+    "eslint": "^9.23.0",
+    "prettier": "^3.5.3"
   },
   "prettier": "@epic-web/config/prettier"
 }
