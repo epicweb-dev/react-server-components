@@ -1,5 +1,5 @@
 // 🐨 you'll want to import Suspense from react
-import { /* Suspense */, Fragment, createElement as h } from 'react'
+import { /* Suspense, */ Fragment, createElement as h } from 'react'
 import {
 	ShipDetails,
 	// 💰 you'll want this:
