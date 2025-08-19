@@ -102,9 +102,10 @@ function Root() {
 			if (!contentCache.has(historyKey)) {
 				// if we don't have this key in the cache already, set it now
 				contentCache.set(historyKey, nextContentPromise)
+				startTransition(() => updateContentKey(historyKey))
+			} else {
+				updateContentKey(historyKey)
 			}
-
-			updateContentKey(historyKey)
 		}
 		window.addEventListener('popstate', handlePopState)
 		return () => window.removeEventListener('popstate', handlePopState)

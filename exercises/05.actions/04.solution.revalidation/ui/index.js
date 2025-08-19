@@ -96,9 +96,10 @@ function Root() {
 				const fetchPromise = fetchContent(nextLocation)
 				const nextContentPromise = createFromFetch(fetchPromise)
 				contentCache.set(historyKey, nextContentPromise)
+				startTransition(() => updateContentKey(historyKey))
+			} else {
+				updateContentKey(historyKey)
 			}
-
-			updateContentKey(historyKey)
 		}
 		window.addEventListener('popstate', handlePopState)
 		return () => window.removeEventListener('popstate', handlePopState)
