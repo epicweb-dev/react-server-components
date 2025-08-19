@@ -61,6 +61,7 @@ function Root() {
 
 			// 🐨 change this to setContentKey(historyKey)
 			startTransition(() => setContentPromise(nextContentPromise))
+			// 🐨 otherwise, setContentKey(historyKey) directly (no transition needed)
 		}
 		window.addEventListener('popstate', handlePopState)
 		return () => window.removeEventListener('popstate', handlePopState)
