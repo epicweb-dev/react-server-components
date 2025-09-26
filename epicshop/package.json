@@ -4,12 +4,12 @@
     "test": "node test.js"
   },
   "dependencies": {
-    "@epic-web/workshop-app": "^6.33.0",
+    "@epic-web/workshop-app": "^6.35.1",
     "enquirer": "^2.4.1",
     "execa": "^9.5.2",
     "match-sorter": "^8.0.0",
     "p-limit": "^6.2.0",
-    "@epic-web/workshop-cli": "^6.33.0",
-    "@epic-web/workshop-utils": "^6.33.0"
+    "@epic-web/workshop-cli": "^6.35.1",
+    "@epic-web/workshop-utils": "^6.35.1"
   }
 }
