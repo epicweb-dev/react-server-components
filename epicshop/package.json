@@ -4,10 +4,10 @@
     "test": "node test.js"
   },
   "dependencies": {
-    "@epic-web/workshop-app": "^6.47.6",
-    "@epic-web/workshop-utils": "^6.47.6",
+    "@epic-web/workshop-app": "^6.47.9",
+    "@epic-web/workshop-utils": "^6.47.9",
     "enquirer": "^2.4.1",
-    "epicshop": "^6.47.6",
+    "epicshop": "^6.47.9",
     "execa": "^9.5.2",
     "match-sorter": "^8.0.0",
     "p-limit": "^6.2.0"
