@@ -30,7 +30,7 @@
     "start": "pkgmgrx --prefix ./epicshop epicshop start",
     "dev": "pkgmgrx --prefix ./epicshop epicshop start",
     "test": "node ./epicshop/test.js",
-    "setup": "node ./epicshop/setup.js",
+    "setup": "pkgmgrx epicshop setup",
     "setup:custom": "node ./epicshop/setup-custom.js",
     "format": "prettier --write .",
     "lint": "eslint ."
