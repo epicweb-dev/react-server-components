@@ -7,9 +7,9 @@ import { createElement as h } from 'react'
 // import { useSpinDelay } from './spin-delay.js'
 
 export function ShipDetailsPendingTransition({ children }) {
-	// 🐨 get the location, nextLocation, and isPending from useRouter
-	// 🐨 the details are pending if isPending is true and the shipId of the
-	// nextLocation differs from the shipId of the current location
+	// 🐨 get the location and nextLocation from useRouter
+	// 🐨 the details are pending if the shipId of the nextLocation differs from
+	// the shipId of the current location
 	// 💰 use parseLocationState to get the shipId.
 	// 💯 for extra credit, avoid a flash of loading state with useSpinDelay
 	const isShipDetailsPending = false

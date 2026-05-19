@@ -20,10 +20,8 @@ Then we'll change our `location` to be a `nextLocation` and then use
 `useDeferredValue` to get the `location` so that it remains unchanged until the
 transition is complete.
 
-Then we can add `isPending`, `nextLocation`, and `location` to our router
-context. Compare `nextLocation` with `location` to see which part of the URL is
-changing, and combine that with `isPending` so we only show pending UI while a
-transition is actually in progress.
+Then we can add the `isPending` and `nextLocation` to our router context and use
+that to determine pending states for our UI.
 
 🧝‍♂️ You're going to want to use the `parseLocationState` utility I made for this
 one. Here's how it works:

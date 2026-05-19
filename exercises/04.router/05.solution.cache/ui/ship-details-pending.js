@@ -5,11 +5,10 @@ import { parseLocationState, useRouter } from './router.js'
 import { useSpinDelay } from './spin-delay.js'
 
 export function ShipDetailsPendingTransition({ children }) {
-	const { location, nextLocation, isPending } = useRouter()
+	const { location, nextLocation } = useRouter()
 	const isShipDetailsPending = useSpinDelay(
-		isPending &&
-			parseLocationState(nextLocation).shipId !==
-				parseLocationState(location).shipId,
+		parseLocationState(nextLocation).shipId !==
+			parseLocationState(location).shipId,
 		{ delay: 300, minDuration: 350 },
 	)
 

@@ -43,7 +43,7 @@ function Root() {
 	const [nextLocation, setNextLocation] = useState(getGlobalLocation)
 	// 🐨 change this to contentKey
 	const [contentPromise, setContentPromise] = useState(initialContentPromise)
-	const [isPending, startTransition] = useTransition()
+	const [, startTransition] = useTransition()
 
 	const location = useDeferredValue(nextLocation)
 	// 🐨 get the contentPromise from the contentCache by the contentKey
@@ -102,7 +102,6 @@ function Root() {
 				navigate,
 				location,
 				nextLocation,
-				isPending,
 			},
 		},
 		use(contentPromise),

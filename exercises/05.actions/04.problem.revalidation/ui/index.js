@@ -80,7 +80,7 @@ function Root() {
 	const contentCache = useContentCache()
 	const [nextLocation, setNextLocation] = useState(getGlobalLocation)
 	const [contentKey, setContentKey] = useState(initialContentKey)
-	const [isPending, startTransition] = useTransition()
+	const [, startTransition] = useTransition()
 
 	// 🐨 add a useEffect here that reassigns updateContentKey to a function that
 	// accepts a newContentKey and calls setContentKey(newContentKey) in a startTransition
@@ -141,7 +141,6 @@ function Root() {
 				navigate,
 				location,
 				nextLocation,
-				isPending,
 			},
 		},
 		use(contentPromise).root,

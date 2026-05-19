@@ -32,7 +32,7 @@ function Root() {
 	// 🐨 create a latestNav ref here which you can initialize to null if you like
 	const [nextLocation, setNextLocation] = useState(getGlobalLocation)
 	const [contentPromise, setContentPromise] = useState(initialContentPromise)
-	const [isPending, startTransition] = useTransition()
+	const [, startTransition] = useTransition()
 
 	const location = useDeferredValue(nextLocation)
 
@@ -65,7 +65,6 @@ function Root() {
 				navigate,
 				location,
 				nextLocation,
-				isPending,
 			},
 		},
 		use(contentPromise),
