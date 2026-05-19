@@ -53,7 +53,7 @@ function Root() {
 	const contentCache = useContentCache()
 	const [nextLocation, setNextLocation] = useState(getGlobalLocation)
 	const [contentKey, setContentKey] = useState(initialContentKey)
-	const [isPending, startTransition] = useTransition()
+	const [, startTransition] = useTransition()
 
 	const location = useDeferredValue(nextLocation)
 	const contentPromise = contentCache.get(contentKey)
@@ -108,7 +108,6 @@ function Root() {
 				navigate,
 				location,
 				nextLocation,
-				isPending,
 			},
 		},
 		// 🐨 the contentPromise is now an object with a root property, update this

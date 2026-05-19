@@ -13,15 +13,15 @@ To be able to do this effectively, we need a few things:
    is changing
 
 We've already got our transition wrapped in a `startTransition`, but this is the
-global one from `react`. We need to use one from `useTransition` instead so we
-get access to the `isPending` state.
+global one from `react`. We need to use one from `useTransition` instead so our
+navigation updates are marked as transitions.
 
 Then we'll change our `location` to be a `nextLocation` and then use
 `useDeferredValue` to get the `location` so that it remains unchanged until the
 transition is complete.
 
-Then we can add the `isPending` and `nextLocation` to our router context and use
-that to determine pending states for our UI.
+Then we can add `nextLocation` to our router context and compare it with
+`location` to determine pending states for our UI.
 
 🧝‍♂️ You're going to want to use the `parseLocationState` utility I made for this
 one. Here's how it works:
