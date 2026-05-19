@@ -8,10 +8,10 @@ import { mergeLocationState, useRouter } from './router.js'
 // import { useSpinDelay } from './spin-delay.js'
 
 export function ShipSearch({ search, results, fallback }) {
-	// 🐨 get the nextLocation here
+	// 🐨 get the nextLocation and isPending here
 	const { navigate, location } = useRouter()
-	// 🐨 we're pending if the nextLocation's search is different from the current
-	// location's search
+	// 🐨 we're pending if isPending is true and the nextLocation's search is
+	// different from the current location's search
 	// 💰 you'll want to use parseLocationState for this
 	// 💯 for extra credit, avoid a flash of loading state with useSpinDelay
 	const isShipSearchPending = false

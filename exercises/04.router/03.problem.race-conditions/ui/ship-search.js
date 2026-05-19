@@ -6,10 +6,11 @@ import { parseLocationState, mergeLocationState, useRouter } from './router.js'
 import { useSpinDelay } from './spin-delay.js'
 
 export function ShipSearch({ search, results, fallback }) {
-	const { navigate, location, nextLocation } = useRouter()
+	const { navigate, location, nextLocation, isPending } = useRouter()
 	const isShipSearchPending = useSpinDelay(
-		parseLocationState(nextLocation).search !==
-			parseLocationState(location).search,
+		isPending &&
+			parseLocationState(nextLocation).search !==
+				parseLocationState(location).search,
 		{ delay: 300, minDuration: 350 },
 	)
 

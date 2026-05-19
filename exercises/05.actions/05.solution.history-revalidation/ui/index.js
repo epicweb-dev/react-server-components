@@ -73,7 +73,7 @@ function Root() {
 	const contentCache = useContentCache()
 	const [nextLocation, setNextLocation] = useState(getGlobalLocation)
 	const [contentKey, setContentKey] = useState(initialContentKey)
-	const [, startTransition] = useTransition()
+	const [isPending, startTransition] = useTransition()
 
 	// set the updateContentKey function in a useEffect to avoid issues with
 	// concurrent rendering (useDeferredValue will create throw-away renders).
@@ -142,6 +142,7 @@ function Root() {
 				navigate,
 				location,
 				nextLocation,
+				isPending,
 			},
 		},
 		use(contentPromise).root,

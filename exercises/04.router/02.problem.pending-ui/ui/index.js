@@ -32,7 +32,7 @@ function Root() {
 	// 🐨 change this to nextLocation
 	const [location, setLocation] = useState(initialLocation)
 	const [contentPromise, setContentPromise] = useState(initialContentPromise)
-	// 🐨 call useTransition here to get startTransition
+	// 🐨 call useTransition here to get isPending and startTransition
 
 	// 🐨 create a location variable set to useDeferredValue of the nextLocation
 
@@ -61,7 +61,7 @@ function Root() {
 			value: {
 				navigate,
 				location,
-				// 🐨 add the nextLocation to this context value
+				// 🐨 add the nextLocation and isPending to this context value
 			},
 		},
 		use(contentPromise),
