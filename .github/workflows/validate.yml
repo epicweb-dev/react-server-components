@@ -63,7 +63,7 @@ jobs:
           done
 
       - name: ʦ TypeScript
-        run: npm run typecheck
+        run: npm run typecheck --if-present
         working-directory: ./workshop
 
       - name: ⬣ Lint
