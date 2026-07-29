@@ -12,7 +12,7 @@ test('should display the home page and perform client-side routing', async ({
 	})
 
 	// Wait for the streamed search results to replace placeholder "#" links.
-	const firstLink = page.locator('a[href*="shipId="]').first()
+	const firstLink = page.locator('a[href^="/"]').first()
 	await firstLink.waitFor()
 
 	// Get the href attribute of the first link
