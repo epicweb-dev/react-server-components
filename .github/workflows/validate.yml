@@ -83,27 +83,16 @@ jobs:
       - name: ⎔ Setup node
         uses: actions/setup-node@v4
         with:
-          node-version: 26
+          # Playwright 1.51's browser install and test runner hang under Node 26.
+          # The setup matrix above still validates the workshop under Node 26.
+          node-version: 22
 
       - name: 📦 Install dependencies
         run: npm ci
 
-      # Playwright 1.51 hangs while extracting Chromium under Node 26.
-      - name: ⎔ Use Node 22 for Playwright installation
-        if: ${{ hashFiles('epicshop/test.js') != '' }}
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
       - name: 🎭 Install Playwright browser
         if: ${{ hashFiles('epicshop/test.js') != '' }}
         run: npx playwright install --with-deps chromium
-
-      - name: ⎔ Restore Node 26
-        if: ${{ hashFiles('epicshop/test.js') != '' }}
-        uses: actions/setup-node@v4
-        with:
-          node-version: 26
 
       - name: ◭ Generate Prisma clients
         if: ${{ hashFiles('epicshop/test.js') != '' }}
