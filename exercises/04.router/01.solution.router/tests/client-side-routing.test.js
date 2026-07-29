@@ -11,11 +11,9 @@ test('should display the home page and perform client-side routing', async ({
 		reloadCount++
 	})
 
-	// Wait for the page to load
-	await page.waitForSelector('a')
-
-	// Get the first link
-	const firstLink = await page.locator('a').first()
+	// Wait for the streamed search results to replace placeholder "#" links.
+	const firstLink = page.locator('a[href^="/"]').first()
+	await firstLink.waitFor()
 
 	// Get the href attribute of the first link
 	const href = await firstLink.getAttribute('href')

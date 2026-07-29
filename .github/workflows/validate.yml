@@ -92,7 +92,9 @@ jobs:
       - name: ⎔ Setup node
         uses: actions/setup-node@v4
         with:
-          node-version: 26
+          # Playwright 1.51's browser install and test runner hang under Node 26.
+          # The setup matrix above still validates the workshop under Node 26.
+          node-version: 22
 
       - name: 📦 Install dependencies
         run: npm ci
