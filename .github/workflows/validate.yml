@@ -83,7 +83,8 @@ jobs:
 
   tests:
     name: 🧪 Test
-    timeout-minutes: 15
+    # Browser installation plus solution-app tests can exceed the setup budget.
+    timeout-minutes: 30
     runs-on: ubuntu-latest
     steps:
       - name: ⬇️ Checkout repo
@@ -92,9 +93,7 @@ jobs:
       - name: ⎔ Setup node
         uses: actions/setup-node@v4
         with:
-          # Playwright 1.51's browser install and test runner hang under Node 26.
-          # The setup matrix above still validates the workshop under Node 26.
-          node-version: 22
+          node-version: 26
 
       - name: 📦 Install dependencies
         run: npm ci
